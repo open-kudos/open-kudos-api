@@ -1,70 +1,16 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 apply plugin: 'war'
 apply plugin: 'jetty'
 apply plugin: 'eclipse-wtp'
 
 repositories {
-   mavenCentral()
-}
-
-dependencies {
-   providedCompile 'javax.servlet:servlet-api:2.5'
-   compile 'org.springframework:spring-webmvc:3.2.2.RELEASE'
-   runtime 'javax.servlet:jstl:1.1.2'
-}
-
-/* Change context path (base url). otherwise defaults to name of project */
-jettyRunWar.contextPath = '' 
-=======
-=======
->>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
-buildscript {
-    ext {
-        springBootVersion = '1.2.5.RELEASE'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'spring-boot' 
-
-jar {
-    baseName = 'open-kudos-app'
-    version = '0.0.1-SNAPSHOT'
-}
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
     mavenCentral()
 }
 
-
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter")
-	compile("org.springframework:spring-webmvc:4.1.7.RELEASE")
-    testCompile("org.springframework.boot:spring-boot-starter-test") 
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    compile 'org.springframework:spring-webmvc:3.2.2.RELEASE'
+    runtime 'javax.servlet:jstl:1.1.2'
 }
 
-eclipse {
-    classpath {
-         containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-         containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
-    }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
-}
-<<<<<<< HEAD
->>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
-=======
->>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
+/* Change context path (base url). otherwise defaults to name of project */
+jettyRunWar.contextPath = ''
