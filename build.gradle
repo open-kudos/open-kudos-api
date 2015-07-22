@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 apply plugin: 'war'
 apply plugin: 'jetty'
 apply plugin: 'eclipse-wtp'
@@ -16,6 +17,8 @@ dependencies {
 /* Change context path (base url). otherwise defaults to name of project */
 jettyRunWar.contextPath = '' 
 =======
+=======
+>>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
 buildscript {
     ext {
         springBootVersion = '1.2.5.RELEASE'
@@ -61,4 +64,7 @@ eclipse {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
+<<<<<<< HEAD
+>>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
+=======
 >>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
