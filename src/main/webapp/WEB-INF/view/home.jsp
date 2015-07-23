@@ -1,8 +1,17 @@
 <!DOCTYPE HTML>
-<html>
-  <form action="demo_form.asp">
-    First name: <input type="text" name="fname"><br>
-    Last name: <input type="text" name="lname"><br>
-    <input type="submit" value="Submit">
-  </form>
-</html>
+    <html>
+        <head>
+            <title>Login</title>
+        </head>
+        <body>
+            <div class="form-group form">
+                <form action='home' method="post">
+                    <div>
+                       <label>User name: ${userId} password: ${password}</label>
+                    </div>
+                    <button id="loginButton" class="form-control">Log Out</button>
+                    </form>
+                </div>
+            </div>
+        </body>
+    </html>
