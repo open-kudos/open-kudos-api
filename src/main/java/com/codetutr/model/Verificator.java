@@ -9,6 +9,8 @@ import java.util.Map;
 public class Verificator {
 
     private static Map userList = new HashMap<String, User>();
+    public static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
+    "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     public static User getUser(String email){
 

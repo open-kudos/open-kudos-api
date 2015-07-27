@@ -79,7 +79,7 @@ public class UserForm {
         public void validate(Object target, Errors errors) {
             UserForm form = (UserForm) target;
             if (!form.getPassword().equals(form.getConfirmPassword())) {
-                errors.rejectValue("confirmPassword", "no.match");
+                errors.rejectValue("confirmPassword","no.match.password");
             }
         }
     }
