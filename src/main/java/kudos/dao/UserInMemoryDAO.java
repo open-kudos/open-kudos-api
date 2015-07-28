@@ -2,6 +2,7 @@ package kudos.dao;
 
 import com.google.common.base.Optional;
 import kudos.model.User;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 /**
  * Created by chc on 15.7.27.
  */
+@Repository
 public class UserInMemoryDAO implements UserDAO{
 
     private final static Map<String,User> USERS = new HashMap<String,User>();

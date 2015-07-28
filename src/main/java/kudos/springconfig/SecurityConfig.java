@@ -17,14 +17,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder builder, AuthenticationProvider authenticationProvider)
             throws Exception {
-        builder.inMemoryAuthentication()
-                .withUser("user").password("password").roles("USER");
+        System.out.println("this");
+        builder.authenticationProvider(authenticationProvider);
+
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.authorizeRequests().antMatchers("/user/home").hasRole("USER");
+        http.csrf().disable().authorizeRequests().antMatchers("/user/home").hasRole("USER");
 
     }
 }
