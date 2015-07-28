@@ -1,31 +1,12 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-*.class
-*.jar
-*.war
-*.ear
 .idea
 .DS_Store
-
 bin
 build
-
 .settings
 .gradle
-
 .classpath
-
-.project
-=======
-=======
->>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
 build
+.project
 open-kudos.iml
 open-kudos.iws
 open-kudos.ipr
-<<<<<<< HEAD
-.gradle
->>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c
-=======
-.gradle
->>>>>>> 49c3fa4b1fcbb3504e817d6ef4cc8e9a5ddb800c

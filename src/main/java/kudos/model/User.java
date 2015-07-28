@@ -17,7 +17,7 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getUserPassword(){
+    public String getPassword(){
         return this.password;
     }
 
@@ -25,11 +25,11 @@ public class User {
         return this.email;
     }
 
-    public String getUserFirstName(){
+    public String getFirstName(){
         return this.firstName;
     }
 
-    public String getUserLastName(){
+    public String getLastName(){
         return this.lastName;
     }
 

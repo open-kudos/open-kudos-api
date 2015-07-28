@@ -7,9 +7,7 @@
     </head>
     <body>
         <div class="container">
-
-            <form:form method="post" modelAttribute="form" action = "registration">
-
+            <form:form method="post" modelAttribute="form" action="/user/registration">
                 <div>
 
                     <label>Email</label>

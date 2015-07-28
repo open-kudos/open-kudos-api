@@ -1,5 +1,6 @@
 package kudos.dao;
 
+import com.google.common.base.Optional;
 import kudos.model.User;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface UserDAO {
 
-    User getUserByEmail(String email);
+    Optional<User> getUserByEmail(String email);
 
     User create(User user);
 
