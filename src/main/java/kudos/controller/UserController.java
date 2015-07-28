@@ -26,7 +26,6 @@ public class UserController extends BaseController {
 
     @RequestMapping(value="/registration", method = RequestMethod.GET)
     public String registration(Model model) {
-        System.out.println("started");
         model.addAttribute("form", new UserForm());
         return "registration";
     }
@@ -47,8 +46,6 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String login(@RequestParam String email, @RequestParam String password) {
-
-
         return "redirect:/user/home";
     }
 
