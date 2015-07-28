@@ -1,9 +1,8 @@
-package com.codetutr.model;
+package kudos.model;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springmodules.validation.bean.conf.loader.annotation.handler.Email;
 import org.springmodules.validation.bean.conf.loader.annotation.handler.NotBlank;
 
@@ -70,6 +69,9 @@ public class UserForm {
 
     public static class FormValidator implements Validator {
 
+        private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
+                "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
         @Override
         public boolean supports(Class clazz) {
             return UserForm.class.equals(clazz);
@@ -79,8 +81,17 @@ public class UserForm {
         public void validate(Object target, Errors errors) {
             UserForm form = (UserForm) target;
             if (!form.getPassword().equals(form.getConfirmPassword())) {
-                errors.rejectValue("confirmPassword","no.match.password");
+                errors.rejectValue("confirmPassword", "no.match.password");
             }
+
+            if (StringUtils.isEmpty(form.getEmail())) {
+                errors.rejectValue("email", "required.email");
+            }
+
+            if(!form.getEmail().matches(EMAIL_PATTERN)){
+                errors.rejectValue("email","incorrect.email");
+            }
+
         }
     }
 }

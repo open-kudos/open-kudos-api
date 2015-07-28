@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns:p="http://www.springframework.org/schema/p"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
   <servlet>
     <servlet-name>sample</servlet-name>
@@ -14,7 +13,7 @@
     </init-param>
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>com.codetutr.springconfig</param-value>
+      <param-value>kudos.springconfig</param-value>
     </init-param>
   </servlet>
 
@@ -22,9 +21,5 @@
     <servlet-name>sample</servlet-name>
     <url-pattern>/</url-pattern>
   </servlet-mapping>
-
-    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-        <property name="basename" value="/WEB-INF/messages"/>
-    </bean>
 
 </web-app>

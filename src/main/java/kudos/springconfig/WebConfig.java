@@ -1,5 +1,7 @@
-package com.codetutr.springconfig;
+package kudos.springconfig;
 
+import kudos.dao.UserDAO;
+import kudos.dao.UserInMemoryDAO;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,7 +14,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages="com.codetutr.controller")
+@ComponentScan(basePackages="kudos.controller")
 public class WebConfig {
 
 	@Bean
@@ -28,6 +30,11 @@ public class WebConfig {
 		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 		messageSource.setBasename("/WEB-INF/messages");
 		return messageSource;
+	}
+
+	@Bean
+	public UserDAO userDAO() {
+		return new UserInMemoryDAO();
 	}
 
 }

@@ -12,22 +12,22 @@
 
                             <div>
 
-                                <label>Your email is: {email}</label>
+                                <label>Your email is: ${email}</label>
 
                             </div>
                             <div>
 
-                                <label>Your name is: {name}</label>
+                                <label>Your name is: ${name}</label>
 
                             </div>
                             <div>
 
-                                <label>Your surname is: {surname}</label>
+                                <label>Your surname is: ${surname}</label>
 
                             </div>
                             <div>
 
-                                <label>Your password is: {password}</label>
+                                <label>Your password is: ${password}</label>
 
                             </div>
                             <div>

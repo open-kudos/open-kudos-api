@@ -1,4 +1,4 @@
-package com.codetutr.model;
+package kudos.model;
 
 /**
  * Created by chc on 15.7.23.
