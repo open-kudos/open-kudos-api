@@ -1,6 +1,8 @@
 package kudos.controller;
 ;
+import com.google.common.base.Optional;
 import kudos.dao.UserDAO;
+import kudos.model.User;
 import kudos.model.UserForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,12 +37,12 @@ public class UserController extends BaseController {
     public String registration(@ModelAttribute("form") UserForm userForm, Errors errors) {
         new UserForm.FormValidator().validate(userForm, errors);
 
-        if (userDAO.getUserByEmail(userForm.getEmail()) != null || errors.hasFieldErrors()) {
-            errors.rejectValue("email", "email.occupied");
+        try {
+            userDAO.create(userForm.toUser());
+        } catch (IllegalStateException e){
+            errors.rejectValue("email","email.occupied");
             return "registration";
         }
-
-        userDAO.create(userForm.toUser());
         return "redirect:/user/registration-confirm";
     }
 
@@ -56,7 +58,6 @@ public class UserController extends BaseController {
 
     @RequestMapping(value="/registration-confirm", method = RequestMethod.GET)
     public String registrationConfirm() {
-
         return "registration-confirm";
     }
 
