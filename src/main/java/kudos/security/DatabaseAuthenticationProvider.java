@@ -3,7 +3,9 @@ package kudos.security;
 import com.google.common.base.Optional;
 import kudos.dao.UserDAO;
 import kudos.model.User;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,11 +25,12 @@ import java.util.List;
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDAO userDAO;
+    private static Logger LOG = Logger.getLogger(DatabaseAuthenticationProvider.class.getName());
 
     @Autowired
     public DatabaseAuthenticationProvider(UserDAO userDAO) {
         this.userDAO = userDAO;
-        System.out.println("authentication has been created");
+        LOG.warn("DatabaseAuthenticationProvider has been created");
     }
 
     @Override
@@ -36,11 +39,11 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         Optional<User> user = userDAO.getUserByEmail(name);
-        System.out.println("authentication has started");
+        LOG.warn("authentication has started");
         if (user.isPresent() && password.equals(user.get().getPassword())) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
-            grantedAuths.add(new SimpleGrantedAuthority("USER"));
-            System.out.println("authentication has been given");
+            grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
+            LOG.warn("authentication has been given");
             return new UsernamePasswordAuthenticationToken(name, password, grantedAuths);
         } else {
             return null;

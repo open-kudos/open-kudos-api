@@ -4,12 +4,17 @@ import com.google.common.base.Optional;
 import kudos.dao.UserDAO;
 import kudos.model.User;
 import kudos.model.UserForm;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 
 /**
@@ -18,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/user")
 public class UserController extends BaseController {
+
+    private static Logger LOG = Logger.getLogger(UserController.class.getName());
 
     UserDAO userDAO;
 
@@ -52,7 +59,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value="/home", method = RequestMethod.GET)
-    public String home(Model model) {
+    public String home(Model model, Principal principal) {
+        LOG.warn(principal.getName());
         return "home";
     }
 
@@ -60,6 +68,5 @@ public class UserController extends BaseController {
     public String registrationConfirm() {
         return "registration-confirm";
     }
-
 
 }

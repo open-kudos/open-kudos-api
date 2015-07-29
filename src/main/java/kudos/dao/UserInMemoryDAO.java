@@ -13,7 +13,7 @@ import java.util.Map;
 @Repository
 public class UserInMemoryDAO implements UserDAO{
 
-    private final static Map<String,User> USERS = new HashMap<String,User>();
+    private static Map<String,User> USERS = new HashMap<String,User>();
 
     @Override
     public Optional<User> getUserByEmail(String email) {
