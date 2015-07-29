@@ -53,11 +53,6 @@ public class UserController extends BaseController {
         return "redirect:/user/registration-confirm";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String login(@RequestParam String email, @RequestParam String password) {
-        return "redirect:/user/home";
-    }
-
     @RequestMapping(value="/registration-confirm", method = RequestMethod.GET)
     public String registrationConfirm() {
         return "registration-confirm";

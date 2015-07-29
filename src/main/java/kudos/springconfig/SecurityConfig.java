@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 
 
 @Configuration
@@ -30,8 +30,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-       LOG.warn("configure");
-        http.csrf().disable().formLogin().loginPage("/index").failureUrl("/user/registration").usernameParameter("email")
-                .passwordParameter("password").defaultSuccessUrl("/user/home").and().authorizeRequests().antMatchers("/user/home").hasRole("USER");
+        LOG.warn("configure");
+
+        http.csrf().disable().authorizeRequests().antMatchers("/home").hasRole("USER")
+                .and().exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+                .and().formLogin().loginPage("/login").failureUrl("/login?error")
+                .usernameParameter("email").passwordParameter("password").defaultSuccessUrl("/home")
+                .and().authorizeRequests().antMatchers("/home").authenticated()
+                .and().logout().logoutSuccessUrl("/home");
     }
 }

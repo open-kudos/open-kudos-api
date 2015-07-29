@@ -4,20 +4,26 @@ import com.google.common.base.Optional;
 import kudos.dao.UserDAO;
 import kudos.dao.UserInMemoryDAO;
 import kudos.model.User;
+import kudos.model.UserForm;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpSession;
 import java.security.Principal;
+import java.util.Map;
 
 /**
  * Created by chc on 15.7.29.
  */
 @Controller
-@RequestMapping("/user")
 public class HomeController {
 
     Logger LOG = Logger.getLogger(HomeController.class.getName());
@@ -44,15 +50,31 @@ public class HomeController {
             LOG.warn("password is: " + user.getPassword());
 
             model.addAttribute("surname", user.getLastName());
-            LOG.warn("surname is: "+user.getLastName());
+            LOG.warn("surname is: " + user.getLastName());
 
         return "home";
     }
 
     @RequestMapping(value="/home", method = RequestMethod.POST)
-    public String showLogin(){
+    public String logout(HttpSession session){
         LOG.warn("Logging out");
+        session.invalidate();
         return "redirect:/";
+    }
+
+    @RequestMapping(value="/", method = RequestMethod.GET)
+    public String redirectToLogin() {
+        return "redirect:/login";
+    }
+
+    @RequestMapping(value="/login", method = RequestMethod.GET)
+    public String login(@RequestParam(value = "error", required = false) String error, Model model) {
+        LOG.warn("login method has been called");
+        if(error != null){
+            LOG.warn("there is error that must be add, it is: "+error.toString());
+            model.addAttribute("error","The email and (or) username are incorrect!");
+        }
+        return "login";
     }
 
 }
