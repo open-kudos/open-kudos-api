@@ -33,14 +33,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
        LOG.warn("configure");
         http.csrf().disable().formLogin().loginPage("/index").failureUrl("/user/registration").usernameParameter("email")
                 .passwordParameter("password").defaultSuccessUrl("/user/home").and().authorizeRequests().antMatchers("/user/home").hasRole("USER");
-
-        /*http.csrf().disable().authorizeRequests()
-                .antMatchers("/user/home/").hasRole("USER")
-                .and()
-                .formLogin()
-                .loginPage("/").failureUrl("/user/register")
-                .usernameParameter("username")
-                .passwordParameter("password");*/
-
     }
 }

@@ -31,13 +31,28 @@ public class HomeController {
     }
 
     @RequestMapping(value="/home", method = RequestMethod.GET)
-    public String home(Model model, Principal principal) {
-        if(principal != null) {
+    public String showHome(Model model, Principal principal) {
             User user = userDAO.getUserByEmail(principal.getName()).get();
+
             model.addAttribute("email",user.getEmail());
-            model.addAttribute("username",user.getFirstName())
-        }
+            LOG.warn("username is: " + user.getEmail());
+
+            model.addAttribute("name", user.getFirstName());
+            LOG.warn("first name is: " + user.getFirstName());
+
+            model.addAttribute("password", user.getPassword());
+            LOG.warn("password is: " + user.getPassword());
+
+            model.addAttribute("surname", user.getLastName());
+            LOG.warn("surname is: "+user.getLastName());
+
         return "home";
+    }
+
+    @RequestMapping(value="/home", method = RequestMethod.POST)
+    public String showLogin(){
+        LOG.warn("Logging out");
+        return "redirect:/";
     }
 
 }
