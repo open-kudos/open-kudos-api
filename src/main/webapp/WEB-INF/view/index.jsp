@@ -8,7 +8,7 @@
         <div class="container">
             <div>
                 <h2>Login</h2>
-                <form action="/user/login" method="post">
+                <form action="/index" method="post">
                     <div>
                         <input type="text" name="email" placeHolder="email"/>
                     </div>

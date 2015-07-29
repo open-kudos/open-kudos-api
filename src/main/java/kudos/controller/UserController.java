@@ -58,12 +58,6 @@ public class UserController extends BaseController {
         return "redirect:/user/home";
     }
 
-    @RequestMapping(value="/home", method = RequestMethod.GET)
-    public String home(Model model, Principal principal) {
-        LOG.warn(principal.getName());
-        return "home";
-    }
-
     @RequestMapping(value="/registration-confirm", method = RequestMethod.GET)
     public String registrationConfirm() {
         return "registration-confirm";

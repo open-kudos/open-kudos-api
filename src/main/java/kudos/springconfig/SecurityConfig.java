@@ -31,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
        LOG.warn("configure");
-        http.csrf().disable().formLogin().loginPage("/user/login").failureUrl("/user/registration").usernameParameter("email")
+        http.csrf().disable().formLogin().loginPage("/index").failureUrl("/user/registration").usernameParameter("email")
                 .passwordParameter("password").defaultSuccessUrl("/user/home").and().authorizeRequests().antMatchers("/user/home").hasRole("USER");
 
         /*http.csrf().disable().authorizeRequests()
