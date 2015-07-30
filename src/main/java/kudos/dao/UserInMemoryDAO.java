@@ -14,12 +14,16 @@ import java.util.Map;
 @Repository
 public class UserInMemoryDAO implements UserDAO{
 
-    private static Map<String,User> USERS = new HashMap<String,User>();
+    private Map<String,User> users = new HashMap<String,User>();
+
+    {
+        create(new User("user", "user", "user", "user"));
+    }
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        if (USERS.containsKey(email)) {
-            return Optional.of(USERS.get(email));
+        if (users.containsKey(email)) {
+            return Optional.of(users.get(email));
         } else {
             return Optional.absent();
         }
@@ -34,7 +38,7 @@ public class UserInMemoryDAO implements UserDAO{
 
         user.setEncryptedPassword(new StrongPasswordEncryptor().encryptPassword(user.getPassword()));
 
-        USERS.put(user.getEmail(),user);
+        users.put(user.getEmail(), user);
 
         return user;
     }
@@ -46,7 +50,7 @@ public class UserInMemoryDAO implements UserDAO{
             throw new IllegalStateException("User does not exist");
         }
 
-        USERS.put(user.getEmail(), user);
+        users.put(user.getEmail(), user);
 
         return user;
     }

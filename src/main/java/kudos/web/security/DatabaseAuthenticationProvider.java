@@ -6,6 +6,7 @@ import kudos.model.User;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,14 +39,14 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
         Optional<User> user = userDAO.getUserByEmail(name);
 
-        if (user.isPresent() && new StrongPasswordEncryptor().checkPassword(password,user.get().getPassword())) {
+        if (user.isPresent() && new StrongPasswordEncryptor().checkPassword(password, user.get().getPassword())) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
 
             return new UsernamePasswordAuthenticationToken(name, password, grantedAuths);
-        } else {
-            return null;
         }
+        throw new AuthenticationCredentialsNotFoundException("email_password_mismatch");
+
     }
 
     @Override
