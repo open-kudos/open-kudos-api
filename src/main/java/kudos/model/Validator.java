@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by chc on 15.7.23.
  */
-public class Verificator {
+public class Validator {
 
     private static Map userList = new HashMap<String, User>();
 
