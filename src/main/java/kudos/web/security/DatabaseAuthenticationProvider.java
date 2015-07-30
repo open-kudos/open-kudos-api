@@ -29,7 +29,6 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
     @Autowired
     public DatabaseAuthenticationProvider(UserDAO userDAO) {
         this.userDAO = userDAO;
-        LOG.warn("DatabaseAuthenticationProvider has been created");
     }
 
     @Override
@@ -38,11 +37,11 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         Optional<User> user = userDAO.getUserByEmail(name);
-        LOG.warn("authentication has started");
+
         if (user.isPresent() && new StrongPasswordEncryptor().checkPassword(password,user.get().getPassword())) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
-            LOG.warn("authentication has been given, password is: "+password);
+
             return new UsernamePasswordAuthenticationToken(name, password, grantedAuths);
         } else {
             return null;
