@@ -20,12 +20,6 @@ public class UserController extends BaseController {
 
     private static Logger LOG = Logger.getLogger(UserController.class.getName());
 
-    UserDAO userDAO;
-
-    @Autowired
-    public UserController (UserDAO userDAO){
-        this.userDAO = userDAO;
-    }
 
     @RequestMapping(value="/registration", method = RequestMethod.GET)
     public String registration(Model model) {

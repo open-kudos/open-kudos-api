@@ -21,27 +21,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.Map;
 
 /**
  * Created by chc on 15.7.29.
  */
 @Controller
-public class HomeController {
+public class HomeController extends BaseController {
 
     Logger LOG = Logger.getLogger(HomeController.class.getName());
 
-    private final UserDAO userDAO;
-
-    @Autowired
-    public HomeController(UserDAO userDAO) {
-        this.userDAO = userDAO;
-        LOG.warn("HomeController has been created");
-    }
 
     @RequestMapping(value="/home", method = RequestMethod.POST)
     public String logout(HttpSession session) {
@@ -67,7 +58,7 @@ public class HomeController {
 
         return "home";
     }
-    
+
 
     @RequestMapping(value="/", method = RequestMethod.GET)
     public String redirectToLogin() {

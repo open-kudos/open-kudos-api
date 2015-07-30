@@ -10,9 +10,9 @@ import java.util.Map;
 /**
  * Created by chc on 15.7.23.
  */
-public class BaseController {
+public abstract class BaseController {
 
     @Autowired
-    protected UserDAO userDao;
+    protected UserDAO userDAO;
 
 }
