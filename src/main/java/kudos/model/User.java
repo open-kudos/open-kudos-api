@@ -33,4 +33,8 @@ public class User {
         return this.lastName;
     }
 
+    public void setEncryptedPassword(String password){
+        this.password = password;
+    }
+
 }

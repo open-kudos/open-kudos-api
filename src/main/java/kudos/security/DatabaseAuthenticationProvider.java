@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import kudos.dao.UserDAO;
 import kudos.model.User;
 import org.apache.log4j.Logger;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -40,10 +41,10 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
         Optional<User> user = userDAO.getUserByEmail(name);
         LOG.warn("authentication has started");
-        if (user.isPresent() && password.equals(user.get().getPassword())) {
+        if (user.isPresent() && new StrongPasswordEncryptor().checkPassword(password,user.get().getPassword())) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
-            LOG.warn("authentication has been given");
+            LOG.warn("authentication has been given, password is: "+password);
             return new UsernamePasswordAuthenticationToken(name, password, grantedAuths);
         } else {
             return null;

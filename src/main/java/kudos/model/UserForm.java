@@ -78,10 +78,24 @@ public class UserForm {
 
             if (Strings.isNullOrEmpty(form.getEmail())) {
                 errors.rejectValue("email", "required.email");
+            } else if(!form.getEmail().matches(EMAIL_PATTERN)){
+                errors.rejectValue("email","incorrect.email");
             }
 
-            if(!form.getEmail().matches(EMAIL_PATTERN)){
-                errors.rejectValue("email","incorrect.email");
+            if(Strings.isNullOrEmpty(form.getName())){
+                errors.rejectValue("name","name.not.specified");
+            }
+
+            if(Strings.isNullOrEmpty(form.getSurname())){
+                errors.rejectValue("surname","surname.not.specified");
+            }
+
+            if(Strings.isNullOrEmpty(form.getPassword())){
+                errors.rejectValue("password","password.not.specified");
+            }
+
+            if(Strings.isNullOrEmpty(form.getConfirmPassword())){
+                errors.rejectValue("confirmPassword","confirm.password.not.specified");
             }
 
         }

@@ -1,20 +1,14 @@
 package kudos.controller;
-;
-import com.google.common.base.Optional;
+
 import kudos.dao.UserDAO;
-import kudos.model.User;
 import kudos.model.UserForm;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 
 /**
@@ -42,20 +36,36 @@ public class UserController extends BaseController {
 
     @RequestMapping(value="/registration", method = RequestMethod.POST)
     public String registration(@ModelAttribute("form") UserForm userForm, Errors errors) {
+        LOG.warn("Status of errors before validation: " + errors.hasErrors());
         new UserForm.FormValidator().validate(userForm, errors);
+        LOG.warn("Status of errors after validation: " + errors.hasErrors());
+        if (!errors.hasErrors()) {
 
-        try {
-            userDAO.create(userForm.toUser());
-        } catch (IllegalStateException e){
-            errors.rejectValue("email","email.occupied");
+            try {
+                userDAO.create(userForm.toUser());
+                return "redirect:/user/registration-confirm";
+            }
+            catch(IllegalStateException e){
+                errors.rejectValue("email",e.getMessage());
+                return "registration";
+            }
+
+        }else {
             return "registration";
         }
-        return "redirect:/user/registration-confirm";
     }
 
     @RequestMapping(value="/registration-confirm", method = RequestMethod.GET)
     public String registrationConfirm() {
         return "registration-confirm";
+    }
+
+    @RequestMapping(value="/login-with-facebook", method = RequestMethod.GET)
+    public String loginWithFacebook() {
+
+
+
+        return "login-with-facebook";
     }
 
 }

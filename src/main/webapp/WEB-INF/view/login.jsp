@@ -22,6 +22,9 @@
             <div>
                 <a href="/user/registration">Please register here!<a/>
             </div>
+            <div>
+                <a href="user/login-with-facebook">Login with Facebook!<a/>
+            </div>
         </div>
     </body>
 </html>

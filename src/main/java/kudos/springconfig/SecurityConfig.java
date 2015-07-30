@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
 @Configuration
@@ -34,9 +35,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable().authorizeRequests().antMatchers("/home").hasRole("USER")
                 .and().exceptionHandling().authenticationEntryPoint(new Http403ForbiddenEntryPoint())
-                .and().formLogin().loginPage("/login").failureUrl("/login?error")
+                .and().formLogin().loginPage("/login").failureUrl("/login?error").loginProcessingUrl("/login")
                 .usernameParameter("email").passwordParameter("password").defaultSuccessUrl("/home")
                 .and().authorizeRequests().antMatchers("/home").authenticated()
-                .and().logout().logoutSuccessUrl("/home");
+                .and().logout().logoutSuccessUrl("/login?logout");
     }
 }

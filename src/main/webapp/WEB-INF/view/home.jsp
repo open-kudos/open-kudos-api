@@ -19,7 +19,7 @@
     </div>
 
     <form method="post">
-        <input type="submit" value="Logout">
+        <input type="submit" value="Logout" action = "/login?logout" >
     </form>
 
 </html>

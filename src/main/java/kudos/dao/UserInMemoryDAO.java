@@ -2,6 +2,7 @@ package kudos.dao;
 
 import com.google.common.base.Optional;
 import kudos.model.User;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -28,8 +29,10 @@ public class UserInMemoryDAO implements UserDAO{
     public User create(User user) {
         Optional<User> storedUser = getUserByEmail(user.getEmail());
         if (storedUser.isPresent()) {
-            throw new IllegalStateException("User email alredy occupied");
+            throw new IllegalStateException("email.occupied.email");
         }
+
+        user.setEncryptedPassword(new StrongPasswordEncryptor().encryptPassword(user.getPassword()));
 
         USERS.put(user.getEmail(),user);
 

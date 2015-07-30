@@ -5,11 +5,18 @@ import kudos.dao.UserDAO;
 import kudos.dao.UserInMemoryDAO;
 import kudos.model.User;
 import kudos.model.UserForm;
+import kudos.model.Validator;
+import kudos.springconfig.SecurityConfig;
 import org.apache.log4j.Logger;
+import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.jasypt.util.text.StrongTextEncryptor;
+import org.omg.SendingContext.RunTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,6 +43,12 @@ public class HomeController {
         LOG.warn("HomeController has been created");
     }
 
+    @RequestMapping(value="/home", method = RequestMethod.POST)
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
+
     @RequestMapping(value="/home", method = RequestMethod.GET)
     public String showHome(Model model, Principal principal) {
             User user = userDAO.getUserByEmail(principal.getName()).get();
@@ -54,13 +67,7 @@ public class HomeController {
 
         return "home";
     }
-
-    @RequestMapping(value="/home", method = RequestMethod.POST)
-    public String logout(HttpSession session){
-        LOG.warn("Logging out");
-        session.invalidate();
-        return "redirect:/";
-    }
+    
 
     @RequestMapping(value="/", method = RequestMethod.GET)
     public String redirectToLogin() {
@@ -68,7 +75,8 @@ public class HomeController {
     }
 
     @RequestMapping(value="/login", method = RequestMethod.GET)
-    public String login(@RequestParam(value = "error", required = false) String error, Model model) {
+    public String login(@RequestParam(value = "error", required = false) String error,
+                       Model model) {
         LOG.warn("login method has been called");
         if(error != null){
             LOG.warn("there is error that must be add, it is: "+error.toString());
