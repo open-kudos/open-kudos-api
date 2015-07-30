@@ -7,6 +7,8 @@ import kudos.model.User;
 import kudos.model.UserForm;
 import kudos.model.Validator;
 import kudos.springconfig.SecurityConfig;
+import kudos.web.model.IndexResponse;
+import kudos.web.model.Response;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jasypt.util.text.StrongTextEncryptor;
@@ -34,36 +36,32 @@ public class HomeController extends BaseController {
     Logger LOG = Logger.getLogger(HomeController.class.getName());
 
 
-    @RequestMapping(value="/home", method = RequestMethod.POST)
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
-    }
-
     @RequestMapping(value="/home", method = RequestMethod.GET)
     public String showHome(Model model, Principal principal) {
-            User user = userDAO.getUserByEmail(principal.getName()).get();
+        User user = userDAO.getUserByEmail(principal.getName()).get();
 
-            model.addAttribute("email",user.getEmail());
-            LOG.warn("username is: " + user.getEmail());
+        model.addAttribute("email",user.getEmail());
+        LOG.warn("username is: " + user.getEmail());
 
-            model.addAttribute("name", user.getFirstName());
-            LOG.warn("first name is: " + user.getFirstName());
+        model.addAttribute("name", user.getFirstName());
+        LOG.warn("first name is: " + user.getFirstName());
 
-            model.addAttribute("password", user.getPassword());
-            LOG.warn("password is: " + user.getPassword());
+        model.addAttribute("password", user.getPassword());
+        LOG.warn("password is: " + user.getPassword());
 
-            model.addAttribute("surname", user.getLastName());
-            LOG.warn("surname is: " + user.getLastName());
+        model.addAttribute("surname", user.getLastName());
+        LOG.warn("surname is: " + user.getLastName());
 
         return "home";
     }
 
-
     @RequestMapping(value="/", method = RequestMethod.GET)
-    public String redirectToLogin() {
-        return "redirect:/login";
+    public Response index(Principal principal) {
+        IndexResponse response = new IndexResponse();
+        response.setIsLogged(principal != null);
+        return response;
     }
+
 
     @RequestMapping(value="/login", method = RequestMethod.GET)
     public String login(@RequestParam(value = "error", required = false) String error,
