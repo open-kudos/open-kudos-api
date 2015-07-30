@@ -1,4 +1,4 @@
-package kudos.springconfig;
+package kudos.web.config;
 
 import com.google.common.collect.Lists;
 import kudos.web.servlet.JsonViewResolver;
@@ -22,7 +22,7 @@ import java.util.List;
 @EnableWebMvc
 @ComponentScan(basePackages="kudos")
 public class WebConfig extends WebMvcConfigurerAdapter {
-	
+
 	@Bean
 	public ViewResolver viewResolver() {
 		return new JsonViewResolver();

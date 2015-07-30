@@ -1,9 +1,7 @@
-package kudos.controller;
+package kudos.web.controller;
 
-import kudos.dao.UserDAO;
 import kudos.model.UserForm;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.ui.Model;

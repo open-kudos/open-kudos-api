@@ -1,30 +1,15 @@
-package kudos.controller;
+package kudos.web.controller;
 
-import com.google.common.base.Optional;
-import kudos.dao.UserDAO;
-import kudos.dao.UserInMemoryDAO;
 import kudos.model.User;
-import kudos.model.UserForm;
-import kudos.model.Validator;
-import kudos.springconfig.SecurityConfig;
 import kudos.web.model.IndexResponse;
 import kudos.web.model.Response;
 import org.apache.log4j.Logger;
-import org.jasypt.util.password.StrongPasswordEncryptor;
-import org.jasypt.util.text.StrongTextEncryptor;
-import org.omg.SendingContext.RunTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
 /**

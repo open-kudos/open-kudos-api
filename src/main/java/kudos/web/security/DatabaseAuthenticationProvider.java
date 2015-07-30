@@ -1,4 +1,4 @@
-package kudos.security;
+package kudos.web.security;
 
 import com.google.common.base.Optional;
 import kudos.dao.UserDAO;
@@ -6,14 +6,12 @@ import kudos.model.User;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;

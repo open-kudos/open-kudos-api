@@ -21,7 +21,7 @@
 
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>kudos.springconfig</param-value>
+    <param-value>kudos.web.config</param-value>
   </context-param>
 
   <listener>
@@ -37,7 +37,7 @@
     </init-param>
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>kudos.springconfig</param-value>
+      <param-value>kudos.web.config</param-value>
     </init-param>
   </servlet>
 

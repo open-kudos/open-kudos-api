@@ -1,4 +1,4 @@
-package kudos.controller;
+package kudos.web.controller;
 
 import kudos.dao.UserDAO;
 import kudos.model.User;
