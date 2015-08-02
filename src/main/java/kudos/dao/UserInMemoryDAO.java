@@ -54,4 +54,11 @@ public class UserInMemoryDAO implements UserDAO{
 
         return user;
     }
+
+    @Override
+    public void remove(String email){
+        if(getUserByEmail(email).isPresent()){
+            users.remove(email);
+        }
+    }
 }

@@ -14,4 +14,6 @@ public interface UserDAO {
     User create(User user);
 
     User update(User user);
+
+    void remove(String email);
 }
