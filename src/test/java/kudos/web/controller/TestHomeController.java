@@ -56,10 +56,10 @@ public class TestHomeController extends BaseMVCTest {
 
     @Test
     public void testRegistration() throws Exception {
-        postRegistration("mantttttas@gmail.com","Mantas","Damijonaitis","dmj","dmj","success");
+        postRegistration("mantttttasgmail.com","Mantas","Damijonaitis","dmj","dmj","success");
     }
 
-    private void postRegistration(String email, String name, String surname, String password, String confirmPassword, String status) throws Exception {
+    private void postRegistration(String email, String name, String surname, String password, String confirmPassword, String message) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/register")
                 .param("email",email)
                 .param("name",name)
@@ -67,7 +67,7 @@ public class TestHomeController extends BaseMVCTest {
                 .param("password",password)
                 .param("confirmPassword",confirmPassword))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.response.status",is(status)));
+        .andExpect(jsonPath("$.response.message",is(message)));
     }
 
     private void postLogin(String email, String password, String status, String message) throws Exception {

@@ -1,6 +1,7 @@
 package kudos.web.controller;
 
 import com.google.common.base.Strings;
+import jdk.nashorn.internal.ir.debug.JSONWriter;
 import kudos.dao.UserInMemoryDAO;
 import kudos.model.User;
 import kudos.model.UserForm;
@@ -10,6 +11,8 @@ import kudos.web.model.IndexResponse;
 import kudos.web.model.LoginResponse;
 import kudos.web.model.Response;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Created by chc on 15.7.29.
@@ -88,9 +92,20 @@ public class HomeController extends BaseController {
         if(!errors.hasErrors()) {
             return LoginResponse.success();
         } else {
-            return LoginResponse.fail("somewhat gone wrong");
+            JSONObject jsonObject = new JSONObject("{}");
+            JSONArray jsonArray = new JSONArray();
+            List errorsList = errors.getAllErrors();
+
+            for(Object error : errorsList){
+                jsonArray.put(error);
+            }
+
+            jsonObject.put("errorsArray",jsonArray);
+            return LoginResponse.fail(jsonArray.toString()+"ASSsas");
         }
     }
+
+
     /*
     @RequestMapping(value="/login", method = RequestMethod.GET)
     public String login(@RequestParam(value = "error", required = false) String error,
