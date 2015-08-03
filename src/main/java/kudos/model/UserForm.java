@@ -1,8 +1,15 @@
 package kudos.model;
 
 import com.google.common.base.Strings;
+import kudos.dao.UserDAO;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by chc on 15.7.23.
@@ -64,6 +71,8 @@ public class UserForm {
         private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
                 "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
+        public static final List<String> errorsList = new LinkedList<>();
+
         @Override
         public boolean supports(Class clazz) {
             return UserForm.class.equals(clazz);
@@ -71,31 +80,34 @@ public class UserForm {
 
         @Override
         public void validate(Object target, Errors errors) {
+
             UserForm form = (UserForm) target;
-            if (!form.getPassword().equals(form.getConfirmPassword())) {
+
+            if (form.getPassword() != null && form.getConfirmPassword() != null &&
+                    !form.getPassword().equals(form.getConfirmPassword())) {
                 errors.rejectValue("confirmPassword", "no.match.password");
             }
 
             if (Strings.isNullOrEmpty(form.getEmail())) {
                 errors.rejectValue("email", "required.email");
             } else if(!form.getEmail().matches(EMAIL_PATTERN)){
-                errors.rejectValue("email","incorrect.email");
+                errors.rejectValue("email", "incorrect.email");
             }
 
             if(Strings.isNullOrEmpty(form.getName())){
-                errors.rejectValue("name","name.not.specified");
+                errors.rejectValue("name", "name.not.specified");
             }
 
             if(Strings.isNullOrEmpty(form.getSurname())){
-                errors.rejectValue("surname","surname.not.specified");
+                errors.rejectValue("surname", "surname.not.specified");
             }
 
             if(Strings.isNullOrEmpty(form.getPassword())){
-                errors.rejectValue("password","password.not.specified");
+                errors.rejectValue("password", "password.not.specified");
             }
 
             if(Strings.isNullOrEmpty(form.getConfirmPassword())){
-                errors.rejectValue("confirmPassword","confirm.password.not.specified");
+                errors.rejectValue("confirmPassword", "confirm.password.not.specified");
             }
 
         }
