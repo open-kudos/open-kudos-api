@@ -27,6 +27,10 @@ public class User {
     private String startedToWorkDate;
     private String position;
 
+    private boolean isCompleted = false;
+    private boolean showBirthday = false;
+    private boolean isConfirmed = false;
+
     public String getDepartment() {
         return department;
     }
@@ -67,9 +71,9 @@ public class User {
         return showBirthday;
     }
 
-    private boolean isCompleted = false;
-    private boolean showBirthday = false;
-
+    public boolean isConfirmed() {
+        return isConfirmed;
+    }
 
     public User(String password, String email,String firstName, String lastName){
         this.password = password;
@@ -115,6 +119,10 @@ public class User {
         this.isCompleted = isCompleted;
         this.showBirthday = showBirthday;
 
+    }
+
+    public void markUserAsConfirmed(){
+        this.isConfirmed = true;
     }
 
 }

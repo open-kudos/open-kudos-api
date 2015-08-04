@@ -47,6 +47,7 @@ dependencies {
    compile 'log4j:log4j:1.2.17'
    compile 'org.jasypt:jasypt:1.9.2'
    compile 'org.json:json:20141113'
+   compile 'org.apache.commons:commons-email:1.4'
    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
    testCompile 'com.jayway.jsonpath:json-path:2.0.0'
    testCompile 'org.springframework:spring-test:4.1.7.RELEASE'

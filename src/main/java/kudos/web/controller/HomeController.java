@@ -1,14 +1,19 @@
 package kudos.web.controller;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import kudos.dao.repositories.UserRepository;
+import kudos.model.User;
 import kudos.model.UserForm;
+import kudos.services.EmailService;
 import kudos.web.model.ErrorResponse;
 import kudos.web.model.IndexResponse;
 import kudos.web.model.DataResponse;
 import kudos.web.model.Response;
+import org.apache.commons.mail.EmailException;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.jasypt.util.text.StrongTextEncryptor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -83,10 +88,18 @@ public class HomeController extends BaseController {
         new UserForm.FormValidator().validate(userForm, errors);
 
         if (!errors.hasErrors() && repository.findByEmail(userForm.getEmail()) == null) {
+
+            /*try {
+                EmailService.sendConfirmationEmail(userForm.getEmail());
+            } catch (EmailException e) {
+                return new ResponseEntity<>(DataResponse.fail(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+            }*/
+
             String oldPassword = userForm.getPassword();
             userForm.setPassword(new StrongPasswordEncryptor().encryptPassword(oldPassword));
             userDAO.create(userForm.toUser());
-            return new ResponseEntity<>(DataResponse.success(), HttpStatus.OK);
+            return new ResponseEntity<>(DataResponse.success("Confirmation mail has been sent."), HttpStatus.OK);
+
         } else if (!errors.hasErrors()) {
             errors.rejectValue("email","email.already.exists");
             return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()),HttpStatus.BAD_REQUEST);
@@ -96,13 +109,25 @@ public class HomeController extends BaseController {
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public Response logout(HttpSession session, Principal principal) {
+    public ResponseEntity<Response> logout(HttpSession session, Principal principal) {
         if (principal == null) {
-            return null;
-            // TODO refactor errorresponse for logout service return new ErrorResponse(fieldError, "You cannot logout because you are not logged in");
+            return new ResponseEntity<>(DataResponse.fail("Cannot logout because you are not logged in"),HttpStatus.NOT_FOUND);
         }
         session.invalidate();
-        return DataResponse.success();
+        return new ResponseEntity<>(DataResponse.success(),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/confirm-email" , method = RequestMethod.GET)
+    public ResponseEntity<Response> confirmEmail(@RequestParam String hashedMail){
+        String email = new StrongTextEncryptor().decrypt(hashedMail);
+        Optional<User> user = userDAO.getUserByEmail(email);
+        if(userDAO.getUserByEmail(email).isPresent()){
+            user.get().markUserAsConfirmed();
+            userDAO.update(user.get());
+            return new ResponseEntity<>(DataResponse.success(),HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(DataResponse.fail("user with your confirmation link was not found"),HttpStatus.NOT_FOUND);
+        }
     }
 
 }

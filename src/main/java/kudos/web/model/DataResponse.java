@@ -2,6 +2,8 @@ package kudos.web.model;
 
 import kudos.model.User;
 
+import javax.xml.crypto.Data;
+
 /**
  * Created by chc on 15.7.30.
  */
@@ -40,7 +42,9 @@ public class DataResponse extends Response {
     public static DataResponse success() {
         return new DataResponse("success", "", null, null);
     }
-
+    public static DataResponse success(String message){
+        return new DataResponse("success",message,null,null);
+    }
     public static Response fail(String message, String type, String cause) {
         return new DataResponse("fail", message, type, cause);
     }
