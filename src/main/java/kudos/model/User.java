@@ -25,6 +25,35 @@ public class User {
 
     private String startedToWorkDate;
     private String position;
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getStartedToWorkDate() {
+        return startedToWorkDate;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getTeam() {
+        return team;
+    }
+
     private String department;
     private String location;
     private String team;
