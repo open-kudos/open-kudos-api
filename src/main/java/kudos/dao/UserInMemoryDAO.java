@@ -1,12 +1,10 @@
 package kudos.dao;
 
 import com.google.common.base.Optional;
+import kudos.dao.repositories.UserRepository;
 import kudos.model.User;
-import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by chc on 15.7.27.
@@ -14,16 +12,15 @@ import java.util.Map;
 @Repository
 public class UserInMemoryDAO implements UserDAO{
 
-    private Map<String,User> users = new HashMap<String,User>();
+    //private Map<String,User> users = new HashMap<String,User>();
 
-    {
-        create(new User("user", "user", "user", "user"));
-    }
+    @Autowired
+    private UserRepository repository;
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        if (users.containsKey(email)) {
-            return Optional.of(users.get(email));
+        if (/*users.containsKey(email)*/repository.findByEmail(email) != null) {
+            return Optional.of(repository.findByEmail(email));
         } else {
             return Optional.absent();
         }
@@ -36,9 +33,8 @@ public class UserInMemoryDAO implements UserDAO{
             throw new IllegalStateException("email.occupied.email");
         }
 
-        user.setEncryptedPassword(new StrongPasswordEncryptor().encryptPassword(user.getPassword()));
-
-        users.put(user.getEmail(), user);
+        repository.save(user);
+        //users.put(user.getEmail(), user);
 
         return user;
     }
@@ -50,15 +46,19 @@ public class UserInMemoryDAO implements UserDAO{
             throw new IllegalStateException("User does not exist");
         }
 
-        users.put(user.getEmail(), user);
+        repository.delete(storedUser.get());
+        repository.save(user);
+        //users.put(user.getEmail(), user);
 
         return user;
     }
 
     @Override
     public void remove(String email){
-        if(getUserByEmail(email).isPresent()){
-            users.remove(email);
+        Optional<User> user = getUserByEmail(email);
+        if(user.isPresent()){
+            repository.delete(user.get());
+            //users.remove(email);
         }
     }
 }

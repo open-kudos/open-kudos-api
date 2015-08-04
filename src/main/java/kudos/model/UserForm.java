@@ -21,6 +21,16 @@ public class UserForm {
     private String email;
     private String name;
     private String surname;
+    private boolean isCompleted = false;
+
+    public boolean getIsCompleted() {
+        return isCompleted;
+    }
+
+    public void setIsCompleted(boolean completed) {
+        this.isCompleted = completed;
+    }
+
 
     public String getPassword() {
         return password;
@@ -71,8 +81,6 @@ public class UserForm {
         private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
                 "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
-        public static final List<String> errorsList = new LinkedList<>();
-
         @Override
         public boolean supports(Class clazz) {
             return UserForm.class.equals(clazz);
@@ -109,6 +117,8 @@ public class UserForm {
             if(Strings.isNullOrEmpty(form.getConfirmPassword())){
                 errors.rejectValue("confirmPassword", "confirm.password.not.specified");
             }
+
+
 
         }
     }

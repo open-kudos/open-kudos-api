@@ -2,6 +2,7 @@ package kudos.web.security;
 
 import com.google.common.base.Optional;
 import kudos.dao.UserDAO;
+import kudos.dao.repositories.UserRepository;
 import kudos.model.User;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -24,7 +25,8 @@ import java.util.List;
 @Component
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
-    private final UserDAO userDAO;
+    UserDAO userDAO;
+
     private static Logger LOG = Logger.getLogger(DatabaseAuthenticationProvider.class.getName());
 
     @Autowired

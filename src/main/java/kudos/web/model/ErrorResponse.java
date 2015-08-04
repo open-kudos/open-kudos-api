@@ -1,17 +1,35 @@
 package kudos.web.model;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import org.springframework.validation.FieldError;
+
+import javax.annotation.Nullable;
+import java.util.List;
+
 /**
  * Created by chc on 15.7.30.
  */
 public class ErrorResponse extends Response {
 
-    private final String message;
+    private final List<InputFieldError> fieldErrors;
 
-    public ErrorResponse(String message) {
-        this.message = message;
+    public ErrorResponse(List<InputFieldError> fieldErrors) {
+        this.fieldErrors = fieldErrors;
     }
 
-    public String getMessage() {
-        return message;
+    public List<InputFieldError> getFieldsError() {
+        return fieldErrors;
+    }
+
+    public static Response create(List<FieldError> fieldErrors) {
+        //fieldErrors.stream().map()
+        return new ErrorResponse(Lists.transform(fieldErrors, new Function<FieldError, InputFieldError>() {
+            @Nullable
+            @Override
+            public InputFieldError apply(@Nullable FieldError input) {
+                return new InputFieldError(input.getField(), input.getCode());
+            }
+        }));
     }
 }
