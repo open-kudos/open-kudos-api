@@ -1,15 +1,9 @@
 package kudos.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 /**
  * Created by chc on 15.8.4.
  */
-@Document
 public class Email {
-    @Id
-    private String id;
 
     private final String recipientAddress;
     private final String timestamp;
@@ -22,4 +16,21 @@ public class Email {
         this.subject = subject;
         this.message = message;
     }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getRecipientAddress() {
+        return recipientAddress;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
 }

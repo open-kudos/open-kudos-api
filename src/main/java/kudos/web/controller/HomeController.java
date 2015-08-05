@@ -2,40 +2,38 @@ package kudos.web.controller;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.mongodb.MongoException;
 import kudos.dao.repositories.UserRepository;
+import kudos.model.Email;
 import kudos.model.User;
 import kudos.model.UserForm;
-import kudos.services.EmailService;
+import kudos.services.email.EmailServiceTestingPurposes;
 import kudos.web.model.ErrorResponse;
 import kudos.web.model.IndexResponse;
 import kudos.web.model.DataResponse;
 import kudos.web.model.Response;
-import org.apache.commons.mail.EmailException;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jasypt.util.text.StrongTextEncryptor;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.List;
+import java.util.Date;
 
 /**
  * Created by chc on 15.7.29.
@@ -89,15 +87,21 @@ public class HomeController extends BaseController {
 
         if (!errors.hasErrors() && repository.findByEmail(userForm.getEmail()) == null) {
 
-            /*try {
-                EmailService.sendConfirmationEmail(userForm.getEmail());
-            } catch (EmailException e) {
-                return new ResponseEntity<>(DataResponse.fail(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
-            }*/
+            try {
+                StrongTextEncryptor encryptor = new StrongTextEncryptor();
+                encryptor.setPassword(System.getProperty("encryptionPassword"));
+                EmailServiceTestingPurposes.send(new Email("mantas.damijonaitis@swedbank.lt", new Date().toString(), "confirmationMail",
+                        "Welcome to KUDOS app. To verify your email, please paste this link to yout browser: localhost:8080/confirm-email?hashedMail="
+                                + encryptor.encrypt(userForm.getEmail())));
+                String oldPassword = userForm.getPassword();
+                userForm.setPassword(new StrongPasswordEncryptor().encryptPassword(oldPassword));
+                userDAO.create(userForm.toUser());
+            } catch(MessagingException e){
+                    return new ResponseEntity<>(DataResponse.fail(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (MongoException e){
+                    return new ResponseEntity<>(DataResponse.fail(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
 
-            String oldPassword = userForm.getPassword();
-            userForm.setPassword(new StrongPasswordEncryptor().encryptPassword(oldPassword));
-            userDAO.create(userForm.toUser());
             return new ResponseEntity<>(DataResponse.success("Confirmation mail has been sent."), HttpStatus.OK);
 
         } else if (!errors.hasErrors()) {
@@ -119,7 +123,7 @@ public class HomeController extends BaseController {
 
     @RequestMapping(value = "/confirm-email" , method = RequestMethod.GET)
     public ResponseEntity<Response> confirmEmail(@RequestParam String hashedMail){
-        String email = new StrongTextEncryptor().decrypt(hashedMail);
+        String email = new StrongTextEncryptor().decrypt("localhost:8080/confirm-email?hashedMail=b4pX21I30Yy8/jLsQG4v7vVlBpEb7tf8pK9X9S4CGL2RGRLfFHXkSwNz9cg1aWTf");
         Optional<User> user = userDAO.getUserByEmail(email);
         if(userDAO.getUserByEmail(email).isPresent()){
             user.get().markUserAsConfirmed();

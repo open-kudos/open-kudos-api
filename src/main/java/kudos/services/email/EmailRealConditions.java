@@ -1,24 +1,17 @@
-package kudos.services;
+package kudos.services.email;
 
 import com.google.common.base.Strings;
-import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.Email;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
-import org.apache.log4j.Logger;
+import kudos.model.Email;
 import org.jasypt.util.password.StrongPasswordEncryptor;
-import org.jasypt.util.text.StrongTextEncryptor;
 
 /**
- * Created by chc on 15.8.4.
+ * Created by chc on 15.8.5.
  */
-public class EmailService {
+public class EmailRealConditions {
 
-    public static Logger LOG = Logger.getLogger(EmailService.class.getName());
+    public static void sendConfirmationEmail(String userEmail)  {
 
-    public static void sendConfirmationEmail(String userEmail) throws EmailException {
-
-        String message = new StrongPasswordEncryptor().encryptPassword(userEmail);
+        /*String message = new StrongPasswordEncryptor().encryptPassword(userEmail);
 
         String username = System.getProperty("username");
         String password = System.getProperty("password");
@@ -36,7 +29,7 @@ public class EmailService {
             email.addTo(userEmail);
             email.send();
 
-        }
+        }*/
 
     }
 

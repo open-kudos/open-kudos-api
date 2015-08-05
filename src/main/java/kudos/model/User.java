@@ -31,6 +31,9 @@ public class User {
     private boolean showBirthday = false;
     private boolean isConfirmed = false;
 
+    private int remainingKudos = 100;
+    private List<Kudos> kudosOperations;
+
     public String getDepartment() {
         return department;
     }
