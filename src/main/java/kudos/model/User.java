@@ -39,7 +39,8 @@ public class User {
     private String location;
     private String team;
 
-    private int remainingKudos = INITIAL_KUDOS;
+    private int remainingKudos;
+
     private List<Kudos> kudosOperations = new LinkedList<>();
 
     public String getDepartment() {
@@ -87,6 +88,7 @@ public class User {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.remainingKudos = INITIAL_KUDOS;
     }
 
     public String getId() {

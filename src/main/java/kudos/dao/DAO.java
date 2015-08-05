@@ -1,14 +1,16 @@
 package kudos.dao;
 
+import com.google.common.base.Optional;
+
 /**
  * Created by chc on 15.8.5.
  */
 public interface DAO<T> {
-    T get (String email);
+    Optional<T> get (String id);
 
-    T create(T user);
+    Optional<T> create(T obj);
 
-    T update(T user);
+    Optional<T> update(T obj);
 
-    void remove(String email);
+    void remove(String id);
 }

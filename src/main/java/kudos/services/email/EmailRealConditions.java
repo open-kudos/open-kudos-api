@@ -1,9 +1,5 @@
 package kudos.services.email;
 
-import com.google.common.base.Strings;
-import kudos.model.Email;
-import org.jasypt.util.password.StrongPasswordEncryptor;
-
 /**
  * Created by chc on 15.8.5.
  */

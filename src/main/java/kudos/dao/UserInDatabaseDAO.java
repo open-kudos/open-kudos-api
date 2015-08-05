@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository;
  * Created by chc on 15.7.27.
  */
 @Repository
-public class UserInMemoryDAO implements DAO{
-
+public class UserInDatabaseDAO implements UserDAO {
 
     @Autowired
     private UserRepository repository;
@@ -26,8 +25,7 @@ public class UserInMemoryDAO implements DAO{
     }
 
     @Override
-    public Optional<User> create(Object userObj) {
-        User user = (User)userObj;
+    public Optional<User> create(User user) {
         Optional<User> storedUser = get(user.getEmail());
         if (storedUser.isPresent()) {
             throw new IllegalStateException("email.occupied.email");
@@ -37,8 +35,17 @@ public class UserInMemoryDAO implements DAO{
     }
 
     @Override
-    public Object update(Object user) {
-        return null;
+    public Optional<User> update(User user) {
+        Optional<User> storedUser = get(user.getEmail());
+        if (!storedUser.isPresent()) {
+            throw new IllegalStateException("User does not exist");
+        }
+
+        repository.delete(storedUser.get());
+        repository.save(user);
+
+        return Optional.of(user);
+
     }
 
     @Override
@@ -46,7 +53,6 @@ public class UserInMemoryDAO implements DAO{
         Optional<User> user = get(email);
         if(user.isPresent()){
             repository.delete(user.get());
-            //users.remove(email);
         }
     }
 }

@@ -3,7 +3,6 @@ package kudos.web.controller;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.mongodb.MongoException;
-import kudos.dao.repositories.UserRepository;
 import kudos.model.Email;
 import kudos.model.User;
 import kudos.model.UserForm;
@@ -15,7 +14,6 @@ import kudos.web.model.Response;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jasypt.util.text.StrongTextEncryptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -40,9 +38,6 @@ import java.util.Date;
  */
 @Controller
 public class HomeController extends BaseController {
-
-    @Autowired
-    UserRepository repository;
 
     Logger LOG = Logger.getLogger(HomeController.class.getName());
 
@@ -91,11 +86,11 @@ public class HomeController extends BaseController {
     public @ResponseBody ResponseEntity<Response> register(@ModelAttribute("form") UserForm userForm, Errors errors) {
         new UserForm.FormValidator().validate(userForm, errors);
 
-        if (!errors.hasErrors() && repository.findByEmail(userForm.getEmail()) == null) {
+        if (!errors.hasErrors() && userDAO.get(userForm.getEmail()) == null) {
 
             try {
                 StrongPasswordEncryptor encryptor = new StrongPasswordEncryptor();
-                EmailServiceTestingPurposes.send(new Email("mantas.damijonaitis@swedbank.lt", new Date().toString(), "confirmationMail",
+                EmailServiceTestingPurposes.send(new Email(System.getProperty("email"), new Date().toString(), "confirmationMail",
                         "Welcome to KUDOS app. To verify your email, please paste this link to yout browser: localhost:8080/confirm-email?hashedMail="
                                 + encryptor.encryptPassword(userForm.getEmail())));
                 String oldPassword = userForm.getPassword();

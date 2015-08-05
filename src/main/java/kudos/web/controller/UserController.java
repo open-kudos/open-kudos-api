@@ -2,9 +2,8 @@ package kudos.web.controller;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import kudos.dao.DAO;
 import kudos.model.*;
-import kudos.services.transfers.TransferKudos;
+import kudos.services.transfers.KudosTransferService;
 import kudos.web.model.*;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -27,10 +26,10 @@ import java.security.Principal;
 @RequestMapping("/user")
 public class UserController extends BaseController {
 
-    @Autowired
-    DAO dao;
-
     private static Logger LOG = Logger.getLogger(UserController.class.getName());
+
+    @Autowired
+    KudosTransferService kudosTransferService;
 
     @RequestMapping(value = "/delete-me", method = RequestMethod.POST)
     public Response deleteMyAccount(HttpSession session,Principal principal){
@@ -95,7 +94,8 @@ public class UserController extends BaseController {
             String team = myProfileForm.getTeam();
             boolean showBirthday = myProfileForm.getShowBirthday();
 
-            user.updateUserWithAdditionalInformation(password, email, name, surname, birthday, phone, startedToWork, position, departament, location, team, true, showBirthday);
+            user.updateUserWithAdditionalInformation(password, email, name, surname, birthday, phone, startedToWork, position, departament,
+                    location, team, true, showBirthday);
             userDAO.update(user);
 
             return new ResponseEntity<>(DataResponse.success(), HttpStatus.OK);
@@ -128,9 +128,7 @@ public class UserController extends BaseController {
                break;
                default: kudos = new Kudos(collegueEmail, Kudos.KudosType.NORMAL, message);
            }
-
-           new TransferKudos().transferKudos(myEmail,collegueEmail,kudos);
-           return new ResponseEntity<>(DataResponse.success("Kudos transaction completed"),HttpStatus.OK);
+           return kudosTransferService.transferKudos(myEmail, collegueEmail, kudos);
 
        } else {
            return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()),HttpStatus.BAD_REQUEST);
