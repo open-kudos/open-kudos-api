@@ -1,10 +1,9 @@
 package kudos.services.transfers;
 
 import com.google.common.base.Optional;
-import kudos.dao.UserDAO;
+import kudos.dao.DAO;
 import kudos.model.Kudos;
 import kudos.model.User;
-import kudos.web.model.ErrorResponse;
 import kudos.web.model.Response;
 import kudos.web.model.TransferResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,12 @@ import org.springframework.http.ResponseEntity;
 public class TransferKudos {
 
     @Autowired
-    UserDAO dao;
+    DAO dao;
 
     public ResponseEntity<Response> transferKudos(String senderEmail, String receiverEmail, Kudos kudos){
-        Optional<User> receiverUserOptional = dao.getUserByEmail(receiverEmail);
-        User senderUser = dao.getUserByEmail(senderEmail).get();
+        Optional<User> receiverUserOptional = (Optional<User>)dao.get(receiverEmail);
+        Optional<User> senderUserOptional = (Optional<User>)(dao.get(senderEmail));
+        User senderUser = senderUserOptional.get();
         if(receiverUserOptional.isPresent() && senderUser.getRemainingKudos() > kudos.getAmount()){
 
             senderUser.reduceKudos(kudos.getAmount());

@@ -2,9 +2,7 @@ package kudos.web.controller;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import kudos.dao.UserDAO;
-import kudos.dao.UserInMemoryDAO;
-import kudos.dao.repositories.UserRepository;
+import kudos.dao.DAO;
 import kudos.model.*;
 import kudos.services.transfers.TransferKudos;
 import kudos.web.model.*;
@@ -15,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
-import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +28,7 @@ import java.security.Principal;
 public class UserController extends BaseController {
 
     @Autowired
-    UserDAO dao;
+    DAO dao;
 
     private static Logger LOG = Logger.getLogger(UserController.class.getName());
 
@@ -44,7 +41,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ResponseEntity<Response> showHomePage(Principal principal){
-        Optional<User> user = userDAO.getUserByEmail(principal.getName());
+        Optional<User> user = (Optional<User>)userDAO.get(principal.getName());
         if(user.isPresent() && !user.get().isCompleted()){
             return new ResponseEntity<>(DataResponse.fail("You must complete your profile"),HttpStatus.BAD_REQUEST);
         }
@@ -60,7 +57,8 @@ public class UserController extends BaseController {
         new MyProfileForm.MyProfileValidator().validate(myProfileForm,errors);
 
         if(!errors.hasErrors()){
-            User user = userDAO.getUserByEmail(principal.getName()).get();
+            Optional<User> userOptional = (Optional<User>)userDAO.get(principal.getName());
+            User user = userOptional.get();
 
             String email = user.getEmail();
             String password = user.getPassword();

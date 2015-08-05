@@ -129,8 +129,8 @@ public class HomeController extends BaseController {
     @RequestMapping(value = "/confirm-email" , method = RequestMethod.GET)
     public ResponseEntity<Response> confirmEmail(@RequestParam String hashedMail){
         String email = new StrongTextEncryptor().decrypt("localhost:8080/confirm-email?hashedMail=b4pX21I30Yy8/jLsQG4v7vVlBpEb7tf8pK9X9S4CGL2RGRLfFHXkSwNz9cg1aWTf");
-        Optional<User> user = userDAO.getUserByEmail(email);
-        if(userDAO.getUserByEmail(email).isPresent()){
+        Optional<User> user = (Optional<User>)userDAO.get(email);
+        if(user.isPresent()){
             user.get().markUserAsConfirmed();
             userDAO.update(user.get());
             return new ResponseEntity<>(DataResponse.success(),HttpStatus.OK);

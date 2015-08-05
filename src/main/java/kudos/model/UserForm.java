@@ -1,15 +1,8 @@
 package kudos.model;
 
 import com.google.common.base.Strings;
-import kudos.dao.UserDAO;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by chc on 15.7.23.

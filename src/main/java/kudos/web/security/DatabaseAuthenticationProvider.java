@@ -1,8 +1,7 @@
 package kudos.web.security;
 
 import com.google.common.base.Optional;
-import kudos.dao.UserDAO;
-import kudos.dao.repositories.UserRepository;
+import kudos.dao.DAO;
 import kudos.model.User;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -25,12 +24,12 @@ import java.util.List;
 @Component
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
-    UserDAO userDAO;
+    DAO userDAO;
 
     private static Logger LOG = Logger.getLogger(DatabaseAuthenticationProvider.class.getName());
 
     @Autowired
-    public DatabaseAuthenticationProvider(UserDAO userDAO) {
+    public DatabaseAuthenticationProvider(DAO userDAO) {
         this.userDAO = userDAO;
     }
 
@@ -39,7 +38,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        Optional<User> user = userDAO.getUserByEmail(name);
+        Optional<User> user = (Optional<User>)userDAO.get(name);
 
         if (user.isPresent() && new StrongPasswordEncryptor().checkPassword(password, user.get().getPassword())) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
