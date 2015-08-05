@@ -5,12 +5,16 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created by chc on 15.7.23.
  */
 @Document
 public class User {
 
+    private static final int INITIAL_KUDOS = 100;
 
     @Id
     private String id;
@@ -31,8 +35,8 @@ public class User {
     private boolean showBirthday = false;
     private boolean isConfirmed = false;
 
-    private int remainingKudos = 100;
-    private List<Kudos> kudosOperations;
+    private int remainingKudos = INITIAL_KUDOS;
+    private List<Kudos> kudosOperations = new LinkedList<>();
 
     public String getDepartment() {
         return department;
@@ -126,6 +130,18 @@ public class User {
 
     public void markUserAsConfirmed(){
         this.isConfirmed = true;
+    }
+
+    public int getRemainingKudos() {
+        return remainingKudos;
+    }
+
+    public void setRemainingKudos(int remainingKudos) {
+        this.remainingKudos = remainingKudos;
+    }
+
+    public void addKudosToList(Kudos kudos){
+        this.kudosOperations.add(kudos);
     }
 
 }
