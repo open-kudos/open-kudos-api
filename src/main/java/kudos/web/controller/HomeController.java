@@ -56,29 +56,35 @@ public class HomeController extends BaseController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<Response> login(String email,
-                          String password, HttpServletRequest request) {
+                          String password, HttpServletRequest request, Principal principal) {
 
-        if (Strings.isNullOrEmpty(email)) {
-            return new ResponseEntity<>(DataResponse.fail("email.not.specified"), HttpStatus.BAD_REQUEST);
+        if(principal == null) {
+
+            if (Strings.isNullOrEmpty(email)) {
+                return new ResponseEntity<>(DataResponse.fail("email.not.specified"), HttpStatus.BAD_REQUEST);
+            }
+
+            if (Strings.isNullOrEmpty(password)) {
+                return new ResponseEntity<>(DataResponse.fail("password.not.specified"), HttpStatus.BAD_REQUEST);
+            }
+
+            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+
+            try {
+                Authentication authentication = authenticationManager.authenticate(authenticationToken);
+                SecurityContext securityContext = SecurityContextHolder.getContext();
+                securityContext.setAuthentication(authentication);
+                HttpSession session = request.getSession(true);
+                session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+            } catch (AuthenticationCredentialsNotFoundException e) {
+                return new ResponseEntity<>(DataResponse.fail(e.getMessage()), HttpStatus.BAD_REQUEST);
+            }
+
+            return new ResponseEntity<>(DataResponse.success(), HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity<>(DataResponse.fail("Please logout before logging in with new account"), HttpStatus.BAD_REQUEST);
         }
-
-        if (Strings.isNullOrEmpty(password)) {
-            return new ResponseEntity<>(DataResponse.fail("password.not.specified"), HttpStatus.BAD_REQUEST);
-        }
-
-        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-
-        try {
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-            securityContext.setAuthentication(authentication);
-            HttpSession session = request.getSession(true);
-            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-        } catch (AuthenticationCredentialsNotFoundException e) {
-            return new ResponseEntity<>(DataResponse.fail(e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(DataResponse.success(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -88,11 +94,10 @@ public class HomeController extends BaseController {
         if (!errors.hasErrors() && repository.findByEmail(userForm.getEmail()) == null) {
 
             try {
-                StrongTextEncryptor encryptor = new StrongTextEncryptor();
-                encryptor.setPassword(System.getProperty("encryptionPassword"));
+                StrongPasswordEncryptor encryptor = new StrongPasswordEncryptor();
                 EmailServiceTestingPurposes.send(new Email("mantas.damijonaitis@swedbank.lt", new Date().toString(), "confirmationMail",
                         "Welcome to KUDOS app. To verify your email, please paste this link to yout browser: localhost:8080/confirm-email?hashedMail="
-                                + encryptor.encrypt(userForm.getEmail())));
+                                + encryptor.encryptPassword(userForm.getEmail())));
                 String oldPassword = userForm.getPassword();
                 userForm.setPassword(new StrongPasswordEncryptor().encryptPassword(oldPassword));
                 userDAO.create(userForm.toUser());

@@ -8,10 +8,15 @@ import java.util.Date;
  */
 public class Kudos {
 
-    private enum KudosType{
+    public enum KudosType{
         MINIMUM,
         NORMAL,
         MAXIMUM
+    }
+
+    private enum TransformType{
+        SEND,
+        RECEIVED;
     }
 
     private static final String MINIMUM_KUDOS_MESSAGE = "Thank you!";
@@ -27,13 +32,12 @@ public class Kudos {
     private int amount;
     private String timestamp;
 
-    public Kudos(String collegue, KudosType type, String message){
+    public Kudos(String collegue, KudosType kudosType, String message){
         this.collegue = collegue;
         this.message = message;
         this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date());
 
-        switch(type){
-
+        switch(kudosType){
             case MINIMUM:
                 this.kudosTypeMessage = MINIMUM_KUDOS_MESSAGE;
                 this.amount = MINIMUM_KUDOS_AMOUNT;
@@ -48,9 +52,28 @@ public class Kudos {
                 this.kudosTypeMessage = MAXIMUM_KUDOS_MESSAGE;
                 this.amount = MAXIMUM_KUDOS_AMOUNT;
             break;
-
         }
 
+    }
+
+    public String getCollegue() {
+        return collegue;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getKudosTypeMessage() {
+        return kudosTypeMessage;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
     }
 
 }

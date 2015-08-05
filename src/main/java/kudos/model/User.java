@@ -35,6 +35,10 @@ public class User {
     private boolean showBirthday = false;
     private boolean isConfirmed = false;
 
+    private String department;
+    private String location;
+    private String team;
+
     private int remainingKudos = INITIAL_KUDOS;
     private List<Kudos> kudosOperations = new LinkedList<>();
 
@@ -65,10 +69,6 @@ public class User {
     public String getTeam() {
         return team;
     }
-
-    private String department;
-    private String location;
-    private String team;
 
     public boolean isCompleted() {
         return isCompleted;
@@ -132,16 +132,20 @@ public class User {
         this.isConfirmed = true;
     }
 
+    public void reduceKudos(int amount){
+        this.remainingKudos -= amount;
+    }
+
+    public void increaseKudos(int amount){
+        this.remainingKudos += amount;
+    }
+
     public int getRemainingKudos() {
         return remainingKudos;
     }
 
-    public void setRemainingKudos(int remainingKudos) {
-        this.remainingKudos = remainingKudos;
-    }
-
-    public void addKudosToList(Kudos kudos){
-        this.kudosOperations.add(kudos);
+    public void addKudosOperation(Kudos kudos){
+        kudosOperations.add(kudos);
     }
 
 }

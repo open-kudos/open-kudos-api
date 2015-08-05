@@ -5,13 +5,9 @@ import com.google.common.base.Strings;
 import kudos.dao.UserDAO;
 import kudos.dao.UserInMemoryDAO;
 import kudos.dao.repositories.UserRepository;
-import kudos.model.MyProfileForm;
-import kudos.model.User;
-import kudos.model.UserForm;
-import kudos.web.model.DataResponse;
-import kudos.web.model.ErrorResponse;
-import kudos.web.model.Response;
-import kudos.web.model.UserResponse;
+import kudos.model.*;
+import kudos.services.transfers.TransferKudos;
+import kudos.web.model.*;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +105,38 @@ public class UserController extends BaseController {
         } else {
             return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)
+    public ResponseEntity<Response> sendKudos(@ModelAttribute("form")KudosTransferForm kudosTransferForm, Errors errors, Principal principal){
+       new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm,errors);
+       String myEmail = principal.getName();
+       String collegueEmail = kudosTransferForm.getReceiverEmail();
+       String kudosType = kudosTransferForm.getType().toUpperCase();
+       String message =  kudosTransferForm.getMessage();
+       if(!errors.hasErrors()){
+
+           final Kudos kudos;
+
+           switch(kudosType){
+               case "MINIMUM":
+                   kudos = new Kudos(collegueEmail, Kudos.KudosType.MINIMUM, message);
+               break;
+               case "NORMAL":
+                   kudos = new Kudos(collegueEmail, Kudos.KudosType.NORMAL, message);
+               break;
+               case "MAXIMUM":
+                   kudos = new Kudos(collegueEmail, Kudos.KudosType.MAXIMUM, message);
+               break;
+               default: kudos = new Kudos(collegueEmail, Kudos.KudosType.NORMAL, message);
+           }
+
+           new TransferKudos().transferKudos(myEmail,collegueEmail,kudos);
+           return new ResponseEntity<>(DataResponse.success("Kudos transaction completed"),HttpStatus.OK);
+
+       } else {
+           return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()),HttpStatus.BAD_REQUEST);
+       }
 
     }
 
