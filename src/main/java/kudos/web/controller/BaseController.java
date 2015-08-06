@@ -1,6 +1,7 @@
 package kudos.web.controller;
 
-import kudos.dao.DAO;
+import kudos.dao.repositories.TransactionRepository;
+import kudos.dao.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 
@@ -10,10 +11,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 public abstract class BaseController {
 
     @Autowired
-    protected DAO userDAO;
+    protected UserRepository userRepository;
 
     @Autowired
     protected AuthenticationManager authenticationManager;
 
+    @Autowired
+    TransactionRepository transactionRepository;
 
 }

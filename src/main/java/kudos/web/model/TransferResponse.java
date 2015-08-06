@@ -29,8 +29,8 @@ public class TransferResponse extends Response {
         this.status = status;
     }
 
-    public static Response success(){
-        return new TransferResponse("Transfer successful","");
+    public static Response success(String reason){
+        return new TransferResponse("Transfer successful",reason);
     }
 
     public static Response fail(String message){

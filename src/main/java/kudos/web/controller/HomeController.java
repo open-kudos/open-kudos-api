@@ -86,30 +86,35 @@ public class HomeController extends BaseController {
     public @ResponseBody ResponseEntity<Response> register(@ModelAttribute("form") UserForm userForm, Errors errors) {
         new UserForm.FormValidator().validate(userForm, errors);
 
-        if (!errors.hasErrors() && userDAO.get(userForm.getEmail()) == null) {
+
+        if (!errors.hasErrors() && userRepository.findOne(userForm.getEmail()) == null) {
 
             try {
                 StrongPasswordEncryptor encryptor = new StrongPasswordEncryptor();
-                EmailServiceTestingPurposes.send(new Email(System.getProperty("email"), new Date().toString(), "confirmationMail",
+                new EmailServiceTestingPurposes().send(new Email(userForm.getEmail(), new Date().toString(), "confirmationMail",
                         "Welcome to KUDOS app. To verify your email, please paste this link to yout browser: localhost:8080/confirm-email?hashedMail="
                                 + encryptor.encryptPassword(userForm.getEmail())));
                 String oldPassword = userForm.getPassword();
                 userForm.setPassword(new StrongPasswordEncryptor().encryptPassword(oldPassword));
-                userDAO.create(userForm.toUser());
+                LOG.warn("saving user... ");
+                userRepository.save(userForm.toUser());
             } catch(MessagingException e){
-                    return new ResponseEntity<>(DataResponse.fail(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+                    LOG.warn("There was an error with messages");
+                    return new ResponseEntity<>(DataResponse.fail(e.getMessage() + "error with message"), HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (MongoException e){
-                    return new ResponseEntity<>(DataResponse.fail(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+                    LOG.warn("there was an error with mongo");
+                    return new ResponseEntity<>(DataResponse.fail(e.getMessage() + "error with mongo"),HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            LOG.warn("User was registered");
 
-            return new ResponseEntity<>(DataResponse.success("Confirmation mail has been sent."), HttpStatus.OK);
-
-        } else if (!errors.hasErrors()) {
-            errors.rejectValue("email","email.already.exists");
-            return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()),HttpStatus.BAD_REQUEST);
-        } else {
+        } else if (!errors.hasErrors() && userRepository.findOne(userForm.getEmail()) != null) {
+            LOG.warn("email already exists, fail");
+            errors.rejectValue("email", "email.already.exists");
             return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
         }
+
+        return new ResponseEntity<>(DataResponse.success("Confirmation mail has been sent."), HttpStatus.OK);
+
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
@@ -124,10 +129,10 @@ public class HomeController extends BaseController {
     @RequestMapping(value = "/confirm-email" , method = RequestMethod.GET)
     public ResponseEntity<Response> confirmEmail(@RequestParam String hashedMail){
         String email = new StrongTextEncryptor().decrypt("localhost:8080/confirm-email?hashedMail=b4pX21I30Yy8/jLsQG4v7vVlBpEb7tf8pK9X9S4CGL2RGRLfFHXkSwNz9cg1aWTf");
-        Optional<User> user = (Optional<User>)userDAO.get(email);
-        if(user.isPresent()){
-            user.get().markUserAsConfirmed();
-            userDAO.update(user.get());
+        User user = userRepository.findOne(email);
+        if(user != null){
+            user.markUserAsConfirmed();
+            userRepository.save(user);
             return new ResponseEntity<>(DataResponse.success(),HttpStatus.OK);
         } else {
             return new ResponseEntity<>(DataResponse.fail("user with your confirmation link was not found"),HttpStatus.NOT_FOUND);

@@ -13,12 +13,7 @@ import java.util.List;
  */
 @Document
 public class User {
-
-    private static final int INITIAL_KUDOS = 100;
-
     @Id
-    private String id;
-
     @Indexed(unique = true)
     private String email;
     private String password;
@@ -38,10 +33,6 @@ public class User {
     private String department;
     private String location;
     private String team;
-
-    private int remainingKudos;
-
-    private List<Kudos> kudosOperations = new LinkedList<>();
 
     public String getDepartment() {
         return department;
@@ -88,11 +79,6 @@ public class User {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.remainingKudos = INITIAL_KUDOS;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getPassword(){
@@ -132,22 +118,6 @@ public class User {
 
     public void markUserAsConfirmed(){
         this.isConfirmed = true;
-    }
-
-    public void reduceKudos(int amount){
-        this.remainingKudos -= amount;
-    }
-
-    public void increaseKudos(int amount){
-        this.remainingKudos += amount;
-    }
-
-    public int getRemainingKudos() {
-        return remainingKudos;
-    }
-
-    public void addKudosOperation(Kudos kudos){
-        kudosOperations.add(kudos);
     }
 
 }

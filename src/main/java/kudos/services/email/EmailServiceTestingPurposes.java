@@ -22,7 +22,7 @@ public class EmailServiceTestingPurposes {
 
         Properties tMailServerProperties = setupProperties();
         Session tSession = Session.getDefaultInstance(tMailServerProperties, null);
-        Message tMsg = createMessage(tSession, email.getRecipientAddress(), email.getSubject());
+        Message tMsg = createMessage(tSession, System.getProperty("senderEmail"), email.getRecipientAddress(), email.getSubject());
         tMsg.setContent(email.getMessage(),"text/html");
         Transport.send(tMsg);
 
@@ -36,10 +36,11 @@ public class EmailServiceTestingPurposes {
         return tMailServerProperties;
     }
 
-    private static MimeMessage createMessage(Session aSession, String aToAddress, String aSubject) throws AddressException, MessagingException {
-        MimeMessage tMessage = new MimeMessage(aSession);
-        tMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(aToAddress));
-        tMessage.setSubject(aSubject);
+    private static MimeMessage createMessage(Session session, String fromAddress, String toAddress, String subject) throws AddressException, MessagingException {
+        MimeMessage tMessage = new MimeMessage(session);
+        tMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
+        tMessage.setSender(new InternetAddress(fromAddress));
+        tMessage.setSubject(subject);
         tMessage.setSentDate(new Date());
 
         return tMessage;
