@@ -30,9 +30,37 @@ public class User {
     private boolean showBirthday = false;
     private boolean isConfirmed = false;
 
+    private boolean isRegistered = true;
+
     private String department;
     private String location;
     private String team;
+
+    public User(String password, String email,String firstName, String lastName){
+        this.password = password;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public void updateUserWithAdditionalInformation(String password, String email, String firstName, String lastName, String birthday, String phone, String startedToWorkDate, String position, String department, String location,
+                                                    String team, boolean isCompleted, boolean showBirthday){
+
+        this.password = password;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.birthday = birthday;
+        this.phone = phone;
+        this.startedToWorkDate = startedToWorkDate;
+        this.position = position;
+        this.department = department;
+        this.location = location;
+        this.team = team;
+        this.isCompleted = isCompleted;
+        this.showBirthday = showBirthday;
+
+    }
 
     public String getDepartment() {
         return department;
@@ -74,11 +102,12 @@ public class User {
         return isConfirmed;
     }
 
-    public User(String password, String email,String firstName, String lastName){
-        this.password = password;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public boolean isRegistered() {
+        return isRegistered;
+    }
+
+    public void setIsRegistered(boolean isRegistered) {
+        this.isRegistered = isRegistered;
     }
 
     public String getPassword(){
@@ -95,25 +124,6 @@ public class User {
 
     public String getLastName(){
         return this.lastName;
-    }
-
-    public void updateUserWithAdditionalInformation(String password, String email, String firstName, String lastName, String birthday, String phone, String startedToWorkDate, String position, String department, String location,
-                                                    String team, boolean isCompleted, boolean showBirthday){
-
-        this.password = password;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthday = birthday;
-        this.phone = phone;
-        this.startedToWorkDate = startedToWorkDate;
-        this.position = position;
-        this.department = department;
-        this.location = location;
-        this.team = team;
-        this.isCompleted = isCompleted;
-        this.showBirthday = showBirthday;
-
     }
 
     public void markUserAsConfirmed(){

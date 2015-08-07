@@ -3,6 +3,7 @@ package kudos.web.controller;
 import com.google.common.base.Strings;
 import kudos.dao.repositories.TransactionRepository;
 import kudos.model.*;
+import kudos.services.control.KudosAmountControlService;
 import kudos.services.transfers.KudosTransferService;
 import kudos.web.model.*;
 import org.apache.log4j.Logger;
@@ -30,15 +31,20 @@ public class UserController extends BaseController {
     private static Logger LOG = Logger.getLogger(UserController.class.getName());
 
     KudosTransferService kudosTransferService;
+    KudosAmountControlService kudosAmountControlService;
 
     @Autowired
-    public UserController(KudosTransferService kudosTransferService){
+    public UserController(KudosTransferService kudosTransferService, KudosAmountControlService kudosAmountControlService){
         this.kudosTransferService =  kudosTransferService;
+        this.kudosAmountControlService = kudosAmountControlService;
     }
 
     @RequestMapping(value = "/delete-me", method = RequestMethod.POST)
     public Response deleteMyAccount(HttpSession session,Principal principal){
-        userRepository.delete(principal.getName());
+        String userEmail = principal.getName();
+        User user = userRepository.findOne(userEmail);
+        user.setIsRegistered(false);
+        userRepository.save(user);
         session.invalidate();
         return DataResponse.success();
     }
@@ -100,7 +106,7 @@ public class UserController extends BaseController {
 
             user.updateUserWithAdditionalInformation(password, email, name, surname, birthday, phone, startedToWork, position, departament,
                     location, team, true, showBirthday);
-           // userDAO.update(user); TODO implement update
+            userRepository.save(user);
 
             return new ResponseEntity<>(DataResponse.success(), HttpStatus.OK);
 
@@ -140,16 +146,37 @@ public class UserController extends BaseController {
 
     }
 
-    @RequestMapping(value = "/show-my-transactions", method = RequestMethod.GET)
-    public ResponseEntity<Response> showTransactionHistory(Principal principal){
+    @RequestMapping(value = "/show-incoming-transactions", method = RequestMethod.GET)
+    public ResponseEntity<Response> showIncomingTransactionHistory(Principal principal){
         String email = principal.getName();
         List allUserTransactions = transactionRepository.findTransactionsByReceiverEmail(email);
 
         if(allUserTransactions.size() == 0){
-            return new ResponseEntity<>(TransactionHistoryResponse.failedToShow("Currently you have not any transactions"),HttpStatus.OK);
+            return new ResponseEntity<>(TransactionHistoryResponse.failedToShow("Currently you have not any incoming transactions"),HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions),HttpStatus.OK);
         }
     }
+
+    @RequestMapping(value = "/show-outgoing-transactions", method = RequestMethod.GET)
+    public ResponseEntity<Response> showOutcomingTransactionHistory(Principal principal){
+        String email = principal.getName();
+        List allUserTransactions = transactionRepository.findTransactionsBySenderEmail(email);
+
+        if(allUserTransactions.size() == 0){
+            return new ResponseEntity<>(TransactionHistoryResponse.failedToShow("Currently you have not any incoming transactions"),HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions),HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/show-remaining-kudos", method = RequestMethod.GET)
+    public ResponseEntity<Response> showRemainingKudos(Principal principal){
+        int amount = kudosAmountControlService.howManyKudosUserCanSpend(principal.getName());
+        return new ResponseEntity<>(StatusResponse.showKudosStatus(amount+""),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/challenge-friend", method = RequestMethod.POST)
+    public ResponseEntity<Response> challengeFriend(@ModelAttribute("form")ChallengeTransferForm challengeTransferForm)
 
 }

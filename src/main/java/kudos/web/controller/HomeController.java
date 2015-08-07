@@ -85,9 +85,9 @@ public class HomeController extends BaseController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public @ResponseBody ResponseEntity<Response> register(@ModelAttribute("form") UserForm userForm, Errors errors) {
         new UserForm.FormValidator().validate(userForm, errors);
-
-
-        if (!errors.hasErrors() && userRepository.findOne(userForm.getEmail()) == null) {
+        User user = userRepository.findOne(userForm.getEmail());
+        boolean areErrors = errors.hasErrors();
+        if (!areErrors && user == null) {
 
             try {
                 StrongPasswordEncryptor encryptor = new StrongPasswordEncryptor();
@@ -107,10 +107,13 @@ public class HomeController extends BaseController {
             }
             LOG.warn("User was registered");
 
-        } else if (!errors.hasErrors() && userRepository.findOne(userForm.getEmail()) != null) {
+        } else if (!areErrors && user.isRegistered()) {
             LOG.warn("email already exists, fail");
             errors.rejectValue("email", "email.already.exists");
             return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
+        } else if(!errors.hasErrors() && !user.isRegistered()){
+            userRepository.save(userForm.toUser());
+            return new ResponseEntity<>(DataResponse.success("Welcome back to kudos!."), HttpStatus.OK);
         }
 
         return new ResponseEntity<>(DataResponse.success("Confirmation mail has been sent."), HttpStatus.OK);

@@ -13,6 +13,10 @@ public class TransferResponse extends Response {
         this.reason = reason;
     }
 
+    public TransferResponse(String status) {
+        this.status = status;
+    }
+
     public String getReason() {
         return reason;
     }
@@ -31,6 +35,10 @@ public class TransferResponse extends Response {
 
     public static Response success(String reason){
         return new TransferResponse("Transfer successful",reason);
+    }
+
+    public static Response success(){
+        return new TransferResponse("Transfer successful");
     }
 
     public static Response fail(String message){

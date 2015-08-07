@@ -27,7 +27,6 @@ public class Transaction {
 
     @Id
     private String id;
-
     private String senderEmail;
     private String receiverEmail;
     private String message;
