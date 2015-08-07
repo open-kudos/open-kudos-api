@@ -1,4 +1,4 @@
-package kudos.model;
+package kudos.model.form;
 
 import com.google.common.base.Strings;
 import org.springframework.validation.Errors;
@@ -224,7 +224,7 @@ public class MyProfileForm {
 
         }
 
-        public static boolean isEnteredDateValid(String text) {
+        public boolean isEnteredDateValid(String text) {
             if (text == null || !text.matches("\\d{4}-[01]\\d-[0-3]\\d"))
                 return false;
             SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");

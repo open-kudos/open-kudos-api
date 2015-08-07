@@ -1,11 +1,16 @@
 package kudos.web.controller;
 
 import com.google.common.base.Strings;
-import kudos.dao.repositories.TransactionRepository;
-import kudos.model.*;
+import kudos.model.form.ChallengeTransferForm;
+import kudos.model.form.KudosTransferForm;
+import kudos.model.form.MyProfileForm;
+import kudos.model.object.Challenge;
+import kudos.model.object.Transaction;
+import kudos.model.object.User;
 import kudos.services.control.KudosAmountControlService;
 import kudos.services.transfers.KudosTransferService;
-import kudos.web.model.*;
+import kudos.web.model.mainResponse.Response;
+import kudos.web.model.specificResponse.*;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +39,13 @@ public class UserController extends BaseController {
     KudosAmountControlService kudosAmountControlService;
 
     @Autowired
-    public UserController(KudosTransferService kudosTransferService, KudosAmountControlService kudosAmountControlService){
-        this.kudosTransferService =  kudosTransferService;
+    public UserController(KudosTransferService kudosTransferService, KudosAmountControlService kudosAmountControlService) {
+        this.kudosTransferService = kudosTransferService;
         this.kudosAmountControlService = kudosAmountControlService;
     }
 
     @RequestMapping(value = "/delete-me", method = RequestMethod.POST)
-    public Response deleteMyAccount(HttpSession session,Principal principal){
+    public Response deleteMyAccount(HttpSession session, Principal principal) {
         String userEmail = principal.getName();
         User user = userRepository.findOne(userEmail);
         user.setIsRegistered(false);
@@ -50,23 +55,22 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.GET)
-    public ResponseEntity<Response> showHomePage(Principal principal){
+    public ResponseEntity<Response> showHomePage(Principal principal) {
         User user = userRepository.findOne(principal.getName());
-        if(user != null && !user.isCompleted()){
-            return new ResponseEntity<>(DataResponse.fail("You must complete your profile"),HttpStatus.BAD_REQUEST);
-        }
-        else if(user != null){
-            return new ResponseEntity<>(UserResponse.showUser(user),HttpStatus.OK);
+        if (user != null && !user.isCompleted()) {
+            return new ResponseEntity<>(DataResponse.fail("You must complete your profile"), HttpStatus.BAD_REQUEST);
+        } else if (user != null) {
+            return new ResponseEntity<>(UserResponse.showUser(user), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new DataResponse("fail","user does not exist",null,null),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new DataResponse("fail", "user does not exist", null, null), HttpStatus.BAD_REQUEST);
         }
     }
 
     @RequestMapping(value = "complete-profile", method = RequestMethod.POST)
-    public ResponseEntity<Response> completeUserProfile(@ModelAttribute("form") MyProfileForm myProfileForm, Errors errors,Principal principal){
-        new MyProfileForm.MyProfileValidator().validate(myProfileForm,errors);
+    public ResponseEntity<Response> completeUserProfile(@ModelAttribute("form") MyProfileForm myProfileForm, Errors errors, Principal principal) {
+        new MyProfileForm.MyProfileValidator().validate(myProfileForm, errors);
 
-        if(!errors.hasErrors()){
+        if (!errors.hasErrors()) {
             User user = userRepository.findOne(principal.getName());
 
             String email = user.getEmail();
@@ -79,19 +83,19 @@ public class UserController extends BaseController {
             String newFirstName = myProfileForm.getFirstName();
             String newLastName = myProfileForm.getLastName();
 
-            if(!Strings.isNullOrEmpty(newEmail) && !newEmail.equals(email)){
+            if (!Strings.isNullOrEmpty(newEmail) && !newEmail.equals(email)) {
                 email = newEmail;
             }
 
-            if(!Strings.isNullOrEmpty(newPassword) && !new StrongPasswordEncryptor().checkPassword(newPassword, password)){
-                 password = new StrongPasswordEncryptor().encryptPassword(newPassword);
+            if (!Strings.isNullOrEmpty(newPassword) && !new StrongPasswordEncryptor().checkPassword(newPassword, password)) {
+                password = new StrongPasswordEncryptor().encryptPassword(newPassword);
             }
 
-            if(!Strings.isNullOrEmpty(newFirstName) && !name.equals(newFirstName)){
+            if (!Strings.isNullOrEmpty(newFirstName) && !name.equals(newFirstName)) {
                 name = newFirstName;
             }
 
-            if(!Strings.isNullOrEmpty(newLastName) && !surname.equals(newLastName)){
+            if (!Strings.isNullOrEmpty(newLastName) && !surname.equals(newLastName)) {
                 surname = newLastName;
             }
 
@@ -116,67 +120,111 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)
-    public ResponseEntity<Response> sendKudos(@ModelAttribute("form")KudosTransferForm kudosTransferForm, Errors errors, Principal principal){
-       new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm,errors);
-       String myEmail = principal.getName();
-       String collegueEmail = kudosTransferForm.getReceiverEmail();
-       String kudosType = kudosTransferForm.getType().toUpperCase();
-       String message =  kudosTransferForm.getMessage();
-       if(!errors.hasErrors()){
+    public ResponseEntity<Response> sendKudos(@ModelAttribute("form") KudosTransferForm kudosTransferForm, Errors errors, Principal principal) {
+        new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
+        String myEmail = principal.getName();
+        String collegueEmail = kudosTransferForm.getReceiverEmail();
+        String kudosType = kudosTransferForm.getType().toUpperCase();
+        String message = kudosTransferForm.getMessage();
+        if (!errors.hasErrors()) {
 
-           final Transaction transaction;
+            final Transaction transaction;
 
-           switch(kudosType){
-               case "MINIMUM":
-                   transaction = new Transaction(collegueEmail, myEmail, Transaction.KudosType.MINIMUM, message);
-               break;
-               case "NORMAL":
-                   transaction = new Transaction(collegueEmail,myEmail, Transaction.KudosType.NORMAL, message);
-               break;
-               case "MAXIMUM":
-                   transaction = new Transaction(collegueEmail,myEmail, Transaction.KudosType.MAXIMUM, message);
-               break;
-               default: transaction = new Transaction(collegueEmail,myEmail, Transaction.KudosType.NORMAL, message);
-           }
-           return kudosTransferService.transferKudos(transaction);
+            switch (kudosType) {
+                case "MINIMUM":
+                    transaction = new Transaction(collegueEmail, myEmail, Transaction.KudosType.MINIMUM, message);
+                    break;
+                case "NORMAL":
+                    transaction = new Transaction(collegueEmail, myEmail, Transaction.KudosType.NORMAL, message);
+                    break;
+                case "MAXIMUM":
+                    transaction = new Transaction(collegueEmail, myEmail, Transaction.KudosType.MAXIMUM, message);
+                    break;
+                default:
+                    transaction = new Transaction(collegueEmail, myEmail, Transaction.KudosType.NORMAL, message);
+            }
+            return kudosTransferService.transferKudos(transaction);
 
-       } else {
-           return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()),HttpStatus.BAD_REQUEST);
-       }
+        } else {
+            return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
+        }
 
     }
 
     @RequestMapping(value = "/show-incoming-transactions", method = RequestMethod.GET)
-    public ResponseEntity<Response> showIncomingTransactionHistory(Principal principal){
+    public ResponseEntity<Response> showIncomingTransactionHistory(Principal principal) {
         String email = principal.getName();
         List allUserTransactions = transactionRepository.findTransactionsByReceiverEmail(email);
 
-        if(allUserTransactions.size() == 0){
-            return new ResponseEntity<>(TransactionHistoryResponse.failedToShow("Currently you have not any incoming transactions"),HttpStatus.OK);
+        if (allUserTransactions.size() == 0) {
+            return new ResponseEntity<>(TransactionHistoryResponse.failedToShow("Currently you have not any incoming transactions"), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions),HttpStatus.OK);
+            return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions), HttpStatus.OK);
         }
     }
 
     @RequestMapping(value = "/show-outgoing-transactions", method = RequestMethod.GET)
-    public ResponseEntity<Response> showOutcomingTransactionHistory(Principal principal){
+    public ResponseEntity<Response> showOutcomingTransactionHistory(Principal principal) {
         String email = principal.getName();
         List allUserTransactions = transactionRepository.findTransactionsBySenderEmail(email);
 
-        if(allUserTransactions.size() == 0){
-            return new ResponseEntity<>(TransactionHistoryResponse.failedToShow("Currently you have not any incoming transactions"),HttpStatus.OK);
+        if (allUserTransactions.size() == 0) {
+            return new ResponseEntity<>(TransactionHistoryResponse.failedToShow("Currently you have not any incoming transactions"), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions),HttpStatus.OK);
+            return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions), HttpStatus.OK);
         }
     }
 
     @RequestMapping(value = "/show-remaining-kudos", method = RequestMethod.GET)
-    public ResponseEntity<Response> showRemainingKudos(Principal principal){
+    public ResponseEntity<Response> showRemainingKudos(Principal principal) {
         int amount = kudosAmountControlService.howManyKudosUserCanSpend(principal.getName());
-        return new ResponseEntity<>(StatusResponse.showKudosStatus(amount+""),HttpStatus.OK);
+        return new ResponseEntity<>(StatusResponse.showKudosStatus(amount + ""), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/challenge-friend", method = RequestMethod.POST)
-    public ResponseEntity<Response> challengeFriend(@ModelAttribute("form")ChallengeTransferForm challengeTransferForm)
+    public ResponseEntity<Response> challengeFriend(@ModelAttribute("form") ChallengeTransferForm challengeTransferForm, Errors errors, Principal principal) {
+        new ChallengeTransferForm.ChallengeTransferFormValidator().validate(challengeTransferForm, errors);
+
+        if (!errors.hasErrors()) {
+
+            final String senderMail = principal.getName();
+            final String receiverMail = challengeTransferForm.getReceiverEmail();
+            final String judgeMail = challengeTransferForm.getJudgeEmail();
+            final String type = challengeTransferForm.getType();
+            final String challengeName = challengeTransferForm.getChallengeName();
+            final String estimatedDate = challengeTransferForm.getEstimatedDate();
+
+            final boolean receiverExists = userRepository.exists(receiverMail);
+            final boolean judgeExists = userRepository.exists(judgeMail);
+
+            if (receiverExists && judgeExists) {
+                final Challenge challenge;
+                switch (type) {
+                    case "MINIMUM":
+                        challenge = new Challenge(senderMail, receiverMail, judgeMail, challengeName, estimatedDate, Transaction.KudosType.MINIMUM.amount);
+                        break;
+                    case "NORMAL":
+                        challenge = new Challenge(senderMail, receiverMail, judgeMail, challengeName, estimatedDate, Transaction.KudosType.NORMAL.amount);
+                        break;
+                    case "MAXIMUM":
+                        challenge = new Challenge(senderMail, receiverMail, judgeMail, challengeName, estimatedDate, Transaction.KudosType.MAXIMUM.amount);
+                        break;
+                    default:
+                        challenge = new Challenge(senderMail, receiverMail, judgeMail, challengeName, estimatedDate, Transaction.KudosType.NORMAL.amount);
+                }
+
+                return new ResponseEntity<>(TransferResponse.success(),HttpStatus.OK);
+
+            } else if (receiverExists) {
+                return new ResponseEntity<>(TransferResponse.fail("Judge email was not specified"), HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>(TransferResponse.fail("Receiver email was not specified"), HttpStatus.BAD_REQUEST);
+            }
+
+        } else {
+            return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
+        }
+
+    }
 
 }

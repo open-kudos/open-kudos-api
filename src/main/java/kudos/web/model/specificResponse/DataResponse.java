@@ -1,8 +1,6 @@
-package kudos.web.model;
+package kudos.web.model.specificResponse;
 
-import kudos.model.User;
-
-import javax.xml.crypto.Data;
+import kudos.web.model.mainResponse.Response;
 
 /**
  * Created by chc on 15.7.30.

@@ -1,13 +1,10 @@
-package kudos.dao.repositories;
+package kudos.repositories;
 
-import kudos.model.Transaction;
-import kudos.model.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import kudos.model.object.Transaction;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Created by chc on 15.8.6.

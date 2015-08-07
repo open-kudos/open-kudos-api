@@ -1,19 +1,16 @@
 package kudos.services.control;
 
-import kudos.dao.repositories.TransactionRepository;
-import kudos.model.Transaction;
+import kudos.repositories.TransactionRepository;
+import kudos.model.object.Transaction;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 /**
  * Created by chc on 15.8.7.
@@ -22,6 +19,7 @@ import java.util.stream.Stream;
 public class KudosAmountControlService {
 
     private static int WEEKLY_KUDOS_AMOUNT = 50;
+    private final Logger LOG = Logger.getLogger(KudosAmountControlService.class.getName());
 
     @Autowired
     TransactionRepository transactionRepository;
@@ -38,7 +36,7 @@ public class KudosAmountControlService {
                 LocalDateTime transactionTime = dateTimeFormatter.parseLocalDateTime(transactionList.get(i).getTimestamp());
 
                 int transactionAmount = transactionList.get(i).getKudosType().amount;
-
+                LOG.warn("transaction amount is: "+transactionAmount);
                 if (startTime.isBefore(transactionTime) && transactionTime.isAfter(startTime) && amount < WEEKLY_KUDOS_AMOUNT) {
                     amount += transactionAmount;
                 } else {
@@ -46,8 +44,7 @@ public class KudosAmountControlService {
                 }
 
             }
-            return amount;
-
+            return WEEKLY_KUDOS_AMOUNT - amount;
         } else {
             return WEEKLY_KUDOS_AMOUNT;
         }

@@ -1,6 +1,7 @@
-package kudos.model;
+package kudos.model.form;
 
 import com.google.common.base.Strings;
+import kudos.model.object.User;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

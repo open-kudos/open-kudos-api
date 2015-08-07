@@ -1,4 +1,4 @@
-package kudos.web.model;
+package kudos.web.model.specificResponse;
 
 /**
  * Created by chc on 15.8.3.

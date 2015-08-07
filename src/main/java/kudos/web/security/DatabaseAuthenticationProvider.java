@@ -1,7 +1,7 @@
 package kudos.web.security;
 
-import kudos.dao.repositories.UserRepository;
-import kudos.model.User;
+import kudos.repositories.UserRepository;
+import kudos.model.object.User;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;

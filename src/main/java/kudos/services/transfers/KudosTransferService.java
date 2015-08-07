@@ -1,12 +1,11 @@
 package kudos.services.transfers;
 
 import com.mongodb.MongoException;
-import kudos.dao.repositories.TransactionRepository;
-import kudos.model.Transaction;
-import kudos.model.User;
+import kudos.repositories.TransactionRepository;
+import kudos.model.object.Transaction;
 import kudos.services.control.KudosAmountControlService;
-import kudos.web.model.Response;
-import kudos.web.model.TransferResponse;
+import kudos.web.model.mainResponse.Response;
+import kudos.web.model.specificResponse.TransferResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

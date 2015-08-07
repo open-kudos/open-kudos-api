@@ -1,4 +1,4 @@
-package kudos.model;
+package kudos.model.object;
 
 /**
  * Created by chc on 15.8.4.

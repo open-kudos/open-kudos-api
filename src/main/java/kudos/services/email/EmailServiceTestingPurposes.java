@@ -1,7 +1,7 @@
 package kudos.services.email;
 
 
-import kudos.model.Email;
+import kudos.model.object.Email;
 import javax.mail.Transport;
 
 import javax.mail.Message;

@@ -1,4 +1,4 @@
-package kudos.web.model;
+package kudos.web.model.mainResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

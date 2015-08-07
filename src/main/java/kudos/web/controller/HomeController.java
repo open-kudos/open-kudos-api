@@ -1,16 +1,15 @@
 package kudos.web.controller;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.mongodb.MongoException;
-import kudos.model.Email;
-import kudos.model.User;
-import kudos.model.UserForm;
+import kudos.model.object.Email;
+import kudos.model.object.User;
+import kudos.model.form.UserForm;
 import kudos.services.email.EmailServiceTestingPurposes;
-import kudos.web.model.ErrorResponse;
-import kudos.web.model.IndexResponse;
-import kudos.web.model.DataResponse;
-import kudos.web.model.Response;
+import kudos.web.model.specificResponse.ErrorResponse;
+import kudos.web.model.specificResponse.IndexResponse;
+import kudos.web.model.specificResponse.DataResponse;
+import kudos.web.model.mainResponse.Response;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jasypt.util.text.StrongTextEncryptor;

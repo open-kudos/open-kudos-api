@@ -1,5 +1,6 @@
-package kudos.web.model;
+package kudos.web.model.specificResponse;
 
+import kudos.web.model.mainResponse.Response;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.Period;

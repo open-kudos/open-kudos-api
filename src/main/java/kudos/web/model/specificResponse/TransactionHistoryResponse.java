@@ -1,11 +1,13 @@
-package kudos.web.model;
+package kudos.web.model.specificResponse;
+
+import kudos.web.model.mainResponse.Response;
 
 import java.util.List;
 
 /**
  * Created by chc on 15.8.6.
  */
-public class TransactionHistoryResponse extends Response{
+public class TransactionHistoryResponse extends Response {
 
     List transactions;
     String errorMessage;

@@ -1,4 +1,6 @@
-package kudos.web.model;
+package kudos.web.model.specificResponse;
+
+import kudos.web.model.mainResponse.Response;
 
 /**
  * Created by chc on 15.8.5.

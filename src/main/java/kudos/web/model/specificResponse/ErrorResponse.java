@@ -1,7 +1,8 @@
-package kudos.web.model;
+package kudos.web.model.specificResponse;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import kudos.web.model.mainResponse.Response;
 import org.springframework.validation.FieldError;
 
 import javax.annotation.Nullable;
