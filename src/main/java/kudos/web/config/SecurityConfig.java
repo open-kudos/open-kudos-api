@@ -35,7 +35,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable()
                 .authorizeRequests()
-                    .antMatchers("/user/**").hasRole("USER");
+                    .antMatchers("/user/**").hasRole("USER")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/challenges/**").hasRole("USER")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/kudos/**").hasRole("USER");
+
     }
 
     @Bean(name="KudosAuthenticationManager")
@@ -43,18 +50,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-    /*public static class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-
-        @Override
-        public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
-                throws IOException, ServletException {
-            super.onAuthenticationFailure(request, response, exception);
-
-            if(exception.getClass().isAssignableFrom(UsernameNotFoundException.class)) {
-                showMessage("BAD_CREDENTIAL");
-            } else if (exception.getClass().isAssignableFrom(DisabledException.class)) {
-                showMessage("USER_DISABLED");
-            }
-        }*/
 }

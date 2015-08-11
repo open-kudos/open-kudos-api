@@ -1,7 +1,6 @@
 package kudos.repositories;
 
-import com.mongodb.Mongo;
-import kudos.model.object.Challenge;
+import kudos.model.Challenge;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

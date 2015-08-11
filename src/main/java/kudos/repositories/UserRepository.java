@@ -1,6 +1,6 @@
 package kudos.repositories;
 
-import kudos.model.object.User;
+import kudos.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;

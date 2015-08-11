@@ -1,6 +1,9 @@
 package kudos.web.config;
 
+import kudos.KudosBusinessStrategy;
 import kudos.web.servlet.JsonViewResolver;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,5 +38,15 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     @Bean
     public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public KudosBusinessStrategy kudosBusinessStrategy() {
+        return KudosBusinessStrategy.createWeeklyStrategy(50, 1);
+    }
+
+    @Bean(name = "DBTimeFormatter")
+    public DateTimeFormatter DBTimeFormatter() {
+        return DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss,SSS");
     }
 }

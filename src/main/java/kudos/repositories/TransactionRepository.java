@@ -1,6 +1,7 @@
 package kudos.repositories;
 
-import kudos.model.object.Transaction;
+import kudos.model.Transaction;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * Created by chc on 15.8.6.
  */
 @Repository
-public interface TransactionRepository extends CrudRepository<Transaction,String> {
+public interface TransactionRepository extends MongoRepository<Transaction,String> {
 
     Transaction findTransactionByReceiverEmailOrderByTimestampDesc(String receiverEmail);
 
