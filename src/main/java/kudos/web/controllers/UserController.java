@@ -61,7 +61,7 @@ public class UserController extends BaseController {
         if(errors.hasErrors()){
             throw new FormValidationException(errors);
         } else {
-            User user = userRepository.findOne(principal.getName());
+            User user = usersService.getLoggedUser().get();
 
             String email = user.getEmail();
             String password = user.getPassword();
@@ -100,7 +100,7 @@ public class UserController extends BaseController {
 
             user.updateUserWithAdditionalInformation(password, email, name, surname, birthday, phone, startedToWork, position, departament,
                     location, team, true, showBirthday);
-            userRepository.save(user);
+            usersService.saveUser(user);
 
             return new ResponseEntity<>(HttpStatus.OK);
         }

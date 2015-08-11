@@ -12,26 +12,26 @@ import java.text.SimpleDateFormat;
  */
 public class ChallengeTransferForm {
 
-    private String receiverEmail;
-    private String judgeEmail;
+    private String participantEmail;
+    private String refereeEmail;
     private String challengeName;
-    private String estimatedDate;
+    private String dueDate;
     private String amount;
 
-    public String getReceiverEmail() {
-        return receiverEmail;
+    public String getParticipantEmail() {
+        return participantEmail;
     }
 
-    public void setReceiverEmail(String receiverEmail) {
-        this.receiverEmail = receiverEmail;
+    public void setParticipantEmail(String participantEmail) {
+        this.participantEmail = participantEmail;
     }
 
-    public String getJudgeEmail() {
-        return judgeEmail;
+    public String getRefereeEmail() {
+        return refereeEmail;
     }
 
-    public void setJudgeEmail(String judge) {
-        this.judgeEmail = judge;
+    public void setRefereeEmail(String judge) {
+        this.refereeEmail = judge;
     }
 
     public String getChallengeName() {
@@ -42,12 +42,12 @@ public class ChallengeTransferForm {
         this.challengeName = challengeName;
     }
 
-    public String getEstimatedDate() {
-        return estimatedDate;
+    public String getDueDate() {
+        return dueDate;
     }
 
-    public void setEstimatedDate(String estimatedDate) {
-        this.estimatedDate = estimatedDate;
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
     }
 
     public String getAmount() {
@@ -72,22 +72,22 @@ public class ChallengeTransferForm {
         public void validate(Object target, Errors errors) {
             ChallengeTransferForm challengeTransferForm = (ChallengeTransferForm)target;
 
-            String receiverEmail = challengeTransferForm.getReceiverEmail();
-            String judgeEmail = challengeTransferForm.getJudgeEmail();
+            String receiverEmail = challengeTransferForm.getParticipantEmail();
+            String judgeEmail = challengeTransferForm.getRefereeEmail();
             String amountInString = challengeTransferForm.getAmount();
             String challengeName = challengeTransferForm.getChallengeName();
-            String estimatedDate = challengeTransferForm.getEstimatedDate();
+            String estimatedDate = challengeTransferForm.getDueDate();
 
             if(Strings.isNullOrEmpty(receiverEmail)){
-                errors.rejectValue("receiverEmail","receiver.email.not.specified");
+                errors.rejectValue("participantEmail","receiver.email.not.specified");
             } else if(!receiverEmail.matches(EMAIL_PATTERN)){
-                errors.rejectValue("receiverEmail","receiver.email.incorrect");
+                errors.rejectValue("participantEmail","receiver.email.incorrect");
             }
 
             if(Strings.isNullOrEmpty(judgeEmail)){
-                errors.rejectValue("judgeEmail","judge.email.not.specified");
+                errors.rejectValue("refereeEmail","judge.email.not.specified");
             } else if(!judgeEmail.matches(EMAIL_PATTERN)){
-                errors.rejectValue("judgeEmail","judge.email.incorrect");
+                errors.rejectValue("refereeEmail","judge.email.incorrect");
             }
 
             if (!Strings.isNullOrEmpty(amountInString)) {
@@ -106,9 +106,9 @@ public class ChallengeTransferForm {
             }
 
             if(!isEnteredDateValid(estimatedDate)){
-                errors.rejectValue("estimatedDate","estimatedData.is.empty");
+                errors.rejectValue("dueDate","estimatedData.is.empty");
             } else if(Strings.isNullOrEmpty(estimatedDate)){
-                errors.rejectValue("estimatedDate","estimatedDate.is.empty");
+                errors.rejectValue("dueDate","dueDate.is.empty");
             }
 
         }

@@ -14,7 +14,7 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
     List<Challenge> findChallengesBySenderEmail(String senderEmail);
 
-    List<Challenge> findChallengesByReceiverEmail(String receiverEmail);
+    List<Challenge> findChallengesByParticipantEmail(String receiverEmail);
 
-    List<Challenge> findAllChallengerByJudgeEmail(String judgeEmail);
+    List<Challenge> findAllChallengerByRefereeEmail(String judgeEmail);
 }

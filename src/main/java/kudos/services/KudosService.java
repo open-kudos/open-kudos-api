@@ -71,14 +71,11 @@ public class KudosService {
 
     }*/
 
-    public Transaction transfer(String receiverEmail, int amount, String message) throws KudosExceededException, MongoException {
-        Optional<User> receiverUser = usersService.findByEmail(receiverEmail);
-        if(!receiverUser.isPresent()){
-            return null;
-        }
+    public Transaction transfer(User receiver, int amount, String message) throws KudosExceededException, MongoException {
 
         User user = usersService.getLoggedUser().get();
         String senderEmail = user.getEmail();
+        String receiverEmail = receiver.getEmail();
 
         Transaction lastTransaction = repository.findTransactionByReceiverEmailOrderByTimestampDesc(receiverEmail);
         Transaction newTransaction = new Transaction(receiverEmail,user.getEmail(),amount,message);

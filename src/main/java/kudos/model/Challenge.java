@@ -1,6 +1,9 @@
 package kudos.model;
 
+import org.joda.time.LocalDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
 
 /**
  * Created by chc on 15.8.7.
@@ -9,22 +12,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Challenge {
 
     private String senderEmail;
-    private String receiverEmail;
+    private String participantEmail;
 
-    private String judgeEmail;
+    private String refereeEmail;
     private String challengeName;
-    private String estimatedDate;
+    private LocalDate dueDate;
 
     private boolean isCompleted = false;
 
     private int amount;
 
-    public Challenge(String sender, String receiver, String judge, String challengeName, String estimatedDay, int amount) {
-        this.senderEmail = sender;
-        this.receiverEmail = receiver;
-        this.judgeEmail = judge;
+    public Challenge(String senderEmail, String participantEmail, String judge, String challengeName, LocalDate dueDate, int amount) {
+        this.senderEmail = senderEmail;
+        this.participantEmail = participantEmail;
+        this.refereeEmail = judge;
         this.challengeName = challengeName;
-        this.estimatedDate = estimatedDay;
+        this.dueDate = dueDate;
         this.amount = amount;
     }
 
@@ -36,12 +39,12 @@ public class Challenge {
         return senderEmail;
     }
 
-    public String getReceiverEmail() {
-        return receiverEmail;
+    public String getParticipantEmail() {
+        return participantEmail;
     }
 
-    public String getEstimatedDate() {
-        return estimatedDate;
+    public LocalDate getDueDate() {
+        return this.dueDate;
     }
 
     public boolean isCompleted() {
@@ -56,8 +59,8 @@ public class Challenge {
         this.isCompleted = isCompleted;
     }
 
-    public String getJudgeEmail() {
-        return judgeEmail;
+    public String getRefereeEmail() {
+        return refereeEmail;
     }
 
 }

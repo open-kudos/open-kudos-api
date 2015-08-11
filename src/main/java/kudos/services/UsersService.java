@@ -25,4 +25,8 @@ public class UsersService {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         return findByEmail(name);
     }
+
+    public Optional<User>saveUser(User user) {
+        return Optional.of(userRepository.save(user));
+    }
 }

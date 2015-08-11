@@ -1,12 +1,15 @@
 package kudos.web.controllers;
 
+import com.google.common.base.Optional;
 import kudos.exceptions.KudosExceededException;
 import kudos.model.Transaction;
+import kudos.model.User;
 import kudos.web.beans.form.KudosTransferForm;
 import kudos.web.beans.response.*;
 import kudos.web.exceptions.FormValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +21,8 @@ import java.util.List;
 /**
  * Created by chc on 15.8.11.
  */
+@Controller
+@RequestMapping("/kudos")
 public class KudosController extends BaseController {
 
     @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)
@@ -28,8 +33,14 @@ public class KudosController extends BaseController {
             throw new FormValidationException(errors);
         }
 
+        Optional<User> receiver = usersService.findByEmail(kudosTransferForm.getReceiverEmail());
+
+        if(!receiver.isPresent()){
+            return new ResponseEntity<>(new SingleErrorResponse("receiver.not.exist"),HttpStatus.BAD_REQUEST);
+        }
+
         try {
-            Transaction transaction = kudosService.transfer(kudosTransferForm.getReceiverEmail(),
+            Transaction transaction = kudosService.transfer(receiver.get(),
                     Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
             return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);
         } catch(KudosExceededException e) {

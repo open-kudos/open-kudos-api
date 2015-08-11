@@ -1,10 +1,12 @@
 package kudos.web.controllers;
 
+import com.google.common.base.Optional;
 import kudos.exceptions.KudosExceededException;
 import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.model.Challenge;
 import kudos.model.User;
 import kudos.services.ChallengeService;
+import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import org.joda.time.LocalDate;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.security.Principal;
 import java.text.ParseException;
 
 /**
@@ -42,13 +43,21 @@ public class ChallengeController extends BaseController {
             throw new FormValidationException(errors);
         }
 
-        User participant = usersService.findByEmail(form.getReceiverEmail()).get();
-        User referee = usersService.findByEmail(form.getJudgeEmail()).get();
+        Optional<User> participant = usersService.findByEmail(form.getParticipantEmail());
+        Optional<User> referee = usersService.findByEmail(form.getRefereeEmail());
 
-        LocalDate due = LocalDate.fromDateFields(getDateFormat().parse(form.getEstimatedDate()));
+        if(!participant.isPresent()) {
+            return new ResponseEntity<>(new SingleErrorResponse("participant.not.exist"),HttpStatus.BAD_REQUEST);
+        }
+
+        if(!referee.isPresent()){
+            return new ResponseEntity<>(new SingleErrorResponse("referee.not.exist"),HttpStatus.BAD_REQUEST);
+        }
+
+        LocalDate due = LocalDate.fromDateFields(getDateFormat().parse(form.getDueDate()));
         int amount = Integer.parseInt(form.getAmount());
 
-        Challenge challenge = service.challenge(participant, referee, form.getChallengeName(), due, amount);
+        Challenge challenge = service.challenge(participant.get(), referee.get(), form.getChallengeName(), due, amount);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
