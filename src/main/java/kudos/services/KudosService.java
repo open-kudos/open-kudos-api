@@ -1,26 +1,20 @@
 package kudos.services;
 
-import com.google.common.base.Optional;
 import com.mongodb.MongoException;
 import kudos.KudosBusinessStrategy;
+import kudos.exceptions.BusinessException;
+import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.KudosExceededException;
 import kudos.model.User;
 import kudos.repositories.TransactionRepository;
 import kudos.model.Transaction;
-import kudos.web.beans.response.Response;
-import kudos.web.beans.response.SingleErrorResponse;
-import kudos.web.beans.response.TransferResponse;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.jws.soap.SOAPBinding;
 import java.util.List;
 
 /**
@@ -48,64 +42,93 @@ public class KudosService {
         this.dateTimeFormatter = dateTimeFormatter;
     }
 
+    /**
+     * Gives Kudos to User. Kudos are taken from free Kudos balance of the current period.
+     * @param to User who receives Kudos
+     * @param amount The amount of Kudos
+     * @param message The message of the transaction
+     * @return
+     * @throws BusinessException
+     * @throws MongoException
+     */
 
-    /*private void transferKudos(Transaction transaction) {
-
-        int amount = transaction.getAmount();
-        Transaction lastTransaction = repository.findTransactionByReceiverEmailOrderByTimestampDesc(transaction.getReceiver());
-
-        if(lastTransaction == null) {
-            LOG.warn("There was no last transaction detected");
-            transaction.setReceiverBalance(amount);
-        } else if(canUserCanSpendKudos(transaction.getSenderEmail())){
-            transaction.setReceiverBalance(lastTransaction.getReceiverBalance() + amount);
-        } else {
-            return new ResponseEntity<>(TransferResponse.fail("limit.exceeded"), HttpStatus.BAD_REQUEST);
-        }
-
-        try{
-            repository.save(transaction);
-        } catch(MongoException e){
-            return new ResponseEntity<>(new SingleErrorResponse("mongo.error"),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-    }*/
-
-    public Transaction transfer(User receiver, int amount, String message) throws KudosExceededException, MongoException {
+    public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException {
 
         User user = usersService.getLoggedUser().get();
-        String senderEmail = user.getEmail();
-        String receiverEmail = receiver.getEmail();
+        return transferKudos(user, to, amount, message);
+    }
 
-        Transaction lastTransaction = repository.findTransactionByReceiverEmailOrderByTimestampDesc(receiverEmail);
-        Transaction newTransaction = new Transaction(receiverEmail,user.getEmail(),amount,message);
+    /**
+     * Reduces Users free Kudos balance for the current period
+     * @param user User who's free Kudos are reduced
+     * @param amount The amount of Kudos
+     * @param message The message of the transaction.
+     * @return
+     * @throws BusinessException
+     */
 
-        if(!canUserCanSpendKudos(senderEmail)){
-            throw new KudosExceededException();
+    public Transaction reduceFreeKudos(User user, int amount, String message) throws BusinessException {
+        return transferKudos(user, usersService.getKudosMaster(), amount, message);
+    }
+
+    /**
+     * Transfers kudos points from System to Users Kudos account
+     * @param to User who receives Kudos
+     * @param amount The amount of Kudos
+     * @param message The message of the transaction.
+     * @return
+     * @throws BusinessException
+     */
+
+    public Transaction giveSystemKudos(User to, int amount, String message) throws BusinessException {
+        return transferKudos(usersService.getKudosMaster(), to, amount, message);
+    }
+
+    private Transaction transferKudos(User from, User to, int amount, String message) throws BusinessException {
+        Transaction newTransaction = new Transaction(to.getEmail(), from.getEmail(), amount, message);
+
+        if (amount < strategy.getMinDeposit()) {
+            throw new InvalidKudosAmountException("invalid.kudos.amount");
         }
 
-        if(lastTransaction == null) {
-            newTransaction.setReceiverBalance(amount);
-        } else if(canUserCanSpendKudos(senderEmail)){
-            newTransaction.setReceiverBalance(lastTransaction.getReceiverBalance() + amount);
+        if (getFreeKudos(from) < amount){
+            throw new KudosExceededException("exceeded.kudos");
         }
+
+        newTransaction.setReceiverBalance(amount + getKudos(to));
 
         return repository.insert(newTransaction);
-
     }
 
+    /**
+     * Returns the balance of Kudos for the user
+     * @param user
+     * @return
+     */
 
-
-    public boolean canUserCanSpendKudos(String senderEmail) {
-        return strategy.getDeposit() - periodDeposit(senderEmail, strategy.getStartTime()) >= strategy.getMinDeposit();
+    public int getKudos(User user) {
+        Transaction lastTransaction = repository.findTransactionByReceiverEmailOrderByTimestampDesc(user.getEmail());
+        return lastTransaction == null ? 0 : lastTransaction.getReceiverBalance();
     }
 
-    public int periodBalance(String userId, LocalDateTime startTime){
-        return strategy.getDeposit() - periodDeposit(userId,startTime);
+    /**
+     * Returns the balance of free Kudos for the user for the current period
+     * @param user
+     * @return
+     */
+    public int getFreeKudos(User user) {
+        return strategy.getDeposit() - calculateSpentKudos(user, strategy.getStartTime());
     }
 
-    public int periodDeposit(String userId, LocalDateTime startTime){
-        List<Transaction> transactions = repository.findTransactionBySenderEmailOrderByTimestampDesc(userId);
+    /**
+     * Return the amount of Kudos spent since the start time provided
+     * @param user
+     * @param startTime
+     * @return
+     */
+
+    public int calculateSpentKudos(User user, LocalDateTime startTime){
+        List<Transaction> transactions = repository.findTransactionBySenderEmailOrderByTimestampDesc(user.getEmail());
 
         int periodDeposit = 0;
 
@@ -121,5 +144,4 @@ public class KudosService {
 
         return periodDeposit;
     }
-
 }

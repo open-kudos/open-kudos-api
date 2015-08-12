@@ -1,6 +1,7 @@
 package kudos.web.controllers;
 
 import com.google.common.base.Optional;
+import kudos.exceptions.BusinessException;
 import kudos.exceptions.KudosExceededException;
 import kudos.model.Transaction;
 import kudos.model.User;
@@ -26,27 +27,23 @@ import java.util.List;
 public class KudosController extends BaseController {
 
     @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)
-    public ResponseEntity<Response> sendKudos(@ModelAttribute("form") KudosTransferForm kudosTransferForm, Errors errors, Principal principal) throws FormValidationException {
-        new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm,errors);
+    public ResponseEntity<Response> sendKudos(@ModelAttribute("form") KudosTransferForm kudosTransferForm, Errors errors, Principal principal) throws FormValidationException, BusinessException {
+        new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
 
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
             throw new FormValidationException(errors);
         }
 
         Optional<User> receiver = usersService.findByEmail(kudosTransferForm.getReceiverEmail());
 
-        if(!receiver.isPresent()){
-            return new ResponseEntity<>(new SingleErrorResponse("receiver.not.exist"),HttpStatus.BAD_REQUEST);
+        if (!receiver.isPresent()) {
+            return new ResponseEntity<>(new SingleErrorResponse("receiver.not.exist"), HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            Transaction transaction = kudosService.transfer(receiver.get(),
-                    Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
-            return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);
-        } catch(KudosExceededException e) {
-            return new ResponseEntity<>(new SingleErrorResponse("kudos.exceeded"), HttpStatus.BAD_REQUEST);
-        }
 
+        Transaction transaction = kudosService.giveKudos(receiver.get(),
+                Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
+        return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);
 
     }
 
@@ -67,7 +64,7 @@ public class KudosController extends BaseController {
 
     @RequestMapping(value = "/show-remaining-kudos", method = RequestMethod.GET)
     public ResponseEntity<Response> showRemainingKudos(Principal principal) {
-        int amount = kudosService.periodBalance(principal.getName(), kudosBusinessStrategy.getStartTime());
+        int amount = kudosService.getFreeKudos(usersService.getLoggedUser().get());
         return new ResponseEntity<>(StatusResponse.showKudosStatus(amount + ""), HttpStatus.OK);
     }
 

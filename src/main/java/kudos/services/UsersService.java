@@ -29,4 +29,8 @@ public class UsersService {
     public Optional<User>saveUser(User user) {
         return Optional.of(userRepository.save(user));
     }
+
+    public User getKudosMaster() {
+        return new User("pass", "master@of.kudos", "Kudos", "Master");
+    }
 }

@@ -35,7 +35,7 @@ public abstract class BaseController {
     protected KudosBusinessStrategy kudosBusinessStrategy;
 
     protected DateFormat getDateFormat() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+        return new SimpleDateFormat("yyyy-MM-dd");
     }
 
 }

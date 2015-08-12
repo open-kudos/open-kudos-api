@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Created by chc on 15.8.4.
  */
-public class EmailServiceTestingPurposes {
+public class EmailService {
 
     public static void send(Email email) throws MessagingException {
 

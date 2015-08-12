@@ -23,7 +23,7 @@ public class Transaction {
     private int receiverBalance;
 // WHERE timestamp > NOW-2days AND kudosType === 'KIND' GROUP BY receiver ORDER BY sum(kudosAmount) DESC LIMIT 0,1
 
-    public Transaction(String receiverEmail, String senderEmail, int amount, String message){
+    public Transaction(String receiverEmail, String senderEmail, int amount, String message) {
         this.senderEmail = senderEmail;
         this.receiverEmail = receiverEmail;
         this.amount = amount;

@@ -12,9 +12,10 @@ import java.util.List;
 @Repository
 public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
-    List<Challenge> findChallengesBySenderEmail(String senderEmail);
+    List<Challenge> findChallengesByCreator(String creator);
 
-    List<Challenge> findChallengesByParticipantEmail(String receiverEmail);
+    List<Challenge> findChallengesByParticipant(String participant);
 
-    List<Challenge> findAllChallengerByRefereeEmail(String judgeEmail);
+    List<Challenge> findAllChallengesByReferee(String referee);
+
 }

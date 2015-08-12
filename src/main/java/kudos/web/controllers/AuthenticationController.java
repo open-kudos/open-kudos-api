@@ -60,7 +60,7 @@ public class AuthenticationController extends BaseController {
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public ResponseEntity<Response> logout(HttpSession session, Principal principal) {
         if (principal == null) {
-            return new ResponseEntity<>(new SingleErrorResponse("already.logged"),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new SingleErrorResponse("not.logged"),HttpStatus.NOT_FOUND);
         }
         session.invalidate();
         return new ResponseEntity<>(HttpStatus.OK);

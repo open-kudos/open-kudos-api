@@ -1,9 +1,8 @@
 package kudos.model;
 
 import org.joda.time.LocalDate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
 
 /**
  * Created by chc on 15.8.7.
@@ -11,56 +10,106 @@ import java.time.LocalDateTime;
 @Document
 public class Challenge {
 
-    private String senderEmail;
-    private String participantEmail;
+    public enum Status {
+        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, FAILED
+    }
 
-    private String refereeEmail;
-    private String challengeName;
+    @Id
+    private String id;
+    private String creator;
+    private String participant;
+    private String referee;
+
+    private String name;
+
     private LocalDate dueDate;
-
-    private boolean isCompleted = false;
-
+    private LocalDate finishDate;
     private int amount;
+    private Status status;
 
-    public Challenge(String senderEmail, String participantEmail, String judge, String challengeName, LocalDate dueDate, int amount) {
-        this.senderEmail = senderEmail;
-        this.participantEmail = participantEmail;
-        this.refereeEmail = judge;
-        this.challengeName = challengeName;
+
+    public Challenge(String creator, String participant, String referee, String name, LocalDate dueDate, LocalDate finishDate, int amount, Status status) {
+        this.creator = creator;
+        this.participant = participant;
+        this.referee = referee;
+
+        this.name = name;
+
         this.dueDate = dueDate;
+        this.finishDate = finishDate;
         this.amount = amount;
+        this.status = status;
     }
 
-    public String getChallengeName() {
-        return challengeName;
+    public String getId() {
+        return id;
     }
 
-    public String getSenderEmail() {
-        return senderEmail;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getParticipantEmail() {
-        return participantEmail;
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public String getParticipant() {
+        return participant;
+    }
+
+    public void setParticipant(String participant) {
+        this.participant = participant;
+    }
+
+    public String getReferee() {
+        return referee;
+    }
+
+    public void setReferee(String referee) {
+        this.referee = referee;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public LocalDate getDueDate() {
-        return this.dueDate;
+        return dueDate;
     }
 
-    public boolean isCompleted() {
-        return isCompleted;
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public LocalDate getFinishDate() {
+        return finishDate;
+    }
+
+    public void setFinishDate(LocalDate finishDate) {
+        this.finishDate = finishDate;
     }
 
     public int getAmount() {
-        return this.amount;
+        return amount;
     }
 
-    public void setIsCompleted(boolean isCompleted) {
-        this.isCompleted = isCompleted;
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
-    public String getRefereeEmail() {
-        return refereeEmail;
+    public Status getStatus() {
+        return status;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

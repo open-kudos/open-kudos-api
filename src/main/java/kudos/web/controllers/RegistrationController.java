@@ -4,7 +4,7 @@ import com.mongodb.MongoException;
 import kudos.web.beans.form.UserForm;
 import kudos.model.Email;
 import kudos.model.User;
-import kudos.services.EmailServiceTestingPurposes;
+import kudos.services.EmailService;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.SingleErrorResponse;
@@ -38,7 +38,7 @@ public class RegistrationController extends BaseController {
         } else if(!userRepository.exists(userForm.getEmail()) || !userRepository.findOne(userForm.getEmail()).isRegistered()){
             try {
                 String userEmail = userForm.getEmail();
-                new EmailServiceTestingPurposes().send(new Email(userEmail, new Date().toString(), "confirmationMail",
+                new EmailService().send(new Email(userEmail, new Date().toString(), "confirmationMail",
                         "Welcome to KUDOS app. To verify your email, please paste this link to yout browser: localhost:8080/confirm-email?hashedMail="
                                 + userEmail.hashCode()));
                 String password = new StrongPasswordEncryptor().encryptPassword(userForm.getPassword());

@@ -1,5 +1,8 @@
 package kudos.web.handlers;
 
+import kudos.exceptions.BusinessException;
+import kudos.exceptions.InvalidKudosAmountException;
+import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.ErrorResponse;
@@ -26,6 +29,16 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         LOG.info("error count is: " + exception.getErrors().getErrorCount());
         Errors errors = exception.getErrors();
         return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidKudosAmountException.class)
+    public ResponseEntity<Response> handleInvalidKudosAmountException(HttpServletRequest request, InvalidKudosAmountException e){
+        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Response> handleBusinessException(HttpServletRequest request, InvalidKudosAmountException e){
+        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
     }
 
 }
