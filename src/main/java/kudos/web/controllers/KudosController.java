@@ -46,7 +46,7 @@ public class KudosController extends BaseController {
 
     }
 
-    @RequestMapping(value = "/show-incoming-transactions", method = RequestMethod.GET)
+    @RequestMapping(value = "/get-incoming-transactions", method = RequestMethod.GET)
     public ResponseEntity<Response> showIncomingTransactionHistory(Principal principal) {
         String email = principal.getName();
         List allUserTransactions = transactionRepository.findTransactionsByReceiverEmail(email);
@@ -54,14 +54,14 @@ public class KudosController extends BaseController {
 
     }
 
-    @RequestMapping(value = "/show-outgoing-transactions", method = RequestMethod.GET)
+    @RequestMapping(value = "/get-outgoing-transactions", method = RequestMethod.GET)
     public ResponseEntity<Response> showOutcomingTransactionHistory(Principal principal) {
         String email = principal.getName();
         List allUserTransactions = transactionRepository.findTransactionsBySenderEmail(email);
         return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/show-remaining-kudos", method = RequestMethod.GET)
+    @RequestMapping(value = "/get-remaining-kudos", method = RequestMethod.GET)
     public ResponseEntity<Response> showRemainingKudos(Principal principal) {
         int amount = kudosService.getFreeKudos(usersService.getLoggedUser().get());
         return new ResponseEntity<>(StatusResponse.showKudosStatus(amount + ""), HttpStatus.OK);

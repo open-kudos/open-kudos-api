@@ -1,19 +1,20 @@
 package kudos.web.controllers;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import kudos.exceptions.BusinessException;
+import kudos.exceptions.ChallengeIdNotSpecifiedException;
+import kudos.exceptions.InvalidChallengeStatusException;
+import kudos.exceptions.WrongChallengeEditorException;
 import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.model.Challenge;
 import kudos.model.User;
-import kudos.services.ChallengeService;
 import kudos.web.beans.response.ChallengeHistoryResponse;
 import kudos.web.beans.response.ChallengeResponse;
 import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 
@@ -30,11 +32,6 @@ import java.text.ParseException;
 @RequestMapping("/challenges")
 @Controller
 public class ChallengeController extends BaseController {
-
-
-    @Autowired
-    private ChallengeService service;
-
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ResponseEntity<Response> challenge(@ModelAttribute("form") ChallengeTransferForm form, Errors errors)
@@ -61,18 +58,80 @@ public class ChallengeController extends BaseController {
 
         int amount = Integer.parseInt(form.getAmount());
 
-        Challenge challenge = service.create(participant.get(), referee.get(), form.getName(), due, amount);
+        Challenge challenge = challengeService.create(participant.get(), referee.get(), form.getName(), due, amount);
 
         return new ResponseEntity<>(new ChallengeResponse(challenge),HttpStatus.OK);
 
-        //TODO before calling accept, decline, or other modifier methods in controller check
-        //TODO if new modifier is not the same as old one. Throw challengeTypeException
-
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ResponseEntity<Response> challenges(){
-        return new ResponseEntity<>(new ChallengeHistoryResponse(service.getAllCreatedChallenges()),HttpStatus.OK);
+    @RequestMapping(value = "/get-created", method = RequestMethod.GET)
+    public ResponseEntity<Response> createdChallenges(){
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllCreatedChallenges()),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/get-participated", method = RequestMethod.GET)
+    public ResponseEntity<Response> participatedChallenges(){
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllParticipatedChallenges()),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/get-referred", method = RequestMethod.GET)
+    public ResponseEntity<Response> refferedChallenges(){
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllRefferedChallenges()),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/accept", method = RequestMethod.POST)
+    public ResponseEntity<Response> accept(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException {
+
+        if(Strings.isNullOrEmpty(id)){
+            throw new ChallengeIdNotSpecifiedException();
+        }
+
+        Challenge challenge = challengeService.getChallenge(id);
+        if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
+            throw new WrongChallengeEditorException("not.a.participant");
+        }
+        return new ResponseEntity<>(new ChallengeResponse(challengeService.accept(challenge)),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/decline", method = RequestMethod.POST)
+    public ResponseEntity<Response> decline(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException {
+
+        if(Strings.isNullOrEmpty(id)){
+            throw new ChallengeIdNotSpecifiedException();
+        }
+        Challenge challenge = challengeService.getChallenge(id);
+        if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
+            throw new WrongChallengeEditorException("not.a.participant");
+        }
+        return new ResponseEntity<>(new ChallengeResponse(challengeService.decline(challenge)),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
+    public ResponseEntity<Response> accomplish(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException {
+
+        if(Strings.isNullOrEmpty(id)){
+            throw new ChallengeIdNotSpecifiedException();
+        }
+
+        Challenge challenge = challengeService.getChallenge(id);
+        if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
+            throw new WrongChallengeEditorException("not.a.referee");
+        }
+        return new ResponseEntity<>(new ChallengeResponse(challengeService.accomplish(challenge)),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/fail", method = RequestMethod.POST)
+    public ResponseEntity<Response> fail(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException {
+
+        if(Strings.isNullOrEmpty(id)){
+            throw new ChallengeIdNotSpecifiedException();
+        }
+
+        Challenge challenge = challengeService.getChallenge(id);
+        if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
+            throw new WrongChallengeEditorException("not.a.referee");
+        }
+        return new ResponseEntity<>(new ChallengeResponse(challengeService.fail(challenge)),HttpStatus.OK);
     }
 
 }

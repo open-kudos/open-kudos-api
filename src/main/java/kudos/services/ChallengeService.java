@@ -51,6 +51,10 @@ public class ChallengeService {
         return challenge;
     }
 
+    public Challenge getChallenge(String id){
+        return challengeRepository.findChallengeById(id);
+    }
+
     public Challenge accept(Challenge challenge) throws InvalidChallengeStatusException {
         if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
             throw new InvalidChallengeStatusException("challenge.already.accomplished");
@@ -64,7 +68,7 @@ public class ChallengeService {
         if(challenge.getStatus().equals(Challenge.Status.ACCEPTED)){
             throw new InvalidChallengeStatusException("challenge.already.accepted");
         }
-        Challenge databaseChallenge = challengeRepository.findOne(challenge.getId());
+        Challenge databaseChallenge = getChallenge(challenge.getId());
         databaseChallenge.setStatus(Challenge.Status.ACCEPTED);
         return challengeRepository.save(databaseChallenge);
     }
@@ -82,7 +86,7 @@ public class ChallengeService {
         if(challenge.getStatus().equals(Challenge.Status.DECLINED)){
             throw new InvalidChallengeStatusException("challenge.already.declined");
         }
-        Challenge databaseChallenge = challengeRepository.findOne(challenge.getId());
+        Challenge databaseChallenge = getChallenge(challenge.getId());
         databaseChallenge.setStatus(Challenge.Status.DECLINED);
         return challengeRepository.save(databaseChallenge);
     }
@@ -98,7 +102,7 @@ public class ChallengeService {
             throw new InvalidChallengeStatusException("challenge.already.accomplished");
         }
 
-        Challenge databaseChallenge = challengeRepository.findOne(challenge.getId());
+        Challenge databaseChallenge = getChallenge(challenge.getId());
         databaseChallenge.setStatus(Challenge.Status.ACCOMPLISHED);
         return challengeRepository.save(databaseChallenge);
     }
@@ -117,7 +121,7 @@ public class ChallengeService {
             throw new InvalidChallengeStatusException("challenge.not.accomplished");
         }
 
-        Challenge databaseChallenge = challengeRepository.findOne(challenge.getId());
+        Challenge databaseChallenge = getChallenge(challenge.getId());
         databaseChallenge.setStatus(Challenge.Status.FAILED);
         return challengeRepository.save(databaseChallenge);
     }

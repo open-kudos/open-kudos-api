@@ -3,6 +3,7 @@ package kudos.web.controllers;
 import kudos.KudosBusinessStrategy;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
+import kudos.services.ChallengeService;
 import kudos.services.EmailService;
 import kudos.services.KudosService;
 import kudos.services.UsersService;
@@ -32,6 +33,9 @@ public abstract class BaseController {
 
     @Autowired
     protected KudosBusinessStrategy kudosBusinessStrategy;
+
+    @Autowired
+    protected ChallengeService challengeService;
 
     @Autowired
     @Qualifier(value = "DBTimeFormatter")

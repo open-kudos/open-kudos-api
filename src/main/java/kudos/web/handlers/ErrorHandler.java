@@ -1,9 +1,7 @@
 package kudos.web.handlers;
 
 import com.mongodb.MongoException;
-import kudos.exceptions.BusinessException;
-import kudos.exceptions.InvalidChallengeStatusException;
-import kudos.exceptions.InvalidKudosAmountException;
+import kudos.exceptions.*;
 import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
@@ -64,6 +62,18 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Response> handleInvalidChallengeStatusException(HttpServletRequest request,
            InvalidChallengeStatusException e){
         return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(WrongChallengeEditorException.class)
+    public ResponseEntity<Response> handleInvalidChallengeStatusException(HttpServletRequest request,
+                                    WrongChallengeEditorException e){
+        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ChallengeIdNotSpecifiedException.class)
+    public ResponseEntity<Response> handleChallengeIdNotSpecifiedException(HttpServletRequest request,
+                                                                          ChallengeIdNotSpecifiedException e){
+        return new ResponseEntity<>(new SingleErrorResponse("challenge.id.not.specified"),HttpStatus.BAD_REQUEST);
     }
 
 }
