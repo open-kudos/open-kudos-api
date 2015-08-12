@@ -1,6 +1,9 @@
 package kudos.web.beans.form;
 
 import com.google.common.base.Strings;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -106,7 +109,7 @@ public class ChallengeTransferForm {
             }
 
             if(!isEnteredDateValid(estimatedDate)){
-                errors.rejectValue("finishDate","finishDate.is.empty");
+                errors.rejectValue("finishDate","finishDate.is.incorrect");
             } else if(Strings.isNullOrEmpty(estimatedDate)){
                 errors.rejectValue("finishDate","finishDate.is.empty");
             }
@@ -114,16 +117,13 @@ public class ChallengeTransferForm {
         }
 
         public boolean isEnteredDateValid(String text) {
-            if (text == null || !text.matches("\\d{4}-[01]\\d-[0-3]\\d"))
-                return false;
-            SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");
-            dateFormat.setLenient(false);
-            try {
-                dateFormat.parse(text);
+            try{
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss,SSS").parseLocalDate(text);
                 return true;
-            } catch (ParseException ex) {
+            } catch (IllegalArgumentException p){
                 return false;
             }
+
         }
 
     }

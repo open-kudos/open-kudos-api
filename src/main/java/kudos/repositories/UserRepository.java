@@ -16,7 +16,7 @@ public interface UserRepository extends MongoRepository<User,String> {
     User findByFirstName(String firstName);
     List<User> findByLastName(String lastName);
     User findByEmail(String email);
-
+    User findUserByEmailHash(String emailHash);
 
     @Query(value = "{'_id': ?0}", count = true)
     Long countUsersByEmail(String email);

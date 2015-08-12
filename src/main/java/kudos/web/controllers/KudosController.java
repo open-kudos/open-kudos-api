@@ -40,7 +40,6 @@ public class KudosController extends BaseController {
             return new ResponseEntity<>(new SingleErrorResponse("receiver.not.exist"), HttpStatus.BAD_REQUEST);
         }
 
-
         Transaction transaction = kudosService.giveKudos(receiver.get(),
                 Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
         return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);

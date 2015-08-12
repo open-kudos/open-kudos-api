@@ -22,13 +22,13 @@ public class Challenge {
 
     private String name;
 
-    private LocalDate dueDate;
-    private LocalDate finishDate;
+    private String dueDate;
+    private String finishDate;
     private int amount;
     private Status status;
 
 
-    public Challenge(String creator, String participant, String referee, String name, LocalDate dueDate, LocalDate finishDate, int amount, Status status) {
+    public Challenge(String creator, String participant, String referee, String name, String dueDate, String finishDate, int amount, Status status) {
         this.creator = creator;
         this.participant = participant;
         this.referee = referee;
@@ -81,19 +81,19 @@ public class Challenge {
         this.name = name;
     }
 
-    public LocalDate getDueDate() {
+    public String getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
 
-    public LocalDate getFinishDate() {
+    public String getFinishDate() {
         return finishDate;
     }
 
-    public void setFinishDate(LocalDate finishDate) {
+    public void setFinishDate(String finishDate) {
         this.finishDate = finishDate;
     }
 

@@ -49,6 +49,7 @@ dependencies {
    compile 'org.json:json:20141113'
    compile 'com.sun.mail:javax.mail:1.5.4'
    compile 'joda-time:joda-time:2.8.1'
+   testCompile 'org.mockito:mockito-all:1.10.19'
    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
    testCompile 'com.jayway.jsonpath:json-path:2.0.0'
    testCompile 'org.springframework:spring-test:4.1.7.RELEASE'

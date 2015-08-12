@@ -8,6 +8,7 @@ import kudos.exceptions.KudosExceededException;
 import kudos.model.User;
 import kudos.repositories.TransactionRepository;
 import kudos.model.Transaction;
+import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
