@@ -20,4 +20,6 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
     Challenge findChallengeById(String id);
 
+    List<Challenge> findAllChallengesByStatus(Challenge.Status status);
+
 }

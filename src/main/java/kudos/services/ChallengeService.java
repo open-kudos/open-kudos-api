@@ -45,9 +45,8 @@ public class ChallengeService {
         String userEmail = usersService.getLoggedUser().get().getEmail();
 
         Challenge challenge = new Challenge(userEmail, participant.getEmail(), referee.getEmail(), name, due.toString(dateTimeFormatter), null, amount, Challenge.Status.CREATED);
-
-        challenge = challengeRepository.save(challenge);
         kudosService.giveSystemKudos(participant, amount, name);
+        challenge = challengeRepository.save(challenge);
         return challenge;
     }
 
@@ -126,16 +125,28 @@ public class ChallengeService {
         return challengeRepository.save(databaseChallenge);
     }
 
-    public List<Challenge>getAllCreatedChallenges(){
+    public List<Challenge> getAllCreatedByUserChallenges() {
         return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge>getAllParticipatedChallenges(){
+    public List<Challenge> getAllParticipatedChallenges() {
         return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge>getAllRefferedChallenges(){
+    public List<Challenge> getAllRefferedChallenges() {
         return challengeRepository.findAllChallengesByReferee(usersService.getLoggedUser().get().getEmail());
+    }
+
+    public List<Challenge> getAllAcceptedChallenges() {
+        return challengeRepository.findAllChallengesByStatus(Challenge.Status.ACCEPTED);
+    }
+
+    public List<Challenge> getAllCreatedChallenges() {
+        return challengeRepository.findAllChallengesByStatus(Challenge.Status.CREATED);
+    }
+
+    public Challenge saveChallenge(Challenge challenge){
+        return challengeRepository.save(challenge);
     }
 
 }

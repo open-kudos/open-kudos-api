@@ -76,4 +76,10 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new SingleErrorResponse("challenge.id.not.specified"),HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(KudosExceededException.class)
+    public ResponseEntity<Response> handleKudosExceededException(HttpServletRequest request,
+                                                                           KudosExceededException e){
+        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+    }
+
 }
