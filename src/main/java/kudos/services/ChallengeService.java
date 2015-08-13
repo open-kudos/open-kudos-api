@@ -39,12 +39,13 @@ public class ChallengeService {
         this.usersService = usersService;
     }
 
-    public Challenge create(User participant, User referee, String name, LocalDateTime due, int amount)
+    public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount)
              throws BusinessException{
 
         String userEmail = usersService.getLoggedUser().get().getEmail();
 
-        Challenge challenge = new Challenge(userEmail, participant.getEmail(), referee.getEmail(), name, due.toString(dateTimeFormatter), null, amount, Challenge.Status.CREATED);
+        LocalDateTime now = LocalDateTime.now();
+        Challenge challenge = new Challenge(userEmail, participant.getEmail(), referee.getEmail(), name, now.toString(dateTimeFormatter), finishDate.toString(dateTimeFormatter), amount, Challenge.Status.CREATED);
         kudosService.giveSystemKudos(participant, amount, name);
         challenge = challengeRepository.save(challenge);
         return challenge;
@@ -90,7 +91,7 @@ public class ChallengeService {
         return challengeRepository.save(databaseChallenge);
     }
 
-    public Challenge accomplish(Challenge challenge) throws InvalidChallengeStatusException {
+    public Challenge accomplish(Challenge challenge) throws BusinessException {
         if(challenge.getStatus().equals(Challenge.Status.FAILED)){
             throw new InvalidChallengeStatusException("challenge.already.failed");
         }
@@ -103,10 +104,14 @@ public class ChallengeService {
 
         Challenge databaseChallenge = getChallenge(challenge.getId());
         databaseChallenge.setStatus(Challenge.Status.ACCOMPLISHED);
+
+        kudosService.takeSystemKudos(usersService.findByEmail(challenge.getParticipant()).get()
+                ,challenge.getAmount(),challenge.getName());
+
         return challengeRepository.save(databaseChallenge);
     }
 
-    public Challenge fail(Challenge challenge) throws InvalidChallengeStatusException{
+    public Challenge fail(Challenge challenge) throws BusinessException {
         if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
             throw new InvalidChallengeStatusException("challenge.already.accomplished");
         }
@@ -116,24 +121,25 @@ public class ChallengeService {
         if(challenge.getStatus().equals(Challenge.Status.FAILED)){
             throw new InvalidChallengeStatusException("challenge.already.failed");
         }
-        if(challenge.getStatus().equals(Challenge.Status.CREATED)){
-            throw new InvalidChallengeStatusException("challenge.not.accomplished");
-        }
 
         Challenge databaseChallenge = getChallenge(challenge.getId());
         databaseChallenge.setStatus(Challenge.Status.FAILED);
+
+        kudosService.takeSystemKudos(usersService.findByEmail(challenge.getCreator()).get()
+                ,challenge.getAmount(),challenge.getName());
+
         return challengeRepository.save(databaseChallenge);
     }
 
-    public List<Challenge> getAllCreatedByUserChallenges() {
+    public List<Challenge> getAllUserCreatedChallenges() {
         return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge> getAllParticipatedChallenges() {
+    public List<Challenge> getAllUserParticipatedChallenges() {
         return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge> getAllRefferedChallenges() {
+    public List<Challenge> getAllUserRefferedChallenges() {
         return challengeRepository.findAllChallengesByReferee(usersService.getLoggedUser().get().getEmail());
     }
 

@@ -66,17 +66,17 @@ public class ChallengeController extends BaseController {
 
     @RequestMapping(value = "/get-created", method = RequestMethod.GET)
     public ResponseEntity<Response> createdChallenges(){
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllCreatedChallenges()),HttpStatus.OK);
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserCreatedChallenges()),HttpStatus.OK);
     }
 
     @RequestMapping(value = "/get-participated", method = RequestMethod.GET)
     public ResponseEntity<Response> participatedChallenges(){
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllParticipatedChallenges()),HttpStatus.OK);
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserParticipatedChallenges()),HttpStatus.OK);
     }
 
     @RequestMapping(value = "/get-referred", method = RequestMethod.GET)
     public ResponseEntity<Response> refferedChallenges(){
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllRefferedChallenges()),HttpStatus.OK);
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserRefferedChallenges()),HttpStatus.OK);
     }
 
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
@@ -107,7 +107,7 @@ public class ChallengeController extends BaseController {
     }
 
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public ResponseEntity<Response> accomplish(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException {
+    public ResponseEntity<Response> accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException {
 
         if(Strings.isNullOrEmpty(id)){
             throw new ChallengeIdNotSpecifiedException();
@@ -121,7 +121,7 @@ public class ChallengeController extends BaseController {
     }
 
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public ResponseEntity<Response> fail(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException {
+    public ResponseEntity<Response> fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException {
 
         if(Strings.isNullOrEmpty(id)){
             throw new ChallengeIdNotSpecifiedException();

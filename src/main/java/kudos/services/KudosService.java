@@ -1,5 +1,6 @@
 package kudos.services;
 
+import com.google.common.base.Optional;
 import com.mongodb.MongoException;
 import kudos.KudosBusinessStrategy;
 import kudos.exceptions.BusinessException;
@@ -54,7 +55,6 @@ public class KudosService {
      */
 
     public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException {
-
         User user = usersService.getLoggedUser().get();
         return transferKudos(user, to, amount, message);
     }
@@ -74,18 +74,21 @@ public class KudosService {
 
     /**
      * Transfers kudos points from System to Users Kudos account
-     * @param to User who receives Kudos
      * @param amount The amount of Kudos
      * @param message The message of the transaction.
      * @return
      * @throws BusinessException
      */
 
-    public Transaction giveSystemKudos(User to, int amount, String message) throws BusinessException {
-        return transferKudos(usersService.getKudosMaster(), to, amount, message);
+    public Transaction giveSystemKudos(User from, int amount, String message) throws BusinessException {
+        return transferKudos(usersService.getKudosMaster(),usersService.getKudosMaster(), amount, message);
     }
 
-    private Transaction transferKudos(User from, User to, int amount, String message) throws BusinessException {
+    public Transaction takeSystemKudos(User to, int amount, String message) throws BusinessException {
+        return transferKudos(to, usersService.getKudosMaster(), amount, message);
+    }
+
+    private Transaction transferKudos(User to, User from, int amount, String message) throws BusinessException {
         Transaction newTransaction = new Transaction(to.getEmail(), from.getEmail(), amount, message);
 
         if (amount < strategy.getMinDeposit()) {

@@ -1,5 +1,7 @@
 package kudos.services;
 
+import kudos.exceptions.BusinessException;
+import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.model.Challenge;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
@@ -27,27 +29,26 @@ public class ScheduledTasksService {
     DateTimeFormatter dateTimeFormatter;
 
     @Scheduled(fixedRate = 1000 * 15)
-    public void markTasksAsFailed(){
+    public void markTasksAsFailed() throws BusinessException {
         List<Challenge> acceptedChallenges = challengeService.getAllAcceptedChallenges();
         List<Challenge> createdChallenges = challengeService.getAllCreatedChallenges();
 
         LOG.warn("rate");
         for(Challenge challenge : acceptedChallenges){
-            LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getDueggDate());
-            if(challengeFinishTime.isBefore(LocalDateTime.now())) {
-                challenge.setStatus(Challenge.Status.FAILED);
-                challengeService.saveChallenge(challenge);
+            LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getFinishDate());
+            Challenge.Status challengeStatus = challenge.getStatus();
+            if(challengeFinishTime.isBefore(LocalDateTime.now())  && !challengeStatus.equals(Challenge.Status.FAILED)) {
+                challengeService.fail(challenge);
             }
         }
 
         for(Challenge challenge : createdChallenges){
-            LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getDueDate());
-            if(challengeFinishTime.isBefore(LocalDateTime.now())) {
-                challenge.setStatus(Challenge.Status.FAILED);
-                challengeService.saveChallenge(challenge);
+            LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getFinishDate());
+            Challenge.Status challengeStatus = challenge.getStatus();
+            if(challengeFinishTime.isBefore(LocalDateTime.now()) && !challengeStatus.equals(Challenge.Status.FAILED)) {
+                challengeService.fail(challenge);
             }
         }
-
     }
 }
 
