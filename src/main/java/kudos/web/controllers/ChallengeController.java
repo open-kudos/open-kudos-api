@@ -6,14 +6,14 @@ import kudos.exceptions.BusinessException;
 import kudos.exceptions.ChallengeIdNotSpecifiedException;
 import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.exceptions.WrongChallengeEditorException;
-import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.model.Challenge;
 import kudos.model.User;
+import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.web.beans.response.ChallengeHistoryResponse;
 import kudos.web.beans.response.ChallengeResponse;
+import kudos.web.beans.response.Response;
 import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
-import kudos.web.beans.response.Response;
 import org.joda.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,6 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 
@@ -76,7 +75,7 @@ public class ChallengeController extends BaseController {
 
     @RequestMapping(value = "/get-referred", method = RequestMethod.GET)
     public ResponseEntity<Response> refferedChallenges(){
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserRefferedChallenges()),HttpStatus.OK);
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserReferredChallenges()),HttpStatus.OK);
     }
 
     @RequestMapping(value = "/accept", method = RequestMethod.POST)

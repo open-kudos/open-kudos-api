@@ -1,23 +1,19 @@
 package kudos.services;
 
-import com.google.common.base.Optional;
 import com.mongodb.MongoException;
 import kudos.KudosBusinessStrategy;
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.KudosExceededException;
+import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.TransactionRepository;
-import kudos.model.Transaction;
-import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Created by chc on 15.8.7.
@@ -139,22 +135,9 @@ public class KudosService {
      */
 
     public int calculateSpentKudos(User user, LocalDateTime startTime){
-        List<Transaction> transactions = repository.findTransactionBySenderEmailOrderByTimestampDesc(user.getEmail());
-
-        int periodDeposit = 0;
-
-        for (int i = 0; i < transactions.size(); i++) {
-            LocalDateTime transactionTime = dateTimeFormatter.parseLocalDateTime(transactions.get(i).getTimestamp());
-            int amount = transactions.get(i).getAmount();
-            if (startTime.isAfter(transactionTime)) {
-                break;
-            }
-            LOG.trace("transaction amount is: " + amount);
-            periodDeposit += amount;
-        }
-
-        LOG.warn("period deposit is : "+periodDeposit);
-
-        return periodDeposit;
+        return repository.findTransactionBySenderEmailOrderByTimestampDesc(user.getEmail()).stream()
+                .filter(t -> dateTimeFormatter.parseLocalDateTime(t.getTimestamp()).isAfter(startTime))
+                .mapToInt(Transaction::getAmount)
+                .sum();
     }
 }

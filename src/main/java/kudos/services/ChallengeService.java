@@ -1,24 +1,19 @@
 package kudos.services;
 
-import com.mongodb.MongoException;
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidChallengeStatusException;
-import kudos.exceptions.KudosExceededException;
 import kudos.model.Challenge;
 import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
-import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- *
  * Created by chc on 15.8.7.
  */
 @Service
@@ -33,106 +28,45 @@ public class ChallengeService {
     DateTimeFormatter dateTimeFormatter;
 
     @Autowired
-    public ChallengeService(ChallengeRepository challengeRepository, KudosService kudosService, UsersService usersService){
+    public ChallengeService(ChallengeRepository challengeRepository, KudosService kudosService, UsersService usersService) {
         this.challengeRepository = challengeRepository;
         this.kudosService = kudosService;
         this.usersService = usersService;
     }
 
-    public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount)
-             throws BusinessException{
+    public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount) throws BusinessException {
 
         String userEmail = usersService.getLoggedUser().get().getEmail();
-
-        LocalDateTime now = LocalDateTime.now();
-        Challenge challenge = new Challenge(userEmail, participant.getEmail(), referee.getEmail(), name, now.toString(dateTimeFormatter), finishDate.toString(dateTimeFormatter), amount, Challenge.Status.CREATED);
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
-        challenge = challengeRepository.save(challenge);
-        return challenge;
+        return challengeRepository.save(new Challenge(userEmail, participant.getEmail(), referee.getEmail(), name, LocalDateTime.now().toString(dateTimeFormatter),
+                finishDate.toString(dateTimeFormatter), amount, Challenge.Status.CREATED));
     }
 
-    public Challenge getChallenge(String id){
+    public Challenge getChallenge(String id) {
         return challengeRepository.findChallengeById(id);
     }
 
     public Challenge accept(Challenge challenge) throws InvalidChallengeStatusException {
-        if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
-            throw new InvalidChallengeStatusException("challenge.already.accomplished");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.DECLINED)){
-            throw new InvalidChallengeStatusException("challenge.already.declined");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.FAILED)){
-            throw new InvalidChallengeStatusException("challenge.already.failed");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.ACCEPTED)){
-            throw new InvalidChallengeStatusException("challenge.already.accepted");
-        }
-        Challenge databaseChallenge = getChallenge(challenge.getId());
-        databaseChallenge.setStatus(Challenge.Status.ACCEPTED);
-        return challengeRepository.save(databaseChallenge);
+        checkNotAccomplishedDeclinedFailedOrAccepted(challenge);
+        return setStatusAndSave(challenge, Challenge.Status.ACCEPTED);
     }
 
     public Challenge decline(Challenge challenge) throws BusinessException {
-        if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
-            throw new InvalidChallengeStatusException("challenge.already.accomplished");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.FAILED)){
-            throw new InvalidChallengeStatusException("challenge.already.failed");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.ACCEPTED)){
-            throw new InvalidChallengeStatusException("challenge.already.accepted");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.DECLINED)){
-            throw new InvalidChallengeStatusException("challenge.already.declined");
-        }
-        Challenge databaseChallenge = getChallenge(challenge.getId());
-        databaseChallenge.setStatus(Challenge.Status.DECLINED);
-
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get()
-                , challenge.getAmount(), challenge.getName());
-
-        return challengeRepository.save(databaseChallenge);
+        checkNotAccomplishedDeclinedFailedOrAccepted(challenge);
+        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName());
+        return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge accomplish(Challenge challenge) throws BusinessException {
-        if(challenge.getStatus().equals(Challenge.Status.FAILED)){
-            throw new InvalidChallengeStatusException("challenge.already.failed");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.DECLINED)){
-            throw new InvalidChallengeStatusException("challenge.already.declined");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
-            throw new InvalidChallengeStatusException("challenge.already.accomplished");
-        }
-
-        Challenge databaseChallenge = getChallenge(challenge.getId());
-        databaseChallenge.setStatus(Challenge.Status.ACCOMPLISHED);
-
-        kudosService.takeSystemKudos(usersService.findByEmail(challenge.getParticipant()).get()
-                ,challenge.getAmount(),challenge.getName());
-
-        return challengeRepository.save(databaseChallenge);
+        checkNotAccomplishedDeclinedOrFailed(challenge);
+        kudosService.takeSystemKudos(usersService.findByEmail(challenge.getParticipant()).get(), challenge.getAmount(), challenge.getName());
+        return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
     public Challenge fail(Challenge challenge) throws BusinessException {
-        if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
-            throw new InvalidChallengeStatusException("challenge.already.accomplished");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.DECLINED)){
-            throw new InvalidChallengeStatusException("challenge.already.declined");
-        }
-        if(challenge.getStatus().equals(Challenge.Status.FAILED)){
-            throw new InvalidChallengeStatusException("challenge.already.failed");
-        }
-
-        Challenge databaseChallenge = getChallenge(challenge.getId());
-        databaseChallenge.setStatus(Challenge.Status.FAILED);
-
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get()
-                ,challenge.getAmount(),challenge.getName());
-
-        return challengeRepository.save(databaseChallenge);
+        checkNotAccomplishedDeclinedOrFailed(challenge);
+        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName());
+        return setStatusAndSave(challenge, Challenge.Status.FAILED);
     }
 
     public List<Challenge> getAllUserCreatedChallenges() {
@@ -143,7 +77,7 @@ public class ChallengeService {
         return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge> getAllUserRefferedChallenges() {
+    public List<Challenge> getAllUserReferredChallenges() {
         return challengeRepository.findAllChallengesByReferee(usersService.getLoggedUser().get().getEmail());
     }
 
@@ -155,8 +89,28 @@ public class ChallengeService {
         return challengeRepository.findAllChallengesByStatus(Challenge.Status.CREATED);
     }
 
-    public Challenge saveChallenge(Challenge challenge){
-        return challengeRepository.save(challenge);
+    private void checkNotAccomplishedDeclinedFailedOrAccepted(Challenge challenge) throws InvalidChallengeStatusException {
+        switch (challenge.getStatus()) {
+            case ACCEPTED:
+                throw new InvalidChallengeStatusException("challenge.already.accepted");
+        }
+        checkNotAccomplishedDeclinedOrFailed(challenge);
     }
 
+    private void checkNotAccomplishedDeclinedOrFailed(Challenge challenge) throws InvalidChallengeStatusException {
+        switch (challenge.getStatus()) {
+            case ACCOMPLISHED:
+                throw new InvalidChallengeStatusException("challenge.already.accomplished");
+            case DECLINED:
+                throw new InvalidChallengeStatusException("challenge.already.declined");
+            case FAILED:
+                throw new InvalidChallengeStatusException("challenge.already.failed");
+        }
+    }
+
+    private Challenge setStatusAndSave(Challenge challenge, Challenge.Status status) {
+        Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
+        databaseChallenge.setStatus(status);
+        return challengeRepository.save(databaseChallenge);
+    }
 }
