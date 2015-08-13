@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by chc on 15.7.23.
@@ -26,7 +27,7 @@ public class User {
     private String startedToWorkDate;
     private String position;
 
-    private int emailHash;
+    private String emailHash;
 
     private boolean isCompleted = false;
     private boolean showBirthday = false;
@@ -43,7 +44,6 @@ public class User {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.emailHash = this.email.hashCode();
     }
 
     public void updateUserWithAdditionalInformation(String password, String email, String firstName, String lastName, String birthday, String phone, String startedToWorkDate, String position, String department, String location,
@@ -133,11 +133,11 @@ public class User {
         this.isConfirmed = true;
     }
 
-    public int getEmailHash() {
+    public String getEmailHash() {
         return emailHash;
     }
 
-    public void setEmailHash(int emailHash) {
+    public void setEmailHash(String emailHash) {
         this.emailHash = emailHash;
     }
 }

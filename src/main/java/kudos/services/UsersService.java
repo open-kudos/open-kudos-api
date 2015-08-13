@@ -1,11 +1,14 @@
 package kudos.services;
 
+
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import freemarker.template.TemplateException;
 import kudos.model.Email;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
+import kudos.web.config.WebConfig;
 import kudos.web.exceptions.UserException;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +16,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by chc on 15.8.11.
@@ -44,7 +51,7 @@ public class UsersService {
         return new User("pass", "master@of.kudos", "Kudos", "Master");
     }
 
-    public User registerUser(User user) throws UserException, MessagingException {
+    public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
         String email = user.getEmail();
 
         if(findByEmail(email).isPresent() && findByEmail(email).get().isRegistered()){
@@ -53,11 +60,14 @@ public class UsersService {
             throw new UserException("user.already.exists");
         }
 
-        emailService.send(new Email(email, new Date().toString(),"",email.hashCode()+""));
+        String hash = getRandomHash();
+
+        emailService.send(new Email(email, new Date().toString(),"", hash));
 
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
 
         User newUser = new User(password, email, user.getFirstName(), user.getLastName());
+        newUser.setEmailHash(hash);
         return saveUser(newUser).get();
     }
 
@@ -127,6 +137,23 @@ public class UsersService {
             throw new UserException("user.not.completed");
         }
         return user;
+    }
+
+    public void resetPassword(String email) throws UserException{
+        if(Strings.isNullOrEmpty(email)){
+            throw new UserException("email.not.specified");
+        }
+
+        if(!findByEmail(email).isPresent()){
+            throw  new UserException("user.does.not.exist");
+        }
+
+        /*String hash = getRandomHash();
+        EmailService*/
+    }
+
+    private String getRandomHash(){
+        return new BigInteger(130, new SecureRandom()).toString(32);
     }
 
 }

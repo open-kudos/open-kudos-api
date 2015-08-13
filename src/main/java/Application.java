@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * Created by chc on 15.8.3.
  */
-@EnableScheduling
 public class Application {
 
     public static void main(String[] args) throws Exception{

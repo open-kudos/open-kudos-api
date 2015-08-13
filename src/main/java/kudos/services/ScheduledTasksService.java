@@ -33,7 +33,7 @@ public class ScheduledTasksService {
         List<Challenge> acceptedChallenges = challengeService.getAllAcceptedChallenges();
         List<Challenge> createdChallenges = challengeService.getAllCreatedChallenges();
 
-        LOG.info("accepted challenges amount is: "+acceptedChallenges.size()+" created challenges amount is: "+ createdChallenges.size());
+        LOG.info("accepted challenges amount is: " + acceptedChallenges.size() + " created challenges amount is: " + createdChallenges.size());
 
         LOG.info("rate");
         for(Challenge challenge : acceptedChallenges){

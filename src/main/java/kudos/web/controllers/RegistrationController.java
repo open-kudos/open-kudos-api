@@ -1,6 +1,9 @@
 package kudos.web.controllers;
 
+import com.google.common.base.Strings;
+import freemarker.template.TemplateException;
 import kudos.web.beans.form.UserForm;
+import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
@@ -13,6 +16,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 
 /**
  * Created by chc on 15.8.10.
@@ -25,7 +29,7 @@ public class RegistrationController extends BaseController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public
     @ResponseBody
-    ResponseEntity<Response> register(@ModelAttribute("form") UserForm userForm, Errors errors) throws FormValidationException, MessagingException, UserException {
+    ResponseEntity<Response> register(@ModelAttribute("form") UserForm userForm, Errors errors) throws FormValidationException, MessagingException, UserException, IOException, TemplateException {
         new UserForm.FormValidator().validate(userForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
@@ -35,10 +39,19 @@ public class RegistrationController extends BaseController {
 
     }
 
-    @RequestMapping(value = "/confirm-email", method = RequestMethod.GET)
-    public ResponseEntity<Response> confirmEmail(@RequestParam String hashedMail) throws UserException {
-        return new ResponseEntity<>(new UserResponse(usersService.confirmUser(hashedMail)),HttpStatus.OK);
+    @RequestMapping(value = "/confirm-email", method = RequestMethod.POST)
+    public ResponseEntity<Response> confirmEmail(String id) throws UserException {
+        if(Strings.isNullOrEmpty(id)){
+            return new ResponseEntity<>(new SingleErrorResponse("confirm.id.not.specified"),HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(new UserResponse(usersService.confirmUser(id)),HttpStatus.OK);
     }
+
+    /*@RequestMapping(value = "/reset-my-password", method = RequestMethod.POST)
+    public ResponseEntity<Response> resetMyPassword(String email){
+        return new ResponseEntity<>()
+    }*/
 
 
 }

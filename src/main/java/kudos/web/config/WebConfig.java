@@ -13,9 +13,13 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 @Configuration
 @EnableWebMvc
@@ -51,4 +55,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public DateTimeFormatter DBTimeFormatter() {
         return DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss,SSS");
     }
+
 }
+
+
