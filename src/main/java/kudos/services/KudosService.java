@@ -56,7 +56,7 @@ public class KudosService {
 
     public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException {
         User user = usersService.getLoggedUser().get();
-        return transferKudos(user, to, amount, message);
+        return transferKudos(to, user, amount, message);
     }
 
     /**
@@ -69,7 +69,7 @@ public class KudosService {
      */
 
     public Transaction reduceFreeKudos(User user, int amount, String message) throws BusinessException {
-        return transferKudos(user, usersService.getKudosMaster(), amount, message);
+        return transferKudos(usersService.getKudosMaster(), user, amount, message);
     }
 
     /**
@@ -81,11 +81,18 @@ public class KudosService {
      */
 
     public Transaction giveSystemKudos(User from, int amount, String message) throws BusinessException {
-        return transferKudos(usersService.getKudosMaster(),usersService.getKudosMaster(), amount, message);
+        return transferKudos(usersService.getKudosMaster(),from, amount, message);
     }
 
     public Transaction takeSystemKudos(User to, int amount, String message) throws BusinessException {
         return transferKudos(to, usersService.getKudosMaster(), amount, message);
+    }
+
+    public Transaction retrieveSystemKudos(User to, int amount, String message) throws BusinessException {
+        //TODO works, but need better approach
+        Transaction newTransaction = new Transaction(to.getEmail(), to.getEmail(), -amount, message);
+        newTransaction.setReceiverBalance(getKudos(to));
+        return repository.insert(newTransaction);
     }
 
     private Transaction transferKudos(User to, User from, int amount, String message) throws BusinessException {
@@ -145,6 +152,8 @@ public class KudosService {
             LOG.trace("transaction amount is: " + amount);
             periodDeposit += amount;
         }
+
+        LOG.warn("period deposit is : "+periodDeposit);
 
         return periodDeposit;
     }

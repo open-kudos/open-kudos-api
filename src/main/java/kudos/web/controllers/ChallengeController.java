@@ -94,7 +94,7 @@ public class ChallengeController extends BaseController {
     }
 
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
-    public ResponseEntity<Response> decline(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException {
+    public ResponseEntity<Response> decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException {
 
         if(Strings.isNullOrEmpty(id)){
             throw new ChallengeIdNotSpecifiedException();

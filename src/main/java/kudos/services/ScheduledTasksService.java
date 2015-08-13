@@ -33,7 +33,9 @@ public class ScheduledTasksService {
         List<Challenge> acceptedChallenges = challengeService.getAllAcceptedChallenges();
         List<Challenge> createdChallenges = challengeService.getAllCreatedChallenges();
 
-        LOG.warn("rate");
+        LOG.info("accepted challenges amount is: "+acceptedChallenges.size()+" created challenges amount is: "+ createdChallenges.size());
+
+        LOG.info("rate");
         for(Challenge challenge : acceptedChallenges){
             LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getFinishDate());
             Challenge.Status challengeStatus = challenge.getStatus();
@@ -46,6 +48,7 @@ public class ScheduledTasksService {
             LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getFinishDate());
             Challenge.Status challengeStatus = challenge.getStatus();
             if(challengeFinishTime.isBefore(LocalDateTime.now()) && !challengeStatus.equals(Challenge.Status.FAILED)) {
+                LOG.info("created challenge was marked as failed");
                 challengeService.fail(challenge);
             }
         }

@@ -67,4 +67,10 @@ public class KudosController extends BaseController {
         return new ResponseEntity<>(StatusResponse.showKudosStatus(amount + ""), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/get-received-kudos", method = RequestMethod.GET)
+    public ResponseEntity<Response> showReceivedKudos(Principal principal) {
+        int amount = kudosService.getKudos(usersService.getLoggedUser().get());
+        return new ResponseEntity<>(StatusResponse.showKudosStatus(amount+""), HttpStatus.OK);
+    }
+
 }
