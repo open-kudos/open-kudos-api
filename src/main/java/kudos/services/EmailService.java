@@ -24,9 +24,6 @@ import java.util.Properties;
 @Component
 public class EmailService {
 
-    private static final String DEFAULT_EMAIL_MESSAGE = "Welcome to KUDOS app. To verify your email, please paste this" +
-            " link to your browser: ";
-
     private static final String DEFAULT_MESSAGE_LINK = "http://localhost:8080/confirm-email?id=";
 
     private static final String DEFAULT_EMAIL_SUBJECT = "confirmationMail";
@@ -39,8 +36,8 @@ public class EmailService {
         Properties tMailServerProperties = setupProperties();
         Session tSession = Session.getDefaultInstance(tMailServerProperties, null);
         Message tMsg = createMessage(tSession, System.getProperty("senderEmail"), email.getRecipientAddress(), /*email.getSubject()*/DEFAULT_EMAIL_SUBJECT);
-        tMsg.setContent(/*DEFAULT_EMAIL_MESSAGE + email.getMessage()*/templatingService.getEmailHtml("Welcome to kudos App",
-                DEFAULT_EMAIL_MESSAGE, DEFAULT_MESSAGE_LINK + email.getMessage()), "text/html");
+        tMsg.setContent(/*DEFAULT_EMAIL_MESSAGE + email.getMessage()*/templatingService.getHtml("Welcome to kudos App",
+                DEFAULT_MESSAGE_LINK + email.getMessage()), "text/html");
         Transport.send(tMsg);
 
     }

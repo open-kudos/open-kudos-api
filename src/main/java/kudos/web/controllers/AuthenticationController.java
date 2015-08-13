@@ -1,9 +1,11 @@
 package kudos.web.controllers;
 
 import kudos.web.beans.form.LoginForm;
+import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.SingleErrorResponse;
+import kudos.web.exceptions.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -32,28 +34,18 @@ public class AuthenticationController extends BaseController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody
     ResponseEntity<Response> login(@ModelAttribute("form")LoginForm loginForm, Errors errors,
-                                   Principal principal, HttpServletRequest request) throws FormValidationException {
+                                   Principal principal, HttpServletRequest request) throws FormValidationException, UserException {
         new LoginForm.LoginFormValidator().validate(loginForm,errors);
 
         if(errors.hasErrors()){
             throw new FormValidationException(errors);
-        } else if(principal == null) {
-
-            Authentication authenticationToken = new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword());
-
-            try {
-                Authentication authentication = authenticationManager.authenticate(authenticationToken);
-                SecurityContext securityContext = SecurityContextHolder.getContext();
-                securityContext.setAuthentication(authentication);
-                HttpSession session = request.getSession(true);
-                session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-                return new ResponseEntity<>(HttpStatus.OK);
-            } catch (AuthenticationCredentialsNotFoundException e) {
-                return new ResponseEntity<>(new SingleErrorResponse("user.not.found"), HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            return new ResponseEntity<>(new SingleErrorResponse("already.logged"), HttpStatus.BAD_REQUEST);
         }
+
+        if(usersService.getLoggedUser().isPresent()) {
+            throw new UserException("user.already.logged");
+        }
+        return new ResponseEntity<>(new UserResponse(usersService.login(loginForm.getEmail(),
+                loginForm.getPassword(),request)),HttpStatus.OK);
     }
 
 

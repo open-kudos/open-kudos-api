@@ -10,6 +10,7 @@ import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -80,6 +81,12 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Response> handleKudosExceededException(HttpServletRequest request,
                                                                            KudosExceededException e){
         return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+    public ResponseEntity<Response> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
+                                                                 AuthenticationCredentialsNotFoundException e){
+        return new ResponseEntity<>(new SingleErrorResponse(e.getMessage()),HttpStatus.BAD_REQUEST);
     }
 
 }

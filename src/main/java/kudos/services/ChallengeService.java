@@ -7,6 +7,7 @@ import kudos.exceptions.KudosExceededException;
 import kudos.model.Challenge;
 import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
+import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -40,7 +41,7 @@ public class ChallengeService {
     }
 
     public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount)
-             throws BusinessException{
+            throws BusinessException, UserException {
 
         String userEmail = usersService.getLoggedUser().get().getEmail();
 
@@ -73,7 +74,7 @@ public class ChallengeService {
         return challengeRepository.save(databaseChallenge);
     }
 
-    public Challenge decline(Challenge challenge) throws BusinessException {
+    public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
             throw new InvalidChallengeStatusException("challenge.already.accomplished");
         }
@@ -95,7 +96,7 @@ public class ChallengeService {
         return challengeRepository.save(databaseChallenge);
     }
 
-    public Challenge accomplish(Challenge challenge) throws BusinessException {
+    public Challenge accomplish(Challenge challenge) throws BusinessException, UserException {
         if(challenge.getStatus().equals(Challenge.Status.FAILED)){
             throw new InvalidChallengeStatusException("challenge.already.failed");
         }
@@ -115,7 +116,7 @@ public class ChallengeService {
         return challengeRepository.save(databaseChallenge);
     }
 
-    public Challenge fail(Challenge challenge) throws BusinessException {
+    public Challenge fail(Challenge challenge) throws BusinessException, UserException {
         if(challenge.getStatus().equals(Challenge.Status.ACCOMPLISHED)){
             throw new InvalidChallengeStatusException("challenge.already.accomplished");
         }
@@ -130,20 +131,20 @@ public class ChallengeService {
         databaseChallenge.setStatus(Challenge.Status.FAILED);
 
         kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get()
-                ,challenge.getAmount(),challenge.getName());
+                , challenge.getAmount(), challenge.getName());
 
         return challengeRepository.save(databaseChallenge);
     }
 
-    public List<Challenge> getAllUserCreatedChallenges() {
+    public List<Challenge> getAllUserCreatedChallenges() throws UserException {
         return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge> getAllUserParticipatedChallenges() {
+    public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
         return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge> getAllUserRefferedChallenges() {
+    public List<Challenge> getAllUserRefferedChallenges() throws UserException {
         return challengeRepository.findAllChallengesByReferee(usersService.getLoggedUser().get().getEmail());
     }
 
