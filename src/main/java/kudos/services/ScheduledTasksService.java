@@ -3,6 +3,7 @@ package kudos.services;
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.model.Challenge;
+import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -29,7 +30,7 @@ public class ScheduledTasksService {
     DateTimeFormatter dateTimeFormatter;
 
     @Scheduled(fixedRate = 1000 * 15)
-    public void markTasksAsFailed() throws BusinessException {
+    public void markTasksAsFailed() throws BusinessException, UserException {
         List<Challenge> acceptedChallenges = challengeService.getAllAcceptedChallenges();
         List<Challenge> createdChallenges = challengeService.getAllCreatedChallenges();
 

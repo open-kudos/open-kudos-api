@@ -26,7 +26,7 @@ public class UserController extends BaseController {
 
 
     @RequestMapping(value = "/disable", method = RequestMethod.POST)
-    public ResponseEntity<Response> disableMyAccount(HttpSession session) {
+    public ResponseEntity<Response> disableMyAccount(HttpSession session) throws UserException {
         usersService.disableMyAcount();
         session.invalidate();
         return new ResponseEntity<>(HttpStatus.OK);
@@ -38,7 +38,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "complete-profile", method = RequestMethod.POST)
-    public ResponseEntity<Response> completeUserProfile(@ModelAttribute("form") MyProfileForm myProfileForm, Errors errors) throws FormValidationException {
+    public ResponseEntity<Response> completeUserProfile(@ModelAttribute("form") MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException {
         new MyProfileForm.MyProfileValidator().validate(myProfileForm, errors);
         if(errors.hasErrors()){
             throw new FormValidationException(errors);

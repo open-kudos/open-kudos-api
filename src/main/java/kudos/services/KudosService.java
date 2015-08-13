@@ -50,7 +50,7 @@ public class KudosService {
      * @throws MongoException
      */
 
-    public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException {
+    public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException, UserException {
         User user = usersService.getLoggedUser().get();
         return transferKudos(to, user, amount, message);
     }

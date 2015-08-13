@@ -8,17 +8,29 @@ import kudos.model.Email;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
+import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.config.WebConfig;
 import kudos.web.exceptions.UserException;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -29,16 +41,22 @@ import java.util.UUID;
 public class UsersService {
 
     @Autowired
-    protected UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    protected EmailService emailService;
+    private EmailService emailService;
 
-    public Optional<User> findByEmail(String email) {
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    public Optional<User> findByEmail(String email) throws UserException {
+        if(userRepository.findOne(email) != null  && !userRepository.findOne(email).isRegistered()){
+            throw new UserException("user.not.exist");
+        }
         return Optional.fromNullable(userRepository.findByEmail(email));
     }
 
-    public Optional<User> getLoggedUser() {
+    public Optional<User> getLoggedUser() throws UserException {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         return findByEmail(name);
     }
@@ -82,7 +100,7 @@ public class UsersService {
         }
     }
 
-    public User completeUser(MyProfileForm myProfileForm){
+    public User completeUser(MyProfileForm myProfileForm) throws UserException {
         User user = getLoggedUser().get();
 
         String email = user.getEmail();
@@ -125,7 +143,7 @@ public class UsersService {
          return saveUser(user).get();
     }
 
-    public void disableMyAcount(){
+    public void disableMyAcount() throws UserException {
         User user = getLoggedUser().get();
         user.setIsRegistered(false);
         userRepository.save(user);
@@ -139,17 +157,37 @@ public class UsersService {
         return user;
     }
 
-    public void resetPassword(String email) throws UserException{
+    public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException {
+
+        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);
+        HttpSession session = request.getSession(true);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+        return userRepository.findByEmail(email);
+
+    }
+
+    public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {
         if(Strings.isNullOrEmpty(email)){
             throw new UserException("email.not.specified");
         }
-
         if(!findByEmail(email).isPresent()){
-            throw  new UserException("user.does.not.exist");
+            throw new UserException("user.does.not.exist");
         }
 
-        /*String hash = getRandomHash();
-        EmailService*/
+        User user = findByEmail(email).get();
+
+        if(!user.isRegistered()){
+            throw new UserException("user.not.registered");
+        }
+        String hash = getRandomHash();
+        user.setEmailHash(hash);
+
+        emailService.send(new Email(email, LocalDateTime.now().toString(),
+                "Click this link to reset your password","http://localhost:8080/reset-password-by-id?id="+hash));
+        userRepository.save(user);
     }
 
     private String getRandomHash(){

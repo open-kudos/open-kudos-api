@@ -8,6 +8,7 @@ import kudos.model.User;
 import kudos.web.beans.form.KudosTransferForm;
 import kudos.web.beans.response.*;
 import kudos.web.exceptions.FormValidationException;
+import kudos.web.exceptions.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,21 +28,17 @@ import java.util.List;
 public class KudosController extends BaseController {
 
     @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)
-    public ResponseEntity<Response> sendKudos(@ModelAttribute("form") KudosTransferForm kudosTransferForm, Errors errors, Principal principal) throws FormValidationException, BusinessException {
+    public ResponseEntity<Response> sendKudos(@ModelAttribute("form") KudosTransferForm kudosTransferForm, Errors errors, Principal principal) throws FormValidationException, BusinessException, UserException {
         new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
 
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
         }
 
-        Optional<User> receiver = usersService.findByEmail(kudosTransferForm.getReceiverEmail());
+        Transaction transaction = kudosService.giveKudos(
+                usersService.findByEmail(kudosTransferForm.getReceiverEmail()).get(),
+        Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
 
-        if (!receiver.isPresent()) {
-            return new ResponseEntity<>(new SingleErrorResponse("receiver.not.exist"), HttpStatus.BAD_REQUEST);
-        }
-
-        Transaction transaction = kudosService.giveKudos(receiver.get(),
-                Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
         return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);
 
     }
@@ -62,13 +59,13 @@ public class KudosController extends BaseController {
     }
 
     @RequestMapping(value = "/get-remaining-kudos", method = RequestMethod.GET)
-    public ResponseEntity<Response> showRemainingKudos(Principal principal) {
+    public ResponseEntity<Response> showRemainingKudos(Principal principal) throws UserException {
         int amount = kudosService.getFreeKudos(usersService.getLoggedUser().get());
         return new ResponseEntity<>(StatusResponse.showKudosStatus(amount + ""), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/get-received-kudos", method = RequestMethod.GET)
-    public ResponseEntity<Response> showReceivedKudos(Principal principal) {
+    public ResponseEntity<Response> showReceivedKudos(Principal principal) throws UserException {
         int amount = kudosService.getKudos(usersService.getLoggedUser().get());
         return new ResponseEntity<>(StatusResponse.showKudosStatus(amount+""), HttpStatus.OK);
     }

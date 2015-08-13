@@ -34,9 +34,7 @@ public class RegistrationController extends BaseController {
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
         }
-
         return new ResponseEntity<>(new UserResponse(usersService.registerUser(userForm.toUser())), HttpStatus.CREATED);
-
     }
 
     @RequestMapping(value = "/confirm-email", method = RequestMethod.POST)
@@ -48,10 +46,11 @@ public class RegistrationController extends BaseController {
         return new ResponseEntity<>(new UserResponse(usersService.confirmUser(id)),HttpStatus.OK);
     }
 
-    /*@RequestMapping(value = "/reset-my-password", method = RequestMethod.POST)
-    public ResponseEntity<Response> resetMyPassword(String email){
-        return new ResponseEntity<>()
-    }*/
+    @RequestMapping(value = "/reset-my-password", method = RequestMethod.POST)
+    public ResponseEntity<Response> resetMyPassword(String email) throws MessagingException, TemplateException, UserException, IOException {
+        usersService.resetPassword(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
 }
