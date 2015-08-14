@@ -187,11 +187,11 @@ public class UsersService {
         if(!user.isRegistered()){
             throw new UserException("user.not.registered");
         }
-        String hash = getRandomHash();
-        user.setEmailHash(hash);
+        String resetHash = getRandomHash();
+        user.setEmailHash(resetHash);
 
         emailService.send(new Email(email, LocalDateTime.now().toString(),
-                "Click this link to reset your password: ","http://localhost:8080/reset-password-by-id?id="+hash));
+                "Click this link to reset your password: ","http://localhost:8080/reset-password-by-id?id="+resetHash));
         userRepository.save(user);
     }
 

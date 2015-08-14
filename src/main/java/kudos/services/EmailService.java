@@ -25,11 +25,9 @@ import java.util.Properties;
 @Component
 public class EmailService {
 
-    private static final String DEFAULT_MESSAGE_LINK = "http://localhost:8080/confirm-email?id=";
-
     private static final String DEFAULT_EMAIL_SUBJECT = "confirmationMail";
 
-    private Logger LOG = Logger.getLogger(EmailService.class);
+    private final Logger LOG = Logger.getLogger(EmailService.class);
 
     @Autowired
     TemplatingService templatingService;
@@ -44,7 +42,7 @@ public class EmailService {
         Transport.send(tMsg);
 
         LOG.info(templatingService.getHtml("Welcome to kudos App",email.getSubject(),
-                DEFAULT_MESSAGE_LINK + email.getMessage()));
+                email.getMessage()));
 
     }
 

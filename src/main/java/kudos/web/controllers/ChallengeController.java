@@ -6,14 +6,14 @@ import kudos.exceptions.BusinessException;
 import kudos.exceptions.ChallengeIdNotSpecifiedException;
 import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.exceptions.WrongChallengeEditorException;
+import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.model.Challenge;
 import kudos.model.User;
-import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.web.beans.response.ChallengeHistoryResponse;
 import kudos.web.beans.response.ChallengeResponse;
-import kudos.web.beans.response.Response;
 import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
+import kudos.web.beans.response.Response;
 import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
@@ -23,6 +23,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
 
@@ -43,22 +44,11 @@ public class ChallengeController extends BaseController {
             throw new FormValidationException(errors);
         }
 
-        Optional<User> participant = usersService.findByEmail(form.getParticipant());
-        Optional<User> referee = usersService.findByEmail(form.getReferee());
-
-        if(!participant.isPresent()) {
-            return new ResponseEntity<>(new SingleErrorResponse("participant.not.exist"),HttpStatus.BAD_REQUEST);
-        }
-
-        if(!referee.isPresent()){
-            return new ResponseEntity<>(new SingleErrorResponse("referee.not.exist"),HttpStatus.BAD_REQUEST);
-        }
-
-        LocalDateTime due = formatter.parseLocalDateTime(form.getFinishDate());
-
-        int amount = Integer.parseInt(form.getAmount());
-
-        Challenge challenge = challengeService.create(participant.get(), referee.get(), form.getName(), due, amount);
+        Challenge challenge = challengeService.create(usersService.findByEmail(form.getParticipant()).get()
+                ,usersService.findByEmail(form.getReferee()).get(),
+                form.getName(),
+                formatter.parseLocalDateTime(form.getFinishDate()),
+                Integer.parseInt(form.getAmount()));
 
         return new ResponseEntity<>(new ChallengeResponse(challenge),HttpStatus.OK);
 
@@ -76,7 +66,7 @@ public class ChallengeController extends BaseController {
 
     @RequestMapping(value = "/get-referred", method = RequestMethod.GET)
     public ResponseEntity<Response> refferedChallenges() throws UserException {
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserReferredChallenges()),HttpStatus.OK);
+        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserReferredChallenges()), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
