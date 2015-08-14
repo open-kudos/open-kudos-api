@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * Created by chc on 15.8.7.
  */
-@Repository
 public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
     List<Challenge> findChallengesByCreator(String creator);

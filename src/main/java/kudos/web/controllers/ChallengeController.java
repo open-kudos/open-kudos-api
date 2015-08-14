@@ -34,6 +34,20 @@ import java.text.ParseException;
 @Controller
 public class ChallengeController extends BaseController {
 
+    /**
+     *
+     * {
+     *
+     * }
+     *
+     *
+     * @param form
+     * @param errors
+     * @return
+     * @throws FormValidationException when input is shitty.
+     * @throws ParseException
+     * @throws BusinessException
+     */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ResponseEntity<Response> challenge(@ModelAttribute("form") ChallengeTransferForm form, Errors errors)
             throws FormValidationException, ParseException, BusinessException, UserException {

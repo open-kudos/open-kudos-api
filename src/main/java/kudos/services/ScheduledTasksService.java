@@ -53,6 +53,7 @@ public class ScheduledTasksService {
                 challengeService.fail(challenge);
             }
         }
+
     }
 }
 

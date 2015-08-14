@@ -1,27 +1,18 @@
-apply plugin: 'war'
-apply plugin: 'jetty'
-apply plugin: 'eclipse-wtp'
-
-configurations {
-   compile.exclude module: "spring-boot-starter-tomcat"
-}
-
 buildscript {
-   repositories {
-      mavenCentral()
-   }
-   dependencies {
-      classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
-   }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.5.RELEASE")
+    }
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+apply plugin: 'war'
 apply plugin: 'spring-boot'
 
-jar {
-   baseName = 'open-kudos-SNAPSHOT'
+war {
+   baseName = 'open-kudos'
    version =  '0.1.0'
 }
 
@@ -34,8 +25,9 @@ targetCompatibility = 1.8
 
 
 dependencies {
-   compile("org.springframework.boot:spring-boot-starter-web:1.2.5.RELEASE")
-   compile("org.springframework.boot:spring-boot-starter-jetty:1.2.5.RELEASE")
+   compile("org.springframework.boot:spring-boot-starter-actuator")
+   compile 'org.springframework.boot:spring-boot-starter-web:1.2.5.RELEASE'
+   compile 'org.springframework.boot:spring-boot-starter-jetty:1.2.5.RELEASE'
    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
    compile 'org.springframework:spring-webmvc:4.1.7.RELEASE'
    compile 'org.springframework.security:spring-security-web:4.0.2.RELEASE'
@@ -49,6 +41,7 @@ dependencies {
    compile 'org.json:json:20141113'
    compile 'com.sun.mail:javax.mail:1.5.4'
    compile 'joda-time:joda-time:2.8.1'
+   providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
    compile 'org.freemarker:freemarker:2.3.23'
    testCompile 'org.mockito:mockito-all:1.10.19'
    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
