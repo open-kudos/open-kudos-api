@@ -35,7 +35,7 @@ public class TemplatingService {
         data.put("title", DEFAULT_TITLE);
     }
 
-    public String getHtml(String message, String hashedLink) throws IOException, TemplateException {
+    public String getHtml(String message, String hashedLink, String subject) throws IOException, TemplateException {
 
         Template emailTemplate = configuration.getTemplate("RegistrationTemplate.ftl");
 
@@ -43,6 +43,7 @@ public class TemplatingService {
 
         emailTemplateData.put("message",message);
         emailTemplateData.put("hashedLink", hashedLink);
+        emailTemplateData.put("subject",subject);
 
         Writer out = new StringWriter();
         emailTemplate.process(emailTemplateData, out);

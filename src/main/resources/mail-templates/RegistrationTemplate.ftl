@@ -1,1 +1,1 @@
-<p>${message} <a href="${hashedLink}">Click here to complete registration!</p>
+<p>${subject} <a href="${hashedLink}">${message}</p>

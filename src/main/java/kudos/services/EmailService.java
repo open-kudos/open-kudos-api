@@ -3,6 +3,7 @@ package kudos.services;
 
 import freemarker.template.TemplateException;
 import kudos.model.Email;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,8 @@ public class EmailService {
 
     private static final String DEFAULT_EMAIL_SUBJECT = "confirmationMail";
 
+    private Logger LOG = Logger.getLogger(EmailService.class);
+
     @Autowired
     TemplatingService templatingService;
 
@@ -35,10 +38,13 @@ public class EmailService {
 
         Properties tMailServerProperties = setupProperties();
         Session tSession = Session.getDefaultInstance(tMailServerProperties, null);
-        Message tMsg = createMessage(tSession, System.getProperty("senderEmail"), email.getRecipientAddress(), /*email.getSubject()*/DEFAULT_EMAIL_SUBJECT);
-        tMsg.setContent(/*DEFAULT_EMAIL_MESSAGE + email.getMessage()*/templatingService.getHtml("Welcome to kudos App",
-                DEFAULT_MESSAGE_LINK + email.getMessage()), "text/html");
+        Message tMsg = createMessage(tSession, System.getProperty("senderEmail"), email.getRecipientAddress(), /*email.getSubject()*/email.getSubject());
+        tMsg.setContent(/*DEFAULT_EMAIL_MESSAGE + email.getMessage()*/templatingService.getHtml("Welcome to kudos App",email.getSubject(),
+                 email.getMessage()), "text/html");
         Transport.send(tMsg);
+
+        LOG.info(templatingService.getHtml("Welcome to kudos App",email.getSubject(),
+                DEFAULT_MESSAGE_LINK + email.getMessage()));
 
     }
 

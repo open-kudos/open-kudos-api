@@ -80,7 +80,8 @@ public class UsersService {
 
         String hash = getRandomHash();
 
-        emailService.send(new Email(email, new Date().toString(),"", hash));
+        emailService.send(new Email(email, new Date().toString(),"Welcome to KUDOS app. Click this link to complete registration",
+                "http://localhost:8080/reset-password-by-id?id="+hash));
 
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
 
@@ -157,7 +158,11 @@ public class UsersService {
         return user;
     }
 
-    public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException {
+    public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
+
+        if(getLoggedUser().isPresent()) {
+            throw new UserException("user.already.logged");
+        }
 
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
@@ -186,7 +191,7 @@ public class UsersService {
         user.setEmailHash(hash);
 
         emailService.send(new Email(email, LocalDateTime.now().toString(),
-                "Click this link to reset your password","http://localhost:8080/reset-password-by-id?id="+hash));
+                "Click this link to reset your password: ","http://localhost:8080/reset-password-by-id?id="+hash));
         userRepository.save(user);
     }
 

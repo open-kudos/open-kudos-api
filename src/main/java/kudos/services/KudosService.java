@@ -8,6 +8,7 @@ import kudos.exceptions.KudosExceededException;
 import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.TransactionRepository;
+import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -50,7 +51,7 @@ public class KudosService {
      * @throws MongoException
      */
 
-    public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException, UserException {
+    public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException, UserException, UserException {
         User user = usersService.getLoggedUser().get();
         return transferKudos(to, user, amount, message);
     }

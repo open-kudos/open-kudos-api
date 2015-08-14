@@ -5,6 +5,7 @@ import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.model.Challenge;
 import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
+import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class ChallengeService {
         this.usersService = usersService;
     }
 
-    public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount) throws BusinessException {
+    public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount) throws BusinessException, UserException {
 
         String userEmail = usersService.getLoggedUser().get().getEmail();
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
@@ -51,33 +52,33 @@ public class ChallengeService {
         return setStatusAndSave(challenge, Challenge.Status.ACCEPTED);
     }
 
-    public Challenge decline(Challenge challenge) throws BusinessException {
+    public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrAccepted(challenge);
         kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName());
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
-    public Challenge accomplish(Challenge challenge) throws BusinessException {
+    public Challenge accomplish(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedOrFailed(challenge);
         kudosService.takeSystemKudos(usersService.findByEmail(challenge.getParticipant()).get(), challenge.getAmount(), challenge.getName());
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
-    public Challenge fail(Challenge challenge) throws BusinessException {
+    public Challenge fail(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedOrFailed(challenge);
         kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName());
         return setStatusAndSave(challenge, Challenge.Status.FAILED);
     }
 
-    public List<Challenge> getAllUserCreatedChallenges() {
+    public List<Challenge> getAllUserCreatedChallenges() throws UserException {
         return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge> getAllUserParticipatedChallenges() {
-        return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
+    public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
+       return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
     }
 
-    public List<Challenge> getAllUserReferredChallenges() {
+    public List<Challenge> getAllUserReferredChallenges() throws UserException {
         return challengeRepository.findAllChallengesByReferee(usersService.getLoggedUser().get().getEmail());
     }
 

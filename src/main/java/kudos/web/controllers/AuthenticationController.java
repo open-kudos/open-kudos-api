@@ -41,9 +41,6 @@ public class AuthenticationController extends BaseController {
             throw new FormValidationException(errors);
         }
 
-        if(usersService.getLoggedUser().isPresent()) {
-            throw new UserException("user.already.logged");
-        }
         return new ResponseEntity<>(new UserResponse(usersService.login(loginForm.getEmail(),
                 loginForm.getPassword(),request)),HttpStatus.OK);
     }
