@@ -71,7 +71,7 @@ public class ChallengeTransferForm {
 
     public static class ChallengeTransferFormValidator implements Validator {
 
-        private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
+        private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*" +
                 "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
         @Override
@@ -81,7 +81,7 @@ public class ChallengeTransferForm {
 
         @Override
         public void validate(Object target, Errors errors) {
-            ChallengeTransferForm challengeTransferForm = (ChallengeTransferForm)target;
+            ChallengeTransferForm challengeTransferForm = (ChallengeTransferForm) target;
 
             String receiverEmail = challengeTransferForm.getParticipant();
             String judgeEmail = challengeTransferForm.getReferee();
@@ -89,46 +89,49 @@ public class ChallengeTransferForm {
             String challengeName = challengeTransferForm.getName();
             String estimatedDate = challengeTransferForm.getFinishDate();
 
-            if(Strings.isNullOrEmpty(receiverEmail)){
-                errors.rejectValue("participant","receiver.email.not.specified");
-            } else if(!receiverEmail.matches(EMAIL_PATTERN)){
-                errors.rejectValue("participant","receiver.email.incorrect");
+            if (Strings.isNullOrEmpty(receiverEmail)) {
+                errors.rejectValue("participant", "receiver.email.not.specified");
+            } else if (!receiverEmail.matches(EMAIL_PATTERN)) {
+                errors.rejectValue("participant", "receiver.email.incorrect");
             }
 
-            if(Strings.isNullOrEmpty(judgeEmail)){
-                errors.rejectValue("referee","referee.not.specified");
-            } else if(!judgeEmail.matches(EMAIL_PATTERN)){
-                errors.rejectValue("referee","referee.incorrect");
+            if (Strings.isNullOrEmpty(judgeEmail)) {
+                errors.rejectValue("referee", "referee.email.not.specified");
+            } else if (!judgeEmail.matches(EMAIL_PATTERN)) {
+                errors.rejectValue("referee", "referee.email.incorrect");
             }
 
-            if (!Strings.isNullOrEmpty(amountInString)) {
-                try {
-                    int amount = Integer.parseInt(amountInString);
-                    if (amount <= 0) {
-                        errors.rejectValue("amount", "amount.negative.or.zero");
-                    }
-                } catch (NumberFormatException e) {
-                    errors.rejectValue("amount", "amount.not.digit");
+            if (Strings.isNullOrEmpty(amountInString)) {
+                errors.rejectValue("amount", "amount.not.specified");
+            }
+
+            try {
+                int amount = Integer.parseInt(amountInString);
+                if (amount <= 0) {
+                    errors.rejectValue("amount", "amount.negative.or.zero");
                 }
+            } catch (NumberFormatException e) {
+                errors.rejectValue("amount", "amount.not.digit");
             }
 
-            if(Strings.isNullOrEmpty(challengeName)){
-                errors.rejectValue("name","create.name.is.empty");
+
+            if (Strings.isNullOrEmpty(challengeName)) {
+                errors.rejectValue("name", "name.not.specified");
             }
 
-            if(!isEnteredDateValid(estimatedDate)){
-                errors.rejectValue("finishDate","finishDate.is.incorrect");
-            } else if(Strings.isNullOrEmpty(estimatedDate)){
-                errors.rejectValue("finishDate","finishDate.is.empty");
+            if (Strings.isNullOrEmpty(estimatedDate)) {
+                errors.rejectValue("finishDate", "finishDate.not.specified");
+            } else if (!isEnteredDateValid(estimatedDate)) {
+                errors.rejectValue("finishDate", "finishDate.incorrect");
             }
 
         }
 
         public boolean isEnteredDateValid(String text) {
-            try{
+            try {
                 DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss,SSS").parseLocalDate(text);
                 return true;
-            } catch (IllegalArgumentException p){
+            } catch (IllegalArgumentException p) {
                 return false;
             }
 

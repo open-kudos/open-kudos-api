@@ -15,7 +15,7 @@ import java.security.Principal;
 @Controller
 public class HomeController extends BaseController {
 
-    Logger LOG = Logger.getLogger(HomeController.class.getName());
+    private Logger LOG = Logger.getLogger(HomeController.class.getName());
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public Response index(Principal principal) {

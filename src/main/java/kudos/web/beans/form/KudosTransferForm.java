@@ -63,7 +63,7 @@ public class KudosTransferForm {
                 try {
                     int amount = Integer.parseInt(form.getAmount());
                     if (amount <= 0) {
-                        errors.rejectValue("amount", "amount.negative");
+                        errors.rejectValue("amount", "amount.negative.or.zero");
                     }
                 } catch (NumberFormatException e) {
                     errors.rejectValue("amount", "amount.not.digit");

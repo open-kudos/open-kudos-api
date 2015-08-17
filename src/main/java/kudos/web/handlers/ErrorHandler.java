@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 
 
 /**
@@ -40,7 +41,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Response> handleBusinessException(HttpServletRequest request, InvalidKudosAmountException e){
+    public ResponseEntity<Response> handleBusinessException(HttpServletRequest request, BusinessException e){
         return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
     }
 
@@ -86,6 +87,12 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
     public ResponseEntity<Response> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
                                                                  AuthenticationCredentialsNotFoundException e){
+        return new ResponseEntity<>(new SingleErrorResponse(e.getMessage()),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ParseException.class)
+    public ResponseEntity<Response> handleIntegerParseException(HttpServletRequest request,
+                                                                                     ParseException e){
         return new ResponseEntity<>(new SingleErrorResponse(e.getMessage()),HttpStatus.BAD_REQUEST);
     }
 

@@ -24,7 +24,6 @@ public class UserController extends BaseController {
 
     private static Logger LOG = Logger.getLogger(UserController.class.getName());
 
-
     @RequestMapping(value = "/disable", method = RequestMethod.POST)
     public ResponseEntity<Response> disableMyAccount(HttpSession session) throws UserException {
         usersService.disableMyAcount();
