@@ -5,6 +5,7 @@ import freemarker.template.TemplateException;
 import kudos.model.Email;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.mail.Transport;
@@ -29,6 +30,13 @@ public class EmailService {
 
     private final Logger LOG = Logger.getLogger(EmailService.class);
 
+    @Value("${email.sender}")
+    String sender;
+    @Value("${email.smtpHost}")
+    String serverHost;
+    @Value("${email.smtpPort}")
+    String serverPort;
+
     @Autowired
     TemplatingService templatingService;
 
@@ -36,22 +44,23 @@ public class EmailService {
 
         Properties tMailServerProperties = setupProperties();
         Session tSession = Session.getDefaultInstance(tMailServerProperties, null);
-        Message tMsg = createMessage(tSession, System.getProperty("senderEmail"), email.getRecipientAddress(), /*email.getSubject()*/email.getSubject());
+        Message tMsg = createMessage(tSession, sender, email.getRecipientAddress(), /*email.getSubject()*/email.getSubject());
         tMsg.setContent(/*DEFAULT_EMAIL_MESSAGE + email.getMessage()*/templatingService.getHtml("Welcome to kudos App",email.getSubject(),
                  email.getMessage()), "text/html");
-        Transport.send(tMsg);
+        //TODO fix gmail auth Transport.send(tMsg);
 
         LOG.info(templatingService.getHtml("Welcome to kudos App",email.getSubject(),
                 email.getMessage()));
 
     }
 
-    private static Properties setupProperties() {
-        String mailServerPropertiesKey = System.getProperty("mailServerKey");
-        String mailServerPropertiesValue = System.getProperty("mailServerValue");
-        Properties tMailServerProperties = System.getProperties();
-        tMailServerProperties.put(mailServerPropertiesKey,mailServerPropertiesValue);
-        return tMailServerProperties;
+    private Properties setupProperties() {
+        Properties props = System.getProperties();
+        props.put("mail.smtp.auth", "false");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", serverHost);
+        props.put("mail.smtp.port", serverPort);
+        return props;
     }
 
     private MimeMessage createMessage(Session session, String fromAddress, String toAddress, String subject) throws AddressException, MessagingException {

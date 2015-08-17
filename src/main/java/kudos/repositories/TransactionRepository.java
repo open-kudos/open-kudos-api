@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * Created by chc on 15.8.6.
  */
-@Repository
 public interface TransactionRepository extends MongoRepository<Transaction,String> {
 
     Transaction findTransactionByReceiverEmailOrderByTimestampDesc(String receiverEmail);
