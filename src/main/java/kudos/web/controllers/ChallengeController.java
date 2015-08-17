@@ -16,40 +16,27 @@ import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDateTime;
+import org.jsondoc.core.annotation.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 
 /**
  * Created by chc on 15.8.11.
  */
+@Api(name = "challenge controller", description = "Controller for managing challenges", group = "challenges")
 @RequestMapping("/challenges")
 @Controller
 public class ChallengeController extends BaseController {
 
-    /**
-     *
-     * {
-     *
-     * }
-     *
-     *
-     * @param form
-     * @param errors
-     * @return
-     * @throws FormValidationException when input is shitty.
-     * @throws ParseException
-     * @throws BusinessException
-     */
+    @ApiMethod(consumes = MediaType.TEXT_HTML_VALUE)
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<Response> challenge(@ModelAttribute("form") ChallengeTransferForm form, Errors errors)
+    public @ApiResponseObject @ResponseBody Challenge challenge(@RequestParam @RequestBody ChallengeTransferForm form, Errors errors)
             throws FormValidationException, ParseException, BusinessException, UserException {
 
         new ChallengeTransferForm.ChallengeTransferFormValidator().validate(form, errors);
@@ -64,25 +51,29 @@ public class ChallengeController extends BaseController {
                 formatter.parseLocalDateTime(form.getFinishDate()),
                 Integer.parseInt(form.getAmount()));
 
-        return new ResponseEntity<>(new ChallengeResponse(challenge),HttpStatus.OK);
+        return challenge;
 
     }
 
+    @ApiMethod
     @RequestMapping(value = "/get-created", method = RequestMethod.GET)
     public ResponseEntity<Response> createdChallenges() throws UserException {
         return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserCreatedChallenges()),HttpStatus.OK);
     }
 
+    @ApiMethod
     @RequestMapping(value = "/get-participated", method = RequestMethod.GET)
     public ResponseEntity<Response> participatedChallenges() throws UserException {
         return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserParticipatedChallenges()),HttpStatus.OK);
     }
 
+    @ApiMethod
     @RequestMapping(value = "/get-referred", method = RequestMethod.GET)
     public ResponseEntity<Response> refferedChallenges() throws UserException {
         return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserReferredChallenges()), HttpStatus.OK);
     }
 
+    @ApiMethod
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
     public ResponseEntity<Response> accept(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException {
 
@@ -97,6 +88,7 @@ public class ChallengeController extends BaseController {
         return new ResponseEntity<>(new ChallengeResponse(challengeService.accept(challenge)),HttpStatus.OK);
     }
 
+    @ApiMethod
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
     public ResponseEntity<Response> decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
@@ -110,6 +102,7 @@ public class ChallengeController extends BaseController {
         return new ResponseEntity<>(new ChallengeResponse(challengeService.decline(challenge)),HttpStatus.OK);
     }
 
+    @ApiMethod
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
     public ResponseEntity<Response> accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
@@ -124,6 +117,7 @@ public class ChallengeController extends BaseController {
         return new ResponseEntity<>(new ChallengeResponse(challengeService.accomplish(challenge)),HttpStatus.OK);
     }
 
+    @ApiMethod
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
     public ResponseEntity<Response> fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 

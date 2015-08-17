@@ -1,11 +1,14 @@
 package kudos.model;
 
+import org.jsondoc.core.annotation.ApiObject;
+import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Created by chc on 15.8.7.
  */
+@ApiObject
 @Document
 public class Challenge {
 
@@ -15,15 +18,23 @@ public class Challenge {
 
     @Id
     private String id;
+    @ApiObjectField
     private String creator;
+    @ApiObjectField
     private String participant;
+    @ApiObjectField
     private String referee;
 
+    @ApiObjectField
     private String name;
 
+    @ApiObjectField
     private String dueDate;
+    @ApiObjectField
     private String finishDate;
+    @ApiObjectField
     private int amount;
+    @ApiObjectField
     private Status status;
 
 

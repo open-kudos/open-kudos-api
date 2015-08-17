@@ -8,6 +8,7 @@ import kudos.repositories.ChallengeRepository;
 import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
+import org.jsondoc.core.annotation.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

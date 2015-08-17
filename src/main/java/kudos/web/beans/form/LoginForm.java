@@ -1,16 +1,28 @@
 package kudos.web.beans.form;
 
 import com.google.common.base.Strings;
+import org.jsondoc.core.annotation.ApiHeader;
+import org.jsondoc.core.annotation.ApiObject;
+import org.jsondoc.core.annotation.ApiObjectField;
+import org.jsondoc.core.annotation.ApiQueryParam;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
  * Created by chc on 15.8.11.
  */
+@ApiObject
 public class LoginForm {
 
+    @ApiObjectField
     private String email;
+    @ApiObjectField
     private String password;
+
+    public LoginForm(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     public String getEmail() {
         return email;

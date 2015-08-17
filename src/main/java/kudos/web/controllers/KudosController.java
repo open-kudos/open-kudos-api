@@ -9,6 +9,7 @@ import kudos.web.beans.form.KudosTransferForm;
 import kudos.web.beans.response.*;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
+import org.jsondoc.core.annotation.Api;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,11 +36,16 @@ public class KudosController extends BaseController {
             throw new FormValidationException(errors);
         }
 
-        Transaction transaction = kudosService.giveKudos(
-                usersService.findByEmail(kudosTransferForm.getReceiverEmail()).get(),
-        Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
+        Optional<User> user = usersService.findByEmail(kudosTransferForm.getReceiverEmail());
 
-        return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);
+        if(user.isPresent()) {
+            Transaction transaction = kudosService.giveKudos(
+                    usersService.findByEmail(kudosTransferForm.getReceiverEmail()).get(),
+                    Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
+            return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);
+        } else {
+            throw new UserException("receiver.not.exist");
+        }
 
     }
 

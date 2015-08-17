@@ -28,8 +28,7 @@ public class RegistrationController extends BaseController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public
-    @ResponseBody
-    ResponseEntity<Response> register(@ModelAttribute("form") UserForm userForm, Errors errors) throws FormValidationException, MessagingException, UserException, IOException, TemplateException {
+    @ResponseBody ResponseEntity<Response> register(@ModelAttribute("form") UserForm userForm, Errors errors) throws FormValidationException, MessagingException, UserException, IOException, TemplateException {
         new UserForm.FormValidator().validate(userForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);

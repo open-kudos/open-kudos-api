@@ -4,6 +4,8 @@ import com.google.common.base.Strings;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.jsondoc.core.annotation.ApiObject;
+import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -13,12 +15,18 @@ import java.text.SimpleDateFormat;
 /**
  * Created by chc on 15.8.7.
  */
+@ApiObject
 public class ChallengeTransferForm {
 
+    @ApiObjectField
     private String participant;
+    @ApiObjectField
     private String referee;
+    @ApiObjectField
     private String name;
+    @ApiObjectField
     private String finishDate;
+    @ApiObjectField
     private String amount;
 
     public String getParticipant() {

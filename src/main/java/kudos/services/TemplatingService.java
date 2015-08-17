@@ -28,6 +28,7 @@ public class TemplatingService {
         configuration = new Configuration(new Version(2, 3, 23));
         configuration.setClassForTemplateLoading(TemplatingService.class, "/");
 
+
         FileTemplateLoader templateLoader = new FileTemplateLoader(new File("src/main/resources/mail-templates"));
         configuration.setTemplateLoader(templateLoader);
         mainTemplate = configuration.getTemplate("MainTemplate.ftl");

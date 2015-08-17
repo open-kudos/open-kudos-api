@@ -1,5 +1,6 @@
 package kudos.model;
 
+import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,6 +10,7 @@ import java.util.Date;
 /**
  * Created by chc on 15.8.5.
  */
+@ApiObject
 @Document
 public class Transaction {
 

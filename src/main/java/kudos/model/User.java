@@ -1,6 +1,7 @@
 package kudos.model;
 
 
+import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,6 +13,7 @@ import java.util.UUID;
 /**
  * Created by chc on 15.7.23.
  */
+@ApiObject
 @Document
 public class User {
     @Id

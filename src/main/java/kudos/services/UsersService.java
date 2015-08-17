@@ -50,7 +50,7 @@ public class UsersService {
     private AuthenticationManager authenticationManager;
 
     public Optional<User> findByEmail(String email) throws UserException {
-        if(userRepository.findOne(email) != null  && !userRepository.findOne(email).isRegistered()){
+        if(userRepository.exists(email)  && !userRepository.findOne(email).isRegistered()){
             throw new UserException("user.not.exist");
         }
         return Optional.fromNullable(userRepository.findByEmail(email));
@@ -159,6 +159,18 @@ public class UsersService {
     }
 
     public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
+
+        if(Strings.isNullOrEmpty(email)){
+            throw new UserException("email.not.specified");
+        }
+
+        if(Strings.isNullOrEmpty(password)){
+            throw new UserException("password.not.specified");
+        }
+
+        if(!userRepository.exists(email) || !userRepository.findByEmail(email).isRegistered()){
+            throw new UserException("user.not.exist");
+        }
 
         if(getLoggedUser().isPresent()) {
             throw new UserException("user.already.logged");
