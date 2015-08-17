@@ -55,7 +55,7 @@ public class AuthenticationController extends BaseController {
                                    HttpServletRequest request) throws FormValidationException, UserException {
         return usersService.login(email,password,request);
     }
-    
+
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public ResponseEntity<Response> logout(HttpSession session, Principal principal) {
         if (principal == null) {

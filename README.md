@@ -1,4 +1,4 @@
-open-kudos-readme
+open-kudos-readme by KUDOS team
 
 If you want to view KUDOS documentation, follow these steps:
 	1) Run builded KUDOS jar
