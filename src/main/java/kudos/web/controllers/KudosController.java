@@ -31,7 +31,7 @@ public class KudosController extends BaseController {
 
     @ApiMethod(description = "Service to send kudos")
     @ApiParams(queryparams = {
-            @ApiQueryParam(name = "receiverEmail"),
+            @ApiQueryParam(name = "receiverEmail", description = "For testing use testK@google.lt"),
             @ApiQueryParam(name = "message", description = "Message, explaining why user is giving kudos")
     })
     @ApiErrors(apierrors = {
@@ -90,6 +90,7 @@ public class KudosController extends BaseController {
         return new ResponseEntity<>(StatusResponse.showKudosStatus(amount + ""), HttpStatus.OK);
     }
 
+    @ApiMethod(description = "Service to get received kudos")
     @RequestMapping(value = "/get-received-kudos", method = RequestMethod.GET)
     public ResponseEntity<Response> showReceivedKudos(Principal principal) throws UserException {
         int amount = kudosService.getKudos(usersService.getLoggedUser().get());

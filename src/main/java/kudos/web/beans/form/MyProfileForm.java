@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 public class MyProfileForm {
 
     private String email;
-    private String password;
     private String firstName;
     private String lastName;
     private String birthday;
@@ -44,14 +43,6 @@ public class MyProfileForm {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getFirstName() {
@@ -186,7 +177,7 @@ public class MyProfileForm {
                 errors.rejectValue("birthday","birthday.date.not.specified");
             }
             else if(!isEnteredDateValid(birthdayDate)){
-                errors.rejectValue("birtdhay","birthday.date.incorrect");
+                errors.rejectValue("birthday","birthday.date.incorrect");
             }
 
             String email = form.getEmail();
@@ -203,7 +194,7 @@ public class MyProfileForm {
             if(Strings.isNullOrEmpty(startedToWorkDate)){
                 errors.rejectValue("startedToWorkDate","startedToWorkDate.not.specified");
             } else if(!isEnteredDateValid(startedToWorkDate)){
-                errors.rejectValue("startedToWorkDate","startedToWorkDate.not.specified");
+                errors.rejectValue("startedToWorkDate","startedToWorkDate.incorrect");
             }
 
 

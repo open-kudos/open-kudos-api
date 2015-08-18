@@ -101,7 +101,7 @@ public class UsersService {
         }
     }
 
-    public User completeUser(MyProfileForm myProfileForm) throws UserException {
+    public User completeUser(MyProfileForm myProfileForm) throws UserException, MessagingException, IOException, TemplateException {
         User user = getLoggedUser().get();
 
         String email = user.getEmail();
@@ -141,6 +141,10 @@ public class UsersService {
 
         user.updateUserWithAdditionalInformation(password, email, name, surname, birthday, phone, startedToWork, position, department,
                 location, team, true, showBirthday);
+
+        emailService.send(new Email(email, new Date().toString(), "Welcome to KUDOS app. Click this link to complete registration",
+                "http://localhost:8080/confirm-user-by-id?id=" + getRandomHash()));
+
          return saveUser(user).get();
     }
 
@@ -191,7 +195,7 @@ public class UsersService {
             throw new UserException("email.not.specified");
         }
         if(!findByEmail(email).isPresent()){
-            throw new UserException("user.does.not.exist");
+            throw new UserException("user.not.exist");
         }
 
         User user = findByEmail(email).get();
