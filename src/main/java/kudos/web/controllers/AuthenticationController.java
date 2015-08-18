@@ -1,26 +1,10 @@
 package kudos.web.controllers;
 
-import kudos.model.Challenge;
 import kudos.model.User;
-import kudos.web.beans.form.LoginForm;
-import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.FormValidationException;
-import kudos.web.beans.response.Response;
-import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +39,7 @@ public class AuthenticationController extends BaseController {
                     description = "If user is not logged in")
     })
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public String logout(HttpSession session, Principal principal) throws UserException {
+    public @ApiResponseObject @ResponseBody String logout(HttpSession session, Principal principal) throws UserException {
         if (principal == null) {
             throw new UserException("not.logged");
         }

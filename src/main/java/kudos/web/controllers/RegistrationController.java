@@ -4,15 +4,10 @@ import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
 import kudos.model.User;
 import kudos.web.beans.form.UserForm;
-import kudos.web.beans.response.SingleErrorResponse;
-import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.FormValidationException;
-import kudos.web.beans.response.Response;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -83,9 +78,9 @@ public class RegistrationController extends BaseController {
             @ApiError(code = "user.not.registered", description = "If user is not registered(disabled his account")
     })
     @RequestMapping(value = "/reset-my-password", method = RequestMethod.POST)
-    public ResponseEntity<Response> resetMyPassword(String email) throws MessagingException, TemplateException, UserException, IOException {
+    public String resetMyPassword(String email) throws MessagingException, TemplateException, UserException, IOException {
         usersService.resetPassword(email);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return "Success";
     }
 
 

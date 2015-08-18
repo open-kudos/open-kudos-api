@@ -9,22 +9,15 @@ import kudos.exceptions.WrongChallengeEditorException;
 import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.model.Challenge;
 import kudos.model.User;
-import kudos.web.beans.response.ChallengeHistoryResponse;
-import kudos.web.beans.response.ChallengeResponse;
-import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
-import kudos.web.beans.response.Response;
 import kudos.web.exceptions.UserException;
-import org.joda.time.LocalDateTime;
 import org.jsondoc.core.annotation.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.List;
 
 /**
  * Created by chc on 15.8.11.
@@ -105,20 +98,20 @@ public class ChallengeController extends BaseController {
 
     @ApiMethod(description = "Gets all challenges that logged user has created")
     @RequestMapping(value = "/created", method = RequestMethod.GET)
-    public ResponseEntity<Response> createdChallenges() throws UserException {
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserCreatedChallenges()),HttpStatus.OK);
+    public @ApiResponseObject @ResponseBody List<Challenge> createdChallenges() throws UserException {
+        return challengeService.getAllUserCreatedChallenges();
     }
 
     @ApiMethod(description = "Gets all challenges that logged user has participated")
     @RequestMapping(value = "/participated", method = RequestMethod.GET)
-    public ResponseEntity<Response> participatedChallenges() throws UserException {
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserParticipatedChallenges()),HttpStatus.OK);
+    public @ApiResponseObject @ResponseBody List<Challenge> participatedChallenges() throws UserException {
+        return challengeService.getAllUserParticipatedChallenges();
     }
 
     @ApiMethod(description = "Gets all challenges that logged user has referred")
     @RequestMapping(value = "/referred", method = RequestMethod.GET)
-    public ResponseEntity<Response> refferedChallenges() throws UserException {
-        return new ResponseEntity<>(new ChallengeHistoryResponse(challengeService.getAllUserReferredChallenges()), HttpStatus.OK);
+    public @ApiResponseObject @ResponseBody List<Challenge> refferedChallenges() throws UserException {
+        return challengeService.getAllUserReferredChallenges();
     }
 
     @ApiMethod(description = "Accepts challenge by its id")
@@ -140,7 +133,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
-    public ResponseEntity<Response> accept(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge accept(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException {
 
         if(Strings.isNullOrEmpty(id)){
             throw new ChallengeIdNotSpecifiedException();
@@ -150,7 +143,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.participant");
         }
-        return new ResponseEntity<>(new ChallengeResponse(challengeService.accept(challenge)),HttpStatus.OK);
+        return challengeService.accept(challenge);
     }
 
     @ApiMethod(description = "Declines challenge by its id")
@@ -172,7 +165,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
-    public ResponseEntity<Response> decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
         if(Strings.isNullOrEmpty(id)){
             throw new ChallengeIdNotSpecifiedException();
@@ -181,7 +174,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.participant");
         }
-        return new ResponseEntity<>(new ChallengeResponse(challengeService.decline(challenge)),HttpStatus.OK);
+        return challengeService.decline(challenge);
     }
 
     @ApiMethod(description = "Accomplishes challenge by its id")
@@ -201,7 +194,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public ResponseEntity<Response> accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
         if(Strings.isNullOrEmpty(id)){
             throw new ChallengeIdNotSpecifiedException();
@@ -211,7 +204,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.referee");
         }
-        return new ResponseEntity<>(new ChallengeResponse(challengeService.accomplish(challenge)),HttpStatus.OK);
+        return challengeService.accomplish(challenge);
     }
 
     @ApiMethod(description = "Marks challenge as failed by its id")
@@ -231,7 +224,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public ResponseEntity<Response> fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
         if(Strings.isNullOrEmpty(id)){
             throw new ChallengeIdNotSpecifiedException();
@@ -241,7 +234,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.referee");
         }
-        return new ResponseEntity<>(new ChallengeResponse(challengeService.fail(challenge)),HttpStatus.OK);
+        return challengeService.fail(challenge);
     }
 
 }

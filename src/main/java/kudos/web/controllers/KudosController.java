@@ -17,6 +17,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.List;
@@ -47,54 +48,48 @@ public class KudosController extends BaseController {
                     description = "If kudos receiver does not exist")
     })
     @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)
-    public ResponseEntity<Response> sendKudos(@ModelAttribute("form") KudosTransferForm kudosTransferForm, Errors errors) throws FormValidationException, BusinessException, UserException {
+    public @ApiResponseObject @ResponseBody
+    Transaction sendKudos(KudosTransferForm kudosTransferForm, Errors errors) throws FormValidationException, BusinessException, UserException {
         new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
 
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
         }
-
         Optional<User> user = usersService.findByEmail(kudosTransferForm.getReceiverEmail());
-
-        if(user.isPresent()) {
-            Transaction transaction = kudosService.giveKudos(
-                    user.get(), Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
-            return new ResponseEntity<>(new TransferResponse(transaction), HttpStatus.CREATED);
-        } else {
+        if(!user.isPresent()){
             throw new UserException("receiver.not.exist");
         }
 
+        return kudosService.giveKudos(
+                user.get(), Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
     }
 
     @ApiMethod(description = "Service to get all incoming kudos transactions")
     @RequestMapping(value = "/incoming-transactions", method = RequestMethod.GET)
-    public ResponseEntity<Response> showIncomingTransactionHistory(Principal principal) {
-        String email = principal.getName();
-        List allUserTransactions = transactionRepository.findTransactionsByReceiverEmail(email);
-        return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions), HttpStatus.OK);
+    public @ApiResponseObject @ResponseBody
+    List<Transaction> showIncomingTransactionHistory(Principal principal) {
+        return transactionRepository.findTransactionsByReceiverEmail(principal.getName());
 
     }
 
     @ApiMethod(description = "Service to get all outgoing kudos transactions")
     @RequestMapping(value = "/outgoing-transactions", method = RequestMethod.GET)
-    public ResponseEntity<Response> showOutcomingTransactionHistory(Principal principal) {
-        String email = principal.getName();
-        List allUserTransactions = transactionRepository.findTransactionsBySenderEmail(email);
-        return new ResponseEntity<>(new TransactionHistoryResponse(allUserTransactions), HttpStatus.OK);
+    public @ApiResponseObject @ResponseBody
+    List<Transaction> showOutcomingTransactionHistory(Principal principal) {
+        return transactionRepository.findTransactionsBySenderEmail(principal.getName());
     }
 
     @ApiMethod(description = "Service to get remaining kudos amount")
-    @RequestMapping(value = "/get-remaining-kudos", method = RequestMethod.GET)
-    public ResponseEntity<Response> showRemainingKudos(Principal principal) throws UserException {
-        int amount = kudosService.getFreeKudos(usersService.getLoggedUser().get());
-        return new ResponseEntity<>(StatusResponse.showKudosStatus(amount + ""), HttpStatus.OK);
+    @RequestMapping(value = "/remaining-kudos", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody
+    int showRemainingKudos(Principal principal) throws UserException {
+        return kudosService.getFreeKudos(usersService.getLoggedUser().get());
     }
 
     @ApiMethod(description = "Service to get received kudos")
-    @RequestMapping(value = "/get-received-kudos", method = RequestMethod.GET)
-    public ResponseEntity<Response> showReceivedKudos(Principal principal) throws UserException {
-        int amount = kudosService.getKudos(usersService.getLoggedUser().get());
-        return new ResponseEntity<>(StatusResponse.showKudosStatus(amount+""), HttpStatus.OK);
+    @RequestMapping(value = "/received-kudos", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody int receivedKudos(Principal principal) throws UserException {
+        return kudosService.getKudos(usersService.getLoggedUser().get());
     }
 
 }

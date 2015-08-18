@@ -2,7 +2,6 @@ package kudos.web.handlers;
 
 import com.mongodb.MongoException;
 import kudos.exceptions.*;
-import kudos.web.beans.response.SingleErrorResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.ErrorResponse;
@@ -36,64 +35,64 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidKudosAmountException.class)
-    public ResponseEntity<Response> handleInvalidKudosAmountException(HttpServletRequest request, InvalidKudosAmountException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleInvalidKudosAmountException(HttpServletRequest request, InvalidKudosAmountException e){
+        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Response> handleBusinessException(HttpServletRequest request, BusinessException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleBusinessException(HttpServletRequest request, BusinessException e){
+        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MessagingException.class)
-    public ResponseEntity<Response> handleMessagingException(HttpServletRequest request, MessagingException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> handleMessagingException(HttpServletRequest request, MessagingException e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MongoException.class)
-    public ResponseEntity<Response> handleMessagingException(HttpServletRequest request, MongoException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> handleMessagingException(HttpServletRequest request, MongoException e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<Response> handleOccupiedEmailException(HttpServletRequest request, UserException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getErrorCause()),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleOccupiedEmailException(HttpServletRequest request, UserException e){
+        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(InvalidChallengeStatusException.class)
-    public ResponseEntity<Response> handleInvalidChallengeStatusException(HttpServletRequest request,
+    public ResponseEntity<String> handleInvalidChallengeStatusException(HttpServletRequest request,
            InvalidChallengeStatusException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(WrongChallengeEditorException.class)
-    public ResponseEntity<Response> handleInvalidChallengeStatusException(HttpServletRequest request,
+    public ResponseEntity<String> handleInvalidChallengeStatusException(HttpServletRequest request,
                                     WrongChallengeEditorException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ChallengeIdNotSpecifiedException.class)
-    public ResponseEntity<Response> handleChallengeIdNotSpecifiedException(HttpServletRequest request,
+    public ResponseEntity<String> handleChallengeIdNotSpecifiedException(HttpServletRequest request,
                                                                           ChallengeIdNotSpecifiedException e){
-        return new ResponseEntity<>(new SingleErrorResponse("challenge.id.not.specified"),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("challenge.id.not.specified",HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(KudosExceededException.class)
-    public ResponseEntity<Response> handleKudosExceededException(HttpServletRequest request,
+    public ResponseEntity<String> handleKudosExceededException(HttpServletRequest request,
                                                                            KudosExceededException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getError()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-    public ResponseEntity<Response> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
+    public ResponseEntity<String> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
                                                                  AuthenticationCredentialsNotFoundException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getMessage()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ParseException.class)
-    public ResponseEntity<Response> handleIntegerParseException(HttpServletRequest request,
+    public ResponseEntity<String> handleIntegerParseException(HttpServletRequest request,
                                                                                      ParseException e){
-        return new ResponseEntity<>(new SingleErrorResponse(e.getMessage()),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
 }
