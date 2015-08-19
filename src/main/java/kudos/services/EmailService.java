@@ -8,12 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.mail.Transport;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
@@ -42,19 +39,20 @@ public class EmailService {
 
     public void send(Email email) throws MessagingException, IOException, TemplateException {
 
-        Properties tMailServerProperties = setupProperties();
-        Session tSession = Session.getDefaultInstance(tMailServerProperties, null);
-        Message tMsg = createMessage(tSession, sender, email.getRecipientAddress(), /*email.getSubject()*/email.getSubject());
+        Message tMsg = createMessage(
+                Session.getDefaultInstance(getProperties(), null),
+                sender,
+                email.getRecipientAddress(),
+                email.getSubject()
+        );
         tMsg.setContent(/*DEFAULT_EMAIL_MESSAGE + email.getMessage()*/templatingService.getHtml("Welcome to kudos App",email.getSubject(),
                  email.getMessage()), "text/html");
         //TODO fix gmail auth Transport.send(tMsg);
 
-        LOG.info(templatingService.getHtml("Welcome to kudos App",email.getSubject(),
-                email.getMessage()));
-
+        LOG.info(templatingService.getHtml("Welcome to kudos App",email.getSubject(), email.getMessage()));
     }
 
-    private Properties setupProperties() {
+    private Properties getProperties() {
         Properties props = System.getProperties();
         props.put("mail.smtp.auth", "false");
         props.put("mail.smtp.starttls.enable", "true");
@@ -63,15 +61,13 @@ public class EmailService {
         return props;
     }
 
-    private MimeMessage createMessage(Session session, String fromAddress, String toAddress, String subject) throws AddressException, MessagingException {
+    private MimeMessage createMessage(Session session, String fromAddress, String toAddress, String subject) throws MessagingException {
         MimeMessage tMessage = new MimeMessage(session);
         tMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
         tMessage.setSender(new InternetAddress(fromAddress));
         tMessage.setSubject(subject);
         tMessage.setSentDate(new Date());
-
         return tMessage;
-
     }
 
 }

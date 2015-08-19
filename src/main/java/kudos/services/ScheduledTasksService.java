@@ -1,7 +1,6 @@
 package kudos.services;
 
 import kudos.exceptions.BusinessException;
-import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.model.Challenge;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,30 +30,25 @@ public class ScheduledTasksService {
     DateTimeFormatter dateTimeFormatter;
 
     @Scheduled(fixedRate = 1000 * 15)
-    public void markTasksAsFailed() throws BusinessException, UserException {
-        List<Challenge> acceptedChallenges = challengeService.getAllAcceptedChallenges();
-        List<Challenge> createdChallenges = challengeService.getAllCreatedChallenges();
+    public void markTasksAsFailed() {
+        List<Challenge> challengesToCheck = new ArrayList<>();
+        challengesToCheck.addAll(challengeService.getAllAcceptedChallenges());
+        challengesToCheck.addAll(challengeService.getAllCreatedChallenges());
 
-        LOG.info("accepted challenges amount is: " + acceptedChallenges.size() + " created challenges amount is: " + createdChallenges.size());
+        LOG.info("challengesToCheck challenges amount is: " + challengesToCheck.size());
 
-        LOG.info("rate");
-        for(Challenge challenge : acceptedChallenges){
-            LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getFinishDate());
-            Challenge.Status challengeStatus = challenge.getStatus();
-            if(challengeFinishTime.isBefore(LocalDateTime.now())  && !challengeStatus.equals(Challenge.Status.FAILED)) {
-                challengeService.fail(challenge);
-            }
-        }
-
-        for(Challenge challenge : createdChallenges){
-            LocalDateTime challengeFinishTime = dateTimeFormatter.parseLocalDateTime(challenge.getFinishDate());
-            Challenge.Status challengeStatus = challenge.getStatus();
-            if(challengeFinishTime.isBefore(LocalDateTime.now()) && !challengeStatus.equals(Challenge.Status.FAILED)) {
-                LOG.info("created challenge was marked as failed");
-                challengeService.fail(challenge);
-            }
-        }
-
+        challengesToCheck.stream()
+                .filter(c -> !c.getStatus().equals(Challenge.Status.FAILED))
+                .filter(c -> dateTimeFormatter.parseLocalDateTime(c.getFinishDate()).isBefore(LocalDateTime.now()))
+                .forEach((challenge) -> {
+                    try {
+                        challengeService.fail(challenge);
+                    } catch (BusinessException e) {
+                        e.printStackTrace();
+                    } catch (UserException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 }
 

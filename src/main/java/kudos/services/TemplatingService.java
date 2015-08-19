@@ -1,8 +1,10 @@
 package kudos.services;
 
 import freemarker.cache.FileTemplateLoader;
-import freemarker.core.ParseException;
-import freemarker.template.*;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.Version;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -54,9 +56,6 @@ public class TemplatingService {
 
         mainTemplate.process(data,out);
         return out.toString();
-
     }
-
-
 
 }
