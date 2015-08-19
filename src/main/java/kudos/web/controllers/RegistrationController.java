@@ -6,11 +6,13 @@ import kudos.model.User;
 import kudos.web.beans.form.UserForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
-import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -21,8 +23,6 @@ import java.io.IOException;
 @Api(name = "registration controller", description = "Controller fo registering")
 @Controller
 public class RegistrationController extends BaseController {
-
-    private Logger LOG = Logger.getLogger(RegistrationController.class);
 
     @ApiMethod(description = "Service to register into system")
     @ApiParams(queryparams = {
@@ -42,9 +42,9 @@ public class RegistrationController extends BaseController {
             @ApiError(code = "confirm.password.not.specified", description = "If confirm password is not specified")
     })
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    User register(@ModelAttribute("form") UserForm userForm, Errors errors) throws FormValidationException, MessagingException, UserException, IOException, TemplateException {
+    public @ResponseBody User register(@ModelAttribute("form") UserForm userForm, Errors errors)
+            throws FormValidationException, MessagingException, UserException, IOException, TemplateException {
+
         new UserForm.FormValidator().validate(userForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
@@ -62,9 +62,9 @@ public class RegistrationController extends BaseController {
     })
     @RequestMapping(value = "/confirm-email", method = RequestMethod.POST)
     public User confirmEmail(String id) throws UserException {
-        if(Strings.isNullOrEmpty(id)){
+        if(Strings.isNullOrEmpty(id))
             throw new UserException("id.not.specified");
-        }
+
         return usersService.confirmUser(id);
     }
 
@@ -79,6 +79,7 @@ public class RegistrationController extends BaseController {
     })
     @RequestMapping(value = "/reset-my-password", method = RequestMethod.POST)
     public String resetMyPassword(String email) throws MessagingException, TemplateException, UserException, IOException {
+
         usersService.resetPassword(email);
         return "Success";
     }

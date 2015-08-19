@@ -4,17 +4,14 @@ import freemarker.template.TemplateException;
 import kudos.model.User;
 import kudos.web.beans.form.MyProfileForm;
 import kudos.web.exceptions.FormValidationException;
-import kudos.web.beans.response.*;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
@@ -34,13 +31,15 @@ public class UserController extends BaseController {
     @ApiMethod(description = "Service to disable user account")
     @RequestMapping(value = "/disable", method = RequestMethod.POST)
     public String disableMyAccount(HttpSession session) throws UserException {
-        usersService.disableMyAcount();
+        usersService.disableUsersAcount();
         session.invalidate();
+        // TODO no Strings should be returned
         return "disabled";
     }
 
     @ApiMethod(description = "Service to show user account")
     @RequestMapping(value = "/home", method = RequestMethod.GET)
+    // TODO why is the method name "showHomePage" ?
     public User showHomePage() throws UserException {
         return usersService.getCompletedUser();
     }

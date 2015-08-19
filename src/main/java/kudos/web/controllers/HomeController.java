@@ -2,13 +2,14 @@ package kudos.web.controllers;
 
 import kudos.web.beans.response.IndexResponse;
 import kudos.web.beans.response.Response;
-import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import java.security.Principal;
 
 
@@ -19,18 +20,9 @@ import java.security.Principal;
 @Controller
 public class HomeController extends BaseController {
 
-    private Logger LOG = Logger.getLogger(HomeController.class.getName());
-
     @ApiMethod(description = "method to check whether user is logged in or not")
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public @ApiResponseObject
-    @ResponseBody Response index(Principal principal) {
-        IndexResponse response = new IndexResponse();
-        response.setIsLogged(principal != null);
-        return response;
+    public @ApiResponseObject @ResponseBody Response index(Principal principal) {
+        return new IndexResponse(principal != null);
     }
-
-
-
-
 }

@@ -1,7 +1,6 @@
 package kudos.services;
 
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
 import kudos.model.Email;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -22,13 +20,12 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
+import java.util.Optional;
 
 /**
  * Created by chc on 15.8.11.
@@ -46,10 +43,11 @@ public class UsersService {
     private AuthenticationManager authenticationManager;
 
     public Optional<User> findByEmail(String email) throws UserException {
+        // TODO hard logic of the system. Better to delete user completely instead of setting flags. And update all the transactions with default <user_deleted> tag or something
         if(userRepository.exists(email)  && !userRepository.findOne(email).isRegistered()){
             throw new UserException("user.not.exist");
         }
-        return Optional.fromNullable(userRepository.findByEmail(email));
+        return Optional.ofNullable(userRepository.findByEmail(email));
     }
 
     public Optional<User> getLoggedUser() throws UserException {
@@ -66,27 +64,32 @@ public class UsersService {
     }
 
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
-        String email = user.getEmail();
 
-        if(findByEmail(email).isPresent() && findByEmail(email).get().isRegistered()){
-            throw new UserException("user.already.registered");
-        } else if (findByEmail(email).isPresent()) {
+        String email = user.getEmail();
+        Optional<User> maybeExistingUser = findByEmail(email);
+        if (maybeExistingUser.isPresent()) {
             throw new UserException("user.already.exists");
         }
 
         String hash = getRandomHash();
 
-        emailService.send(new Email(email, new Date().toString(),"Welcome to KUDOS app. Click this link to complete registration",
-                "http://localhost:8080/reset-password-by-id?id="+hash));
+        emailService.send(
+                new Email(email,
+                        new Date().toString(),
+                        "Welcome to KUDOS app. Click this link to complete registration",
+                        "http://localhost:8080/reset-password-by-id?id="+hash)
+        );
 
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
-
         User newUser = new User(password, email, user.getFirstName(), user.getLastName());
         newUser.setEmailHash(hash);
+        // TODO use userService directly
+        // TODO why is it Optional here? You save the user
         return saveUser(newUser).get();
     }
 
     public User confirmUser(String hashedEmail) throws UserException {
+        //TODO find... could be Optional
         User user = userRepository.findUserByEmailHash(hashedEmail);
         if (user != null) {
             user.markUserAsConfirmed();
@@ -98,6 +101,10 @@ public class UsersService {
     }
 
     public User completeUser(MyProfileForm myProfileForm) throws UserException, MessagingException, IOException, TemplateException {
+
+        //TODO create new class which would hold all the variables.
+        //TODO Set and validate those variables in a separate method (~30 lines).
+        //TODO updateUserWithAdditionalInformation should accept newly created class, not 13 parameters
         User user = getLoggedUser().get();
 
         String email = user.getEmail();
@@ -141,10 +148,11 @@ public class UsersService {
         emailService.send(new Email(email, new Date().toString(), "Welcome to KUDOS app. Click this link to complete registration",
                 "http://localhost:8080/confirm-user-by-id?id=" + getRandomHash()));
 
+        //TODO why don't you use userService directly? this looks complicated
          return saveUser(user).get();
     }
 
-    public void disableMyAcount() throws UserException {
+    public void disableUsersAcount() throws UserException {
         User user = getLoggedUser().get();
         user.setIsRegistered(false);
         userRepository.save(user);
@@ -160,6 +168,7 @@ public class UsersService {
 
     public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
 
+        // TODO move 12 lines of param validation into separate method
         if(Strings.isNullOrEmpty(email)){
             throw new UserException("email.not.specified");
         }
@@ -176,20 +185,21 @@ public class UsersService {
             throw new UserException("user.already.logged");
         }
 
-        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authentication);
-        HttpSession session = request.getSession(true);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+        securityContext.setAuthentication(
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password))
+        );
+        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
         return userRepository.findByEmail(email);
-
     }
 
     public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {
         if(Strings.isNullOrEmpty(email)){
             throw new UserException("email.not.specified");
         }
+
+        // TODO calling findByEmail two times is not efficient, one time is enough, i'm sure :)
+        // TODO findByEmail should return Optional and then do the needed checks with orElseThrow
         if(!findByEmail(email).isPresent()){
             throw new UserException("user.not.exist");
         }
@@ -202,12 +212,13 @@ public class UsersService {
         String resetHash = getRandomHash();
         user.setEmailHash(resetHash);
 
-        emailService.send(new Email(email, LocalDateTime.now().toString(),
-                "Click this link to reset your password: ","http://localhost:8080/reset-password-by-id?id="+resetHash));
+        emailService.send(
+                new Email(email, LocalDateTime.now().toString(), "Click this link to reset your password: ","http://localhost:8080/reset-password-by-id?id="+resetHash)
+        );
         userRepository.save(user);
     }
 
-    private String getRandomHash(){
+    private String getRandomHash() {
         return new BigInteger(130, new SecureRandom()).toString(32);
     }
 

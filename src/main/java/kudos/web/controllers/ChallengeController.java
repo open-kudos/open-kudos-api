@@ -1,20 +1,21 @@
 package kudos.web.controllers;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.ChallengeIdNotSpecifiedException;
 import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.exceptions.WrongChallengeEditorException;
-import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.model.Challenge;
 import kudos.model.User;
+import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
 import java.util.List;
@@ -74,26 +75,22 @@ public class ChallengeController extends BaseController {
     public @ApiResponseObject @ResponseBody Challenge challenge(ChallengeTransferForm form, Errors errors)
             throws FormValidationException, ParseException, BusinessException, UserException {
 
+        // TODO same question as in KudosController
         new ChallengeTransferForm.ChallengeTransferFormValidator().validate(form, errors);
 
-        if (errors.hasErrors()) {
+        if (errors.hasErrors())
             throw new FormValidationException(errors);
-        }
 
-        Optional<User> participant = usersService.findByEmail(form.getParticipant());
-        Optional<User> referee = usersService.findByEmail(form.getReferee());
+        User participant = usersService.findByEmail(form.getParticipant()).orElseThrow(() -> new UserException("participant.not.exist"));
+        User referee = usersService.findByEmail(form.getReferee()).orElseThrow(() -> new UserException("referee.not.exist"));
 
-        if(!participant.isPresent()){
-            throw new UserException("participant.not.exist");
-        }
-
-        if(!referee.isPresent()){
-            throw new UserException("referee.not.exist");
-        }
-        return challengeService.create(participant.get(),referee.get(),form.getName(),
+        return challengeService.create(
+                participant,
+                referee,
+                form.getName(),
                 formatter.parseLocalDateTime(form.getFinishDate()),
-                Integer.parseInt(form.getAmount()));
-
+                Integer.parseInt(form.getAmount())
+        );
     }
 
     @ApiMethod(description = "Gets all challenges that logged user has created")
@@ -133,12 +130,13 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge accept(String id) throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge accept(String id)
+            throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException {
 
-        if(Strings.isNullOrEmpty(id)){
+        if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
-        }
 
+        // TODO why getChallenge doesn't return Optional? Return optional and use "orElseThrow" instead of IF
         Challenge challenge = challengeService.getChallenge(id);
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.participant");
@@ -167,9 +165,10 @@ public class ChallengeController extends BaseController {
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
-        if(Strings.isNullOrEmpty(id)){
+        if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
-        }
+
+        // TODO as above. check that challenge is not null (with Optional)
         Challenge challenge = challengeService.getChallenge(id);
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.participant");
@@ -196,10 +195,10 @@ public class ChallengeController extends BaseController {
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
-        if(Strings.isNullOrEmpty(id)){
+        if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
-        }
 
+        // TODO as above. check that challenge is not null (with Optional)
         Challenge challenge = challengeService.getChallenge(id);
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.referee");
@@ -226,10 +225,10 @@ public class ChallengeController extends BaseController {
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
 
-        if(Strings.isNullOrEmpty(id)){
+        if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
-        }
 
+        // TODO as above. check that challenge is not null (with Optional)
         Challenge challenge = challengeService.getChallenge(id);
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.referee");
