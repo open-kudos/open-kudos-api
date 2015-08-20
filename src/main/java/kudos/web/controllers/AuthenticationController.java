@@ -28,7 +28,7 @@ public class AuthenticationController extends BaseController {
              @ApiError(code = "user.not.exist", description = "If user does not exist"),
              @ApiError(code = "user.already.logged", description = "If user is already logged")})
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody User challenge(
+    public @ApiResponseObject @ResponseBody User login(
                 @ApiQueryParam(name = "email") String email,
                 @ApiQueryParam(name = "password") String password,
            HttpServletRequest request) throws FormValidationException, UserException {
@@ -41,13 +41,11 @@ public class AuthenticationController extends BaseController {
                     description = "If user is not logged in")
     })
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody String logout(HttpSession session, Principal principal) throws UserException {
+    public void logout(HttpSession session, Principal principal) throws UserException {
         if (principal == null) {
             throw new UserException("not.logged");
         }
         session.invalidate();
-        // TODO why return a String? who will check that? :)
-        return "logout successful";
     }
 
 }

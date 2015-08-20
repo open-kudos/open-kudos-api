@@ -3,13 +3,18 @@ package kudos.services;
 
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
+import kudos.model.Challenge;
 import kudos.model.Email;
+import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
 import kudos.web.exceptions.UserException;
+import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.omg.IOP.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +29,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -40,11 +47,21 @@ public class UsersService {
     private EmailService emailService;
 
     @Autowired
+    private ChallengeService challengeService;
+
+    @Autowired
+    private KudosService kudosService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
+    private Logger LOG = Logger.getLogger(UsersService.class);
+
+    private static final String DELETED_USER_TAG = "undefined";
+
     public Optional<User> findByEmail(String email) throws UserException {
-        // TODO hard logic of the system. Better to delete user completely instead of setting flags. And update all the transactions with default <user_deleted> tag or something
-        if(userRepository.exists(email)  && !userRepository.findOne(email).isRegistered()){
+
+        if(userRepository.exists(email)){
             throw new UserException("user.not.exist");
         }
         return Optional.ofNullable(userRepository.findByEmail(email));
@@ -55,12 +72,8 @@ public class UsersService {
         return findByEmail(name);
     }
 
-    public Optional<User>saveUser(User user) {
-        return Optional.of(userRepository.save(user));
-    }
-
     public User getKudosMaster() {
-        return new User("pass", "master@of.kudos", "Kudos", "Master");
+        return new User("pass", "master@of.kudos");
     }
 
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
@@ -70,28 +83,22 @@ public class UsersService {
         if (maybeExistingUser.isPresent()) {
             throw new UserException("user.already.exists");
         }
-
-        String hash = getRandomHash();
-
-        emailService.send(
+        /*emailService.send(
                 new Email(email,
                         new Date().toString(),
                         "Welcome to KUDOS app. Click this link to complete registration",
-                        "http://localhost:8080/reset-password-by-id?id="+hash)
-        );
-
+                        "http://localhost:8080/reset-password-by-id?id="+getRandomHash())
+        );*/
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
-        User newUser = new User(password, email, user.getFirstName(), user.getLastName());
-        newUser.setEmailHash(hash);
-        // TODO use userService directly
-        // TODO why is it Optional here? You save the user
-        return saveUser(newUser).get();
+        User newUser = new User(password, email);
+        newUser.setEmailHash(getRandomHash());
+        return userRepository.save(newUser);
     }
 
     public User confirmUser(String hashedEmail) throws UserException {
-        //TODO find... could be Optional
-        User user = userRepository.findUserByEmailHash(hashedEmail);
-        if (user != null) {
+        Optional<User> maybeUser = userRepository.findUserByEmailHash(hashedEmail);
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
             user.markUserAsConfirmed();
             userRepository.save(user);
             return userRepository.save(user);
@@ -101,61 +108,14 @@ public class UsersService {
     }
 
     public User completeUser(MyProfileForm myProfileForm) throws UserException, MessagingException, IOException, TemplateException {
-
-        //TODO create new class which would hold all the variables.
-        //TODO Set and validate those variables in a separate method (~30 lines).
-        //TODO updateUserWithAdditionalInformation should accept newly created class, not 13 parameters
         User user = getLoggedUser().get();
-
-        String email = user.getEmail();
-        String password = user.getPassword();
-        String name = user.getFirstName();
-        String surname = user.getLastName();
-
-        String newEmail = myProfileForm.getEmail();
-        String newPassword = myProfileForm.getNewPassword();
-        String newFirstName = myProfileForm.getFirstName();
-        String newLastName = myProfileForm.getLastName();
-
-        if (!Strings.isNullOrEmpty(newEmail) && !newEmail.equals(email)) {
-            email = newEmail;
-        }
-
-        if (!Strings.isNullOrEmpty(newPassword) && !new StrongPasswordEncryptor().checkPassword(newPassword, password)) {
-            password = new StrongPasswordEncryptor().encryptPassword(newPassword);
-        }
-
-        if (!Strings.isNullOrEmpty(newFirstName) && !name.equals(newFirstName)) {
-            name = newFirstName;
-        }
-
-        if (!Strings.isNullOrEmpty(newLastName) && !surname.equals(newLastName)) {
-            surname = newLastName;
-        }
-
-        String birthday = myProfileForm.getBirthday();
-        String phone = myProfileForm.getPhone();
-        String startedToWork = myProfileForm.getStartedToWorkDate();
-        String position = myProfileForm.getPosition();
-        String department = myProfileForm.getDepartment();
-        String location = myProfileForm.getLocation();
-        String team = myProfileForm.getTeam();
-        boolean showBirthday = myProfileForm.getShowBirthday();
-
-        user.updateUserWithAdditionalInformation(password, email, name, surname, birthday, phone, startedToWork, position, department,
-                location, team, true, showBirthday);
-
-        emailService.send(new Email(email, new Date().toString(), "Welcome to KUDOS app. Click this link to complete registration",
-                "http://localhost:8080/confirm-user-by-id?id=" + getRandomHash()));
-
-        //TODO why don't you use userService directly? this looks complicated
-         return saveUser(user).get();
+        User updatedUser = user.getUpdatedUser(myProfileForm);
+        userRepository.save(updatedUser);
+        return updatedUser;
     }
 
     public void disableUsersAcount() throws UserException {
-        User user = getLoggedUser().get();
-        user.setIsRegistered(false);
-        userRepository.save(user);
+        wipeAllUserData();
     }
 
     public User getCompletedUser() throws UserException {
@@ -168,22 +128,7 @@ public class UsersService {
 
     public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
 
-        // TODO move 12 lines of param validation into separate method
-        if(Strings.isNullOrEmpty(email)){
-            throw new UserException("email.not.specified");
-        }
-
-        if(Strings.isNullOrEmpty(password)){
-            throw new UserException("password.not.specified");
-        }
-
-        if(!userRepository.exists(email) || !userRepository.findByEmail(email).isRegistered()){
-            throw new UserException("user.not.exist");
-        }
-
-        if(getLoggedUser().isPresent()) {
-            throw new UserException("user.already.logged");
-        }
+        loginValidation(email, password);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(
@@ -193,22 +138,34 @@ public class UsersService {
         return userRepository.findByEmail(email);
     }
 
+    private void loginValidation(String email, String password) throws UserException {
+        if(Strings.isNullOrEmpty(email)){
+            throw new UserException("email.not.specified");
+        }
+
+        if(Strings.isNullOrEmpty(password)){
+            throw new UserException("password.not.specified");
+        }
+
+        if(!userRepository.exists(email)){
+            throw new UserException("user.not.exist");
+        }
+
+        if(getLoggedUser().isPresent()) {
+            throw new UserException("user.already.logged");
+        }
+    }
+
     public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {
         if(Strings.isNullOrEmpty(email)){
             throw new UserException("email.not.specified");
         }
 
-        // TODO calling findByEmail two times is not efficient, one time is enough, i'm sure :)
-        // TODO findByEmail should return Optional and then do the needed checks with orElseThrow
-        if(!findByEmail(email).isPresent()){
+        Optional<User> maybeUser = findByEmail(email);
+        if(maybeUser.isPresent()){
             throw new UserException("user.not.exist");
         }
-
-        User user = findByEmail(email).get();
-
-        if(!user.isRegistered()){
-            throw new UserException("user.not.registered");
-        }
+        User user = maybeUser.get();
         String resetHash = getRandomHash();
         user.setEmailHash(resetHash);
 
@@ -220,6 +177,42 @@ public class UsersService {
 
     private String getRandomHash() {
         return new BigInteger(130, new SecureRandom()).toString(32);
+    }
+
+    private void wipeAllUserData() throws UserException {
+
+        challengeService.getAllUserCreatedChallenges().stream()
+        .forEach(challenge -> {
+            challenge.setCreator(DELETED_USER_TAG);
+            challengeService.save(challenge);
+        });
+
+        challengeService.getAllUserParticipatedChallenges().stream()
+        .forEach(challenge -> {
+            challenge.setParticipant(DELETED_USER_TAG);
+            challengeService.save(challenge);
+        });
+
+        challengeService.getAllUserReferredChallenges().stream()
+        .forEach(challenge -> {
+            challenge.setReferee(DELETED_USER_TAG);
+            challengeService.save(challenge);
+        });
+
+        kudosService.getAllLoggedUserIncomingTransactions().stream()
+        .forEach(transaction -> {
+            transaction.setReceiverEmail(DELETED_USER_TAG);
+            kudosService.save(transaction);
+        });
+
+        kudosService.getAllLoggedUserOutgoingTransactions().stream()
+        .forEach(transaction -> {
+            transaction.setSenderEmail(DELETED_USER_TAG);
+            kudosService.save(transaction);
+        });
+
+        userRepository.delete(getLoggedUser().get());
+
     }
 
 }

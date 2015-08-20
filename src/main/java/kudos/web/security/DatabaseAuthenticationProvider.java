@@ -39,7 +39,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
         User user = userRepository.findOne(name);
 
-        if ((user != null && user.isRegistered()) && new StrongPasswordEncryptor().checkPassword(password, user.getPassword())) {
+        if ((user != null && new StrongPasswordEncryptor().checkPassword(password, user.getPassword()))) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
 

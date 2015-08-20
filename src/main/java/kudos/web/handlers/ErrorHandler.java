@@ -95,4 +95,10 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ChallengeException.class)
+    public ResponseEntity<String> handleChallengeException(HttpServletRequest request,
+                                                              ChallengeException e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
 }

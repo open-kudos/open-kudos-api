@@ -10,14 +10,17 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by chc on 15.8.7.
  */
 @Service
+@Scope("prototype")
 public class ChallengeService {
 
     private ChallengeRepository challengeRepository;
@@ -33,6 +36,10 @@ public class ChallengeService {
         this.challengeRepository = challengeRepository;
         this.kudosService = kudosService;
         this.usersService = usersService;
+    }
+
+    public Challenge save(Challenge challenge){
+        return challengeRepository.save(challenge);
     }
 
     public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount) throws BusinessException, UserException {
@@ -51,8 +58,8 @@ public class ChallengeService {
         );
     }
 
-    public Challenge getChallenge(String id) {
-        return challengeRepository.findChallengeById(id);
+    public Optional<Challenge> getChallenge(String id) {
+        return Optional.ofNullable(challengeRepository.findChallengeById(id));
     }
 
     public Challenge accept(Challenge challenge) throws InvalidChallengeStatusException {
@@ -122,4 +129,5 @@ public class ChallengeService {
         databaseChallenge.setStatus(status);
         return challengeRepository.save(databaseChallenge);
     }
+
 }

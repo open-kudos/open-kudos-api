@@ -20,4 +20,6 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     List<Transaction> findTransactionBySenderEmailOrderByTimestampDesc (String senderEmail);
 
+
+
 }

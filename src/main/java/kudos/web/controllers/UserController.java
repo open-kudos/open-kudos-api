@@ -9,9 +9,7 @@ import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
@@ -30,17 +28,15 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Service to disable user account")
     @RequestMapping(value = "/disable", method = RequestMethod.POST)
-    public String disableMyAccount(HttpSession session) throws UserException {
+    public void disableMyAccount(HttpSession session) throws UserException {
         usersService.disableUsersAcount();
         session.invalidate();
-        // TODO no Strings should be returned
-        return "disabled";
+
     }
 
     @ApiMethod(description = "Service to show user account")
     @RequestMapping(value = "/home", method = RequestMethod.GET)
-    // TODO why is the method name "showHomePage" ?
-    public User showHomePage() throws UserException {
+    public User getUserAccount() throws UserException {
         return usersService.getCompletedUser();
     }
 
@@ -76,7 +72,7 @@ public class UserController extends BaseController {
             @ApiError(code = "no.new.password.match", description = "If confirm passwords do not match")
     })
     @RequestMapping(value = "complete-profile", method = RequestMethod.POST)
-    public User completeUserProfile(@ModelAttribute("form") MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
+    public @ResponseBody User completeUserProfile(MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
         new MyProfileForm.MyProfileValidator().validate(myProfileForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);

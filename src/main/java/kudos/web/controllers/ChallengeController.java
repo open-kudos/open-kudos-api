@@ -1,10 +1,7 @@
 package kudos.web.controllers;
 
 import com.google.common.base.Strings;
-import kudos.exceptions.BusinessException;
-import kudos.exceptions.ChallengeIdNotSpecifiedException;
-import kudos.exceptions.InvalidChallengeStatusException;
-import kudos.exceptions.WrongChallengeEditorException;
+import kudos.exceptions.*;
 import kudos.model.Challenge;
 import kudos.model.User;
 import kudos.web.beans.form.ChallengeTransferForm;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by chc on 15.8.11.
@@ -131,13 +129,17 @@ public class ChallengeController extends BaseController {
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge accept(String id)
-            throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException {
+            throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
 
-        // TODO why getChallenge doesn't return Optional? Return optional and use "orElseThrow" instead of IF
-        Challenge challenge = challengeService.getChallenge(id);
+        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
+        if(!maybeChallenge.isPresent()){
+            throw new ChallengeException("challenge.not.found");
+        }
+
+        Challenge challenge = maybeChallenge.get();
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.participant");
         }
@@ -163,13 +165,18 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
 
-        // TODO as above. check that challenge is not null (with Optional)
-        Challenge challenge = challengeService.getChallenge(id);
+        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
+
+        if(!maybeChallenge.isPresent()){
+            throw new ChallengeException("challenge.not.found");
+        }
+
+        Challenge challenge = maybeChallenge.get();
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.participant");
         }
@@ -193,13 +200,17 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
 
-        // TODO as above. check that challenge is not null (with Optional)
-        Challenge challenge = challengeService.getChallenge(id);
+        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
+        if(!maybeChallenge.isPresent()){
+            throw new ChallengeException("challenge.not.found");
+        }
+
+        Challenge challenge = maybeChallenge.get();
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.referee");
         }
@@ -223,13 +234,17 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException {
+    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new ChallengeIdNotSpecifiedException();
 
-        // TODO as above. check that challenge is not null (with Optional)
-        Challenge challenge = challengeService.getChallenge(id);
+        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
+        if(!maybeChallenge.isPresent()){
+            throw new ChallengeException("challenge.not.found");
+        }
+
+        Challenge challenge = maybeChallenge.get();
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not.a.referee");
         }

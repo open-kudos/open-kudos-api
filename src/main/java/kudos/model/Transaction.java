@@ -65,4 +65,11 @@ public class Transaction {
         this.amount = amount;
     }
 
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
+    }
+
+    public void setReceiverEmail(String receiverEmail) {
+        this.receiverEmail = receiverEmail;
+    }
 }

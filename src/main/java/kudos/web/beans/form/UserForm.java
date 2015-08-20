@@ -13,18 +13,6 @@ public class UserForm {
     private String password;
     private String confirmPassword;
     private String email;
-    private String name;
-    private String surname;
-    private boolean isCompleted = false;
-
-    public boolean getIsCompleted() {
-        return isCompleted;
-    }
-
-    public void setIsCompleted(boolean completed) {
-        this.isCompleted = completed;
-    }
-
 
     public String getPassword() {
         return password;
@@ -50,24 +38,8 @@ public class UserForm {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
     public User toUser(){
-        return new User(password,email,name,surname);
+        return new User(password,email);
     }
 
     public static class FormValidator implements Validator {
@@ -94,14 +66,6 @@ public class UserForm {
                 errors.rejectValue("email", "email.not.specified");
             } else if(!form.getEmail().matches(EMAIL_PATTERN)){
                 errors.rejectValue("email", "email.incorrect");
-            }
-
-            if(Strings.isNullOrEmpty(form.getName())){
-                errors.rejectValue("name", "name.not.specified");
-            }
-
-            if(Strings.isNullOrEmpty(form.getSurname())){
-                errors.rejectValue("surname", "surname.not.specified");
             }
 
             if(Strings.isNullOrEmpty(form.getPassword())){

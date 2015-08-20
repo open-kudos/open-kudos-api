@@ -1,6 +1,7 @@
 package kudos.web.beans.form;
 
 import com.google.common.base.Strings;
+import kudos.model.User;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -152,6 +153,7 @@ public class MyProfileForm {
     public void setNewPasswordConfirm(String newPasswordConfirm) {
         this.newPasswordConfirm = newPasswordConfirm;
     }
+
 
     public static class MyProfileValidator implements Validator{
 

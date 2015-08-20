@@ -45,7 +45,6 @@ public class KudosController extends BaseController {
     public @ApiResponseObject @ResponseBody Transaction sendKudos(KudosTransferForm kudosTransferForm, Errors errors)
             throws FormValidationException, BusinessException, UserException {
 
-        // TODO can't this be static? or return errors instead of modifying errors object?
         new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
 
         if (errors.hasErrors())
@@ -59,14 +58,14 @@ public class KudosController extends BaseController {
 
     @ApiMethod(description = "Service to get all incoming kudos transactions")
     @RequestMapping(value = "/incoming-transactions", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Transaction> showIncomingTransactionHistory(Principal principal) {
-        return transactionRepository.findTransactionsByReceiverEmail(principal.getName());
+    public @ApiResponseObject @ResponseBody List<Transaction> showIncomingTransactionHistory() throws UserException {
+        return kudosService.getAllLoggedUserIncomingTransactions();
     }
 
     @ApiMethod(description = "Service to get all outgoing kudos transactions")
     @RequestMapping(value = "/outgoing-transactions", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Transaction> showOutcomingTransactionHistory(Principal principal) {
-        return transactionRepository.findTransactionsBySenderEmail(principal.getName());
+    public @ApiResponseObject @ResponseBody List<Transaction> showOutcomingTransactionHistory() throws UserException {
+        return kudosService.getAllLoggedUserOutgoingTransactions();
     }
 
     @ApiMethod(description = "Service to get remaining kudos amount")

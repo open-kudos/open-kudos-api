@@ -1,11 +1,20 @@
 package kudos.model;
 
 
+import com.google.common.base.Strings;
+import freemarker.template.TemplateException;
+import kudos.web.beans.form.MyProfileForm;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.annotation.concurrent.Immutable;
+import javax.mail.MessagingException;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -18,53 +27,74 @@ import java.util.UUID;
 public class User {
     @Id
     @Indexed(unique = true)
-    private String email;
-    private String password;
-    private String firstName;
-    private String lastName;
+    protected String email;
+    protected String password;
+    protected String firstName;
+    protected String lastName;
 
-    private String birthday;
-    private String phone;
+    protected String birthday;
+    protected String phone;
 
-    private String startedToWorkDate;
-    private String position;
+    protected String startedToWorkDate;
+    protected String position;
 
-    private String emailHash;
+    protected String emailHash;
 
-    private boolean isCompleted = false;
-    private boolean showBirthday = false;
-    private boolean isConfirmed = false;
+    protected boolean isCompleted = false;
+    protected boolean showBirthday = false;
+    protected boolean isConfirmed = false;
 
-    private boolean isRegistered = true;
+    protected String department;
+    protected String location;
+    protected String team;
 
-    private String department;
-    private String location;
-    private String team;
-
-    public User(String password, String email,String firstName, String lastName){
+    public User(String password, String email){
         this.password = password;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
     }
 
-    public void updateUserWithAdditionalInformation(String password, String email, String firstName, String lastName, String birthday, String phone, String startedToWorkDate, String position, String department, String location,
-                                                    String team, boolean isCompleted, boolean showBirthday){
+    private User() {
 
-        this.password = password;
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthday = birthday;
-        this.phone = phone;
-        this.startedToWorkDate = startedToWorkDate;
-        this.position = position;
-        this.department = department;
-        this.location = location;
-        this.team = team;
-        this.isCompleted = isCompleted;
-        this.showBirthday = showBirthday;
+    }
 
+    public User getUpdatedUser(MyProfileForm myProfileForm) throws MessagingException, IOException, TemplateException {
+        String newEmail = myProfileForm.getEmail();
+        String newPassword = myProfileForm.getNewPassword();
+        String newFirstName = myProfileForm.getFirstName();
+        String newLastName = myProfileForm.getLastName();
+
+        User u = new User();
+
+        u.email = !Strings.isNullOrEmpty(newEmail) ? newEmail : this.email;
+
+        if (!Strings.isNullOrEmpty(newPassword) && !new StrongPasswordEncryptor().checkPassword(newPassword, this.password)) {
+            u.password = new StrongPasswordEncryptor().encryptPassword(newPassword);
+        }
+
+        if (!Strings.isNullOrEmpty(newFirstName) && !this.firstName.equals(newFirstName)) {
+            u.firstName = newFirstName;
+        }
+
+        if (!Strings.isNullOrEmpty(newLastName) && !this.lastName.equals(newLastName)) {
+            u.lastName = newLastName;
+        }
+
+        u.birthday = myProfileForm.getBirthday();
+        u.phone = myProfileForm.getPhone();
+        u.startedToWorkDate = myProfileForm.getStartedToWorkDate();
+        u.position = myProfileForm.getPosition();
+        u.department = myProfileForm.getDepartment();
+        u.location = myProfileForm.getLocation();
+        u.team = myProfileForm.getTeam();
+        u.showBirthday = myProfileForm.getShowBirthday();
+        u.isCompleted = true;
+
+        return u;
+
+    }
+
+    private String getRandomHash() {
+        return new BigInteger(130, new SecureRandom()).toString(32);
     }
 
     public String getDepartment() {
@@ -105,14 +135,6 @@ public class User {
 
     public boolean isConfirmed() {
         return isConfirmed;
-    }
-
-    public boolean isRegistered() {
-        return isRegistered;
-    }
-
-    public void setIsRegistered(boolean isRegistered) {
-        this.isRegistered = isRegistered;
     }
 
     public String getPassword(){

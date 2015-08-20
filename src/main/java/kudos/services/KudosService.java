@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Created by chc on 15.8.7.
  */
@@ -24,20 +26,17 @@ public class KudosService {
 
     private final Logger LOG = Logger.getLogger(KudosService.class.getName());
 
-    private final UsersService usersService;
-    private final TransactionRepository repository;
-    private final KudosBusinessStrategy strategy;
-    private final DateTimeFormatter dateTimeFormatter;
+    @Autowired
+    private UsersService usersService;
+    @Autowired
+    private TransactionRepository repository;
+    @Autowired
+    private KudosBusinessStrategy strategy;
+    @Autowired
+    private DateTimeFormatter dateTimeFormatter;
 
     @Autowired
-    public KudosService(UsersService usersService,
-                        TransactionRepository repository,
-                        KudosBusinessStrategy strategy,
-                        @Qualifier("DBTimeFormatter") DateTimeFormatter dateTimeFormatter) {
-
-        this.usersService = usersService;
-        this.repository = repository;
-        this.strategy = strategy;
+    public KudosService(@Qualifier("DBTimeFormatter") DateTimeFormatter dateTimeFormatter) {
         this.dateTimeFormatter = dateTimeFormatter;
     }
 
@@ -141,4 +140,19 @@ public class KudosService {
                 .mapToInt(Transaction::getAmount)
                 .sum();
     }
+
+    public List<Transaction> getAllLoggedUserOutgoingTransactions() throws UserException {
+        User user = usersService.getLoggedUser().get();
+        return repository.findTransactionsBySenderEmail(user.getEmail());
+    }
+
+    public List<Transaction>getAllLoggedUserIncomingTransactions() throws UserException {
+        User user = usersService.getLoggedUser().get();
+        return repository.findTransactionsByReceiverEmail(user.getEmail());
+    }
+
+    public Transaction save(Transaction transaction){
+        return repository.save(transaction);
+    }
+
 }
