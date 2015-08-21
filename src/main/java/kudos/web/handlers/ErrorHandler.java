@@ -71,10 +71,10 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ChallengeIdNotSpecifiedException.class)
+    @ExceptionHandler(IdNotSpecifiedException.class)
     public ResponseEntity<String> handleChallengeIdNotSpecifiedException(HttpServletRequest request,
-                                                                          ChallengeIdNotSpecifiedException e){
-        return new ResponseEntity<>("challenge.id.not.specified",HttpStatus.BAD_REQUEST);
+                                                                          IdNotSpecifiedException e){
+        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(KudosExceededException.class)
@@ -98,7 +98,13 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ChallengeException.class)
     public ResponseEntity<String> handleChallengeException(HttpServletRequest request,
                                                               ChallengeException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RelationException.class)
+    public ResponseEntity<String> handleRelationExceptionException(HttpServletRequest request,
+                                                           RelationException e){
+        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
     }
 
 }

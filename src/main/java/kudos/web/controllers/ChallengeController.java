@@ -129,10 +129,10 @@ public class ChallengeController extends BaseController {
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge accept(String id)
-            throws InvalidChallengeStatusException, WrongChallengeEditorException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
+            throws InvalidChallengeStatusException, WrongChallengeEditorException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
-            throw new ChallengeIdNotSpecifiedException();
+            throw new IdNotSpecifiedException("id.not.specified");
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
         if(!maybeChallenge.isPresent()){
@@ -165,10 +165,10 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
-            throw new ChallengeIdNotSpecifiedException();
+            throw new IdNotSpecifiedException("id.not.specified");
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
 
@@ -200,10 +200,10 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
-            throw new ChallengeIdNotSpecifiedException();
+            throw new IdNotSpecifiedException("id.not.specified");
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
         if(!maybeChallenge.isPresent()){
@@ -234,10 +234,10 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, ChallengeIdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
-            throw new ChallengeIdNotSpecifiedException();
+            throw new IdNotSpecifiedException("id.not.specified");
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
         if(!maybeChallenge.isPresent()){

@@ -60,11 +60,7 @@ public class UsersService {
     private static final String DELETED_USER_TAG = "undefined";
 
     public Optional<User> findByEmail(String email) throws UserException {
-
-        if(userRepository.exists(email)){
-            throw new UserException("user.not.exist");
-        }
-        return Optional.ofNullable(userRepository.findByEmail(email));
+        return Optional.ofNullable(userRepository.findOne(email));
     }
 
     public Optional<User> getLoggedUser() throws UserException {
@@ -78,9 +74,7 @@ public class UsersService {
 
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
 
-        String email = user.getEmail();
-        Optional<User> maybeExistingUser = findByEmail(email);
-        if (maybeExistingUser.isPresent()) {
+        if(userRepository.exists(user.getEmail())){
             throw new UserException("user.already.exists");
         }
         /*emailService.send(
@@ -90,7 +84,7 @@ public class UsersService {
                         "http://localhost:8080/reset-password-by-id?id="+getRandomHash())
         );*/
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
-        User newUser = new User(password, email);
+        User newUser = new User(password, user.getEmail());
         newUser.setEmailHash(getRandomHash());
         return userRepository.save(newUser);
     }
@@ -129,16 +123,15 @@ public class UsersService {
     public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
 
         loginValidation(email, password);
-
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password))
         );
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-        return userRepository.findByEmail(email);
+        return findByEmail(email).get();
     }
 
-    private void loginValidation(String email, String password) throws UserException {
+    private User loginValidation(String email, String password) throws UserException {
         if(Strings.isNullOrEmpty(email)){
             throw new UserException("email.not.specified");
         }
@@ -147,13 +140,16 @@ public class UsersService {
             throw new UserException("password.not.specified");
         }
 
-        if(!userRepository.exists(email)){
-            throw new UserException("user.not.exist");
-        }
-
         if(getLoggedUser().isPresent()) {
             throw new UserException("user.already.logged");
         }
+        Optional<User>maybeUser = findByEmail(email);
+        if(!maybeUser.isPresent()){
+            throw new UserException("user.not.exist");
+        }
+
+        return maybeUser.get();
+
     }
 
     public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {

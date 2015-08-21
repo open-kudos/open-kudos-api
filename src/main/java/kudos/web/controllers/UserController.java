@@ -27,7 +27,7 @@ public class UserController extends BaseController {
     private Logger LOG = Logger.getLogger(UserController.class.getName());
 
     @ApiMethod(description = "Service to disable user account")
-    @RequestMapping(value = "/disable", method = RequestMethod.POST)
+    @RequestMapping(value = "/disable", method = RequestMethod.GET)
     public void disableMyAccount(HttpSession session) throws UserException {
         usersService.disableUsersAcount();
         session.invalidate();
