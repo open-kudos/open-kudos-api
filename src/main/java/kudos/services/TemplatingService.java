@@ -29,11 +29,7 @@ public class TemplatingService {
     public TemplatingService() throws IOException {
         configuration = new Configuration(new Version(2, 3, 23));
         configuration.setClassForTemplateLoading(TemplatingService.class, "/");
-
-
-        FileTemplateLoader templateLoader = new FileTemplateLoader(new File("src/main/resources/mail-templates"));
-        configuration.setTemplateLoader(templateLoader);
-        mainTemplate = configuration.getTemplate("MainTemplate.ftl");
+        mainTemplate = configuration.getTemplate("mail-templates/MainTemplate.ftl");
 
         data.put("title", DEFAULT_TITLE);
     }
