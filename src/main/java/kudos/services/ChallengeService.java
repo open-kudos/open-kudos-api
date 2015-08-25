@@ -108,7 +108,7 @@ public class ChallengeService {
     private void checkNotAccomplishedDeclinedFailedOrAccepted(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
             case ACCEPTED:
-                throw new InvalidChallengeStatusException("challenge.already.accepted");
+                throw new InvalidChallengeStatusException("challenge_already_accepted");
         }
         checkNotAccomplishedDeclinedOrFailed(challenge);
     }
@@ -116,11 +116,11 @@ public class ChallengeService {
     private void checkNotAccomplishedDeclinedOrFailed(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
             case ACCOMPLISHED:
-                throw new InvalidChallengeStatusException("challenge.already.accomplished");
+                throw new InvalidChallengeStatusException("challenge_already_accomplished");
             case DECLINED:
-                throw new InvalidChallengeStatusException("challenge.already.declined");
+                throw new InvalidChallengeStatusException("challenge_already_declined");
             case FAILED:
-                throw new InvalidChallengeStatusException("challenge.already.failed");
+                throw new InvalidChallengeStatusException("challenge_already_failed");
         }
     }
 

@@ -25,7 +25,7 @@ public class RelationService {
 
     public Relation addRelation(Relation relation) throws RelationException {
         if(relationRepository.getRelationByFollowerEmailAndUserEmail(relation.getFollowerEmail(),relation.getUserEmail()) != null){
-            throw new RelationException("relation.already.exists");
+            throw new RelationException("relation_already_exists");
         }
         return relationRepository.save(relation);
     }
@@ -51,7 +51,7 @@ public class RelationService {
 
     public void removeRelation(Relation relation) throws RelationException {
         if(relationRepository.getRelationByFollowerEmailAndUserEmail(relation.getFollowerEmail(),relation.getUserEmail()) == null){
-            throw new RelationException("relation.not.exist");
+            throw new RelationException("relation_not_exist");
         }
         relationRepository.delete(relation);
     }

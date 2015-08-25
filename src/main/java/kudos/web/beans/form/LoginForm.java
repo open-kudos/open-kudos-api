@@ -58,13 +58,13 @@ public class LoginForm {
             final String password = form.getPassword();
 
             if (Strings.isNullOrEmpty(email)) {
-                errors.rejectValue("email", "email.not.specified");
+                errors.rejectValue("email", "email_not_specified");
             } else if (!email.matches(EMAIL_PATTERN)) {
-                errors.rejectValue("email", "email.incorrect");
+                errors.rejectValue("email", "email_incorrect");
             }
 
             if (Strings.isNullOrEmpty(password)) {
-                errors.rejectValue("password", "password.not.specified");
+                errors.rejectValue("password", "password_not_specified");
             }
         }
     }

@@ -176,27 +176,27 @@ public class MyProfileForm {
 
             String birthdayDate = form.getBirthday();
             if(Strings.isNullOrEmpty(birthdayDate)){
-                errors.rejectValue("birthday","birthday.date.not.specified");
+                errors.rejectValue("birthday","birthday_date_not_specified");
             }
             else if(!isEnteredDateValid(birthdayDate)){
-                errors.rejectValue("birthday","birthday.date.incorrect");
+                errors.rejectValue("birthday","birthday_date_incorrect");
             }
 
             String email = form.getEmail();
             if(!Strings.isNullOrEmpty(email) && !email.matches(EMAIL_PATTERN)){
-                errors.rejectValue("email","incorrect.email");
+                errors.rejectValue("email","incorrect_email");
             }
 
             String phone = form.getPhone();
             if(!Strings.isNullOrEmpty(phone)  && !phone.matches(PHONE_PATTERN)){
-                errors.rejectValue("phone","incorrect.phone");
+                errors.rejectValue("phone","incorrect_phone");
             }
 
             String startedToWorkDate = form.getStartedToWorkDate();
             if(Strings.isNullOrEmpty(startedToWorkDate)){
-                errors.rejectValue("startedToWorkDate","startedToWorkDate.not.specified");
+                errors.rejectValue("startedToWorkDate","startedToWorkDate_not_specified");
             } else if(!isEnteredDateValid(startedToWorkDate)){
-                errors.rejectValue("startedToWorkDate","startedToWorkDate.incorrect");
+                errors.rejectValue("startedToWorkDate","startedToWorkDate_incorrect");
             }
 
 
@@ -206,11 +206,11 @@ public class MyProfileForm {
                 String newPassword = form.getNewPassword();
                 String newPasswordConfirm = form.getNewPasswordConfirm();
                 if(Strings.isNullOrEmpty(newPassword)){
-                    errors.rejectValue("newPassword","newPassword.not.specified");
+                    errors.rejectValue("newPassword","newPassword_not_specified");
                 } else if(Strings.isNullOrEmpty(newPasswordConfirm)){
-                    errors.rejectValue("newPasswordConfirm","newPasswordConfirm.not.specified");
+                    errors.rejectValue("newPasswordConfirm","newPasswordConfirm_not_specified");
                 } else if(!newPassword.equals(newPasswordConfirm)){
-                    errors.rejectValue("newPasswordConfirm","no.new.password.match");
+                    errors.rejectValue("newPasswordConfirm","no_new_password_match");
                 }
 
             }

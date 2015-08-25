@@ -95,11 +95,11 @@ public class KudosService {
         Transaction newTransaction = new Transaction(to.getEmail(), from.getEmail(), amount, message);
 
         if (amount < strategy.getMinDeposit()) {
-            throw new InvalidKudosAmountException("invalid.kudos.amount");
+            throw new InvalidKudosAmountException("invalid_kudos_amount");
         }
 
         if (getFreeKudos(from) < amount){
-            throw new KudosExceededException("exceeded.kudos");
+            throw new KudosExceededException("exceeded_kudos");
         }
 
         newTransaction.setReceiverBalance(amount + getKudos(to));

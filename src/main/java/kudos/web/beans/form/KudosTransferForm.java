@@ -54,19 +54,19 @@ public class KudosTransferForm {
             String receiverEmail = form.getReceiverEmail();
 
             if (Strings.isNullOrEmpty(receiverEmail)) {
-                errors.rejectValue("receiverEmail", "receiver.email.not.specified");
+                errors.rejectValue("receiverEmail", "receiver_email_not_specified");
             } else if (!receiverEmail.matches(EMAIL_PATTERN)) {
-                errors.rejectValue("receiverEmail", "receiver.email.incorrect");
+                errors.rejectValue("receiverEmail", "receiver_email_incorrect");
             }
 
             if (!Strings.isNullOrEmpty(form.getAmount())) {
                 try {
                     int amount = Integer.parseInt(form.getAmount());
                     if (amount <= 0) {
-                        errors.rejectValue("amount", "amount.negative.or.zero");
+                        errors.rejectValue("amount", "amount_negative_or_zero");
                     }
                 } catch (NumberFormatException e) {
-                    errors.rejectValue("amount", "amount.not.digit");
+                    errors.rejectValue("amount", "amount_not_digit");
                 }
             }
         }

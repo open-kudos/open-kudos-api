@@ -90,39 +90,39 @@ public class ChallengeTransferForm {
             String estimatedDate = challengeTransferForm.getFinishDate();
 
             if (Strings.isNullOrEmpty(receiverEmail)) {
-                errors.rejectValue("participant", "receiver.email.not.specified");
+                errors.rejectValue("participant", "receiver_email_not_specified");
             } else if (!receiverEmail.matches(EMAIL_PATTERN)) {
-                errors.rejectValue("participant", "receiver.email.incorrect");
+                errors.rejectValue("participant", "receiver_email_incorrect");
             }
 
             if (Strings.isNullOrEmpty(judgeEmail)) {
-                errors.rejectValue("referee", "referee.email.not.specified");
+                errors.rejectValue("referee", "referee_email_not_specified");
             } else if (!judgeEmail.matches(EMAIL_PATTERN)) {
-                errors.rejectValue("referee", "referee.email.incorrect");
+                errors.rejectValue("referee", "referee_email_incorrect");
             }
 
             if (Strings.isNullOrEmpty(amountInString)) {
-                errors.rejectValue("amount", "amount.not.specified");
+                errors.rejectValue("amount", "amount_not_specified");
             }
 
             try {
                 int amount = Integer.parseInt(amountInString);
                 if (amount <= 0) {
-                    errors.rejectValue("amount", "amount.negative.or.zero");
+                    errors.rejectValue("amount", "amount_negative_or_zero");
                 }
             } catch (NumberFormatException e) {
-                errors.rejectValue("amount", "amount.not.digit");
+                errors.rejectValue("amount", "amount_not_digit");
             }
 
 
             if (Strings.isNullOrEmpty(challengeName)) {
-                errors.rejectValue("name", "name.not.specified");
+                errors.rejectValue("name", "name_not_specified");
             }
 
             if (Strings.isNullOrEmpty(estimatedDate)) {
-                errors.rejectValue("finishDate", "finishDate.not.specified");
+                errors.rejectValue("finishDate", "finishDate_not_specified");
             } else if (!isEnteredDateValid(estimatedDate)) {
-                errors.rejectValue("finishDate", "finishDate.incorrect");
+                errors.rejectValue("finishDate", "finishDate_incorrect");
             }
 
         }

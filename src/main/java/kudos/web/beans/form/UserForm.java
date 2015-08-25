@@ -59,24 +59,22 @@ public class UserForm {
 
             if (form.getPassword() != null && form.getConfirmPassword() != null &&
                     !form.getPassword().equals(form.getConfirmPassword())) {
-                errors.rejectValue("confirmPassword", "no.match.password");
+                errors.rejectValue("confirmPassword", "no_match_password");
             }
 
             if (Strings.isNullOrEmpty(form.getEmail())) {
-                errors.rejectValue("email", "email.not.specified");
+                errors.rejectValue("email", "email_not_specified");
             } else if(!form.getEmail().matches(EMAIL_PATTERN)){
-                errors.rejectValue("email", "email.incorrect");
+                errors.rejectValue("email", "email_incorrect");
             }
 
             if(Strings.isNullOrEmpty(form.getPassword())){
-                errors.rejectValue("password", "password.not.specified");
+                errors.rejectValue("password", "password_not_specified");
             }
 
             if(Strings.isNullOrEmpty(form.getConfirmPassword())){
-                errors.rejectValue("confirmPassword", "confirm.password.not.specified");
+                errors.rejectValue("confirmPassword", "confirm_password_not_specified");
             }
-
-
 
         }
     }

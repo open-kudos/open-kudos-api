@@ -75,7 +75,7 @@ public class UsersService {
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
 
         if(userRepository.exists(user.getEmail())){
-            throw new UserException("user.already.exists");
+            throw new UserException("user_already_exists");
         }
         /*emailService.send(
                 new Email(email,
@@ -97,7 +97,7 @@ public class UsersService {
             userRepository.save(user);
             return userRepository.save(user);
         } else {
-            throw new UserException("user.not.found");
+            throw new UserException("user_not_found");
         }
     }
 
@@ -115,7 +115,7 @@ public class UsersService {
     public User getCompletedUser() throws UserException {
         User user = getLoggedUser().get();
         if (!user.isCompleted()) {
-            throw new UserException("user.not.completed");
+            throw new UserException("user_not_completed");
         }
         return user;
     }
@@ -133,19 +133,19 @@ public class UsersService {
 
     private User loginValidation(String email, String password) throws UserException {
         if(Strings.isNullOrEmpty(email)){
-            throw new UserException("email.not.specified");
+            throw new UserException("email_not_specified");
         }
 
         if(Strings.isNullOrEmpty(password)){
-            throw new UserException("password.not.specified");
+            throw new UserException("password_not_specified");
         }
 
         if(getLoggedUser().isPresent()) {
-            throw new UserException("user.already.logged");
+            throw new UserException("user_already_logged");
         }
         Optional<User>maybeUser = findByEmail(email);
         if(!maybeUser.isPresent()){
-            throw new UserException("user.not.exist");
+            throw new UserException("user_not_exist");
         }
 
         return maybeUser.get();
@@ -154,12 +154,12 @@ public class UsersService {
 
     public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {
         if(Strings.isNullOrEmpty(email)){
-            throw new UserException("email.not.specified");
+            throw new UserException("email_not_specified");
         }
 
         Optional<User> maybeUser = findByEmail(email);
         if(maybeUser.isPresent()){
-            throw new UserException("user.not.exist");
+            throw new UserException("user_not_exist");
         }
         User user = maybeUser.get();
         String resetHash = getRandomHash();
