@@ -23,10 +23,10 @@ public class AuthenticationController extends BaseController {
     @ApiMethod(description = "Service to log into system")
     @ApiErrors(apierrors = {
              @ApiError(code = "email_password_mismatch", description = "If entered email or password does not exist in database"),
-             @ApiError(code = "email.not.specified", description = "If email was not specified"),
-             @ApiError(code = "password.not.specified", description = "If password was not specified"),
-             @ApiError(code = "user.not.exist", description = "If user does not exist"),
-             @ApiError(code = "user.already.logged", description = "If user is already logged")})
+             @ApiError(code = "email_not_specified", description = "If email was not specified"),
+             @ApiError(code = "password_not_specified", description = "If password was not specified"),
+             @ApiError(code = "user_not_exist", description = "If user does not exist"),
+             @ApiError(code = "user_already_logged", description = "If user is already logged")})
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody User login(
                 @ApiQueryParam(name = "email") String email,
@@ -37,13 +37,13 @@ public class AuthenticationController extends BaseController {
 
     @ApiMethod(description = "Service to log out of system")
     @ApiErrors(apierrors = {
-            @ApiError(code = "not.logged",
+            @ApiError(code = "not_logged",
                     description = "If user is not logged in")
     })
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public void logout(HttpSession session, Principal principal) throws UserException {
         if (principal == null) {
-            throw new UserException("not.logged");
+            throw new UserException("not_logged");
         }
         session.invalidate();
     }

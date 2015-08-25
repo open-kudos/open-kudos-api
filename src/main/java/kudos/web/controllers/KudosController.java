@@ -30,15 +30,15 @@ public class KudosController extends BaseController {
             @ApiQueryParam(name = "message", description = "Message, explaining why user is giving kudos")
     })
     @ApiErrors(apierrors = {
-            @ApiError(code = "receiver.email.not.specified",
+            @ApiError(code = "receiver_email_not_specified",
                     description = "If receiver email was not specified"),
-            @ApiError(code = "receiver.email.incorrect",
+            @ApiError(code = "receiver_email_incorrect",
                     description = "If receiver email was incorrect"),
-            @ApiError(code = "amount.negative.or.zero",
+            @ApiError(code = "amount_negative_or_zero",
                     description = "If specified amount was negative or equal to zero"),
-            @ApiError(code = "amount.not.digit",
+            @ApiError(code = "amount_not_digit",
                     description = "If specified amount is not a digit"),
-            @ApiError(code = "receiver.not.exist",
+            @ApiError(code = "receiver_not_exist",
                     description = "If kudos receiver does not exist")
     })
     @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)

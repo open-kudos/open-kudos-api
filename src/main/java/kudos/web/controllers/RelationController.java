@@ -27,11 +27,11 @@ public class RelationController extends BaseController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public @ResponseBody Relation addRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
         if(Strings.isNullOrEmpty(email)){
-            throw new IdNotSpecifiedException("id.not.specified");
+            throw new IdNotSpecifiedException("id_not_specified");
         }
         Optional<User> maybeUser = usersService.findByEmail(email);
         if(!maybeUser.isPresent()){
-            throw new UserException("user.not.exist");
+            throw new UserException("user_not_exist");
         }
         User user = maybeUser.get();
         User follower = usersService.getLoggedUser().get();
@@ -42,11 +42,11 @@ public class RelationController extends BaseController {
     @RequestMapping(value = "/remove", method = RequestMethod.GET)
     public void removeRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
         if(Strings.isNullOrEmpty(email)){
-            throw new IdNotSpecifiedException("id.not.specified");
+            throw new IdNotSpecifiedException("id_not_specified");
         }
         Optional<User> maybeUser = usersService.findByEmail(email);
         if(!maybeUser.isPresent()){
-            throw new UserException("user.not.exist");
+            throw new UserException("user_not_exist");
         }
         User user = maybeUser.get();
         User follower = usersService.getLoggedUser().get();

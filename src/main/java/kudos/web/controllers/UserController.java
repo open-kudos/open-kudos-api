@@ -62,14 +62,14 @@ public class UserController extends BaseController {
                     description = "The confirm of new password. Must match with the new password. For testing use microsoft")
     })
     @ApiErrors(apierrors = {
-            @ApiError(code = "birthday.date.not.specified", description = "If birthday date was not specified"),
-            @ApiError(code = "birthday.date.incorrect", description = "If specified birthday date was incorrect"),
-            @ApiError(code = "incorrect.phone", description = "If entered phone number was incorrect"),
-            @ApiError(code = "startedToWorkDate.not.specified", description = "If started to work date was not specified"),
-            @ApiError(code = "startedToWorkDate.incorrect", description = "If started to work date was incorrect"),
-            @ApiError(code = "newPassword.not.specified", description = "If new password was not specified"),
-            @ApiError(code = "newPasswordConfirm.not.specified", description = "If new password confirm was not specified"),
-            @ApiError(code = "no.new.password.match", description = "If confirm passwords do not match")
+            @ApiError(code = "birthday_date_not_specified", description = "If birthday date was not specified"),
+            @ApiError(code = "birthday_date_incorrect", description = "If specified birthday date was incorrect"),
+            @ApiError(code = "incorrect_phone", description = "If entered phone number was incorrect"),
+            @ApiError(code = "startedToWorkDate_not_specified", description = "If started to work date was not specified"),
+            @ApiError(code = "startedToWorkDate_incorrect", description = "If started to work date was incorrect"),
+            @ApiError(code = "newPassword_not_specified", description = "If new password was not specified"),
+            @ApiError(code = "newPasswordConfirm_not_specified", description = "If new password confirm was not specified"),
+            @ApiError(code = "no_new_password_match", description = "If confirm passwords do not match")
     })
     @RequestMapping(value = "complete-profile", method = RequestMethod.POST)
     public @ResponseBody User completeUserProfile(MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {

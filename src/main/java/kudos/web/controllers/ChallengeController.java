@@ -40,33 +40,33 @@ public class ChallengeController extends BaseController {
                         description = "The amount of Kudos that will be gifted if challenge was completed. For testing use 10")
     })
     @ApiErrors(apierrors = {
-            @ApiError(code = "receiver.email.not.specified",
+            @ApiError(code = "receiver_email_not_specified",
                     description = "If receiver email was not specified"),
-            @ApiError(code = "receiver.email.incorrect",
+            @ApiError(code = "receiver_email_incorrect",
                     description = "If receiver email was incorrect"),
-            @ApiError(code = "referee.email.not.specified",
+            @ApiError(code = "referee_email_not_specified",
                     description = "If referee email was not specified"),
-            @ApiError(code = "referee.email.incorrect",
+            @ApiError(code = "referee_email_incorrect",
                     description = "If referee email was incorrect"),
-            @ApiError(code = "amount.not.specified",
+            @ApiError(code = "amount_not_specified",
                     description = "If amount was not specified"),
-            @ApiError(code = "amount.negative.or.zero",
+            @ApiError(code = "amount_negative_or_zero",
                     description = "If specified amount was negative or equal to zero"),
-            @ApiError(code = "amount.not.digit",
+            @ApiError(code = "amount_not_digit",
                     description = "If specified amount was not a digit"),
-            @ApiError(code = "name.not.specified",
+            @ApiError(code = "name_not_specified",
                     description = "If name was not specified"),
-            @ApiError(code = "finishDate.not.specified",
+            @ApiError(code = "finishDate_not_specified",
                     description = "If finish date was not specified"),
-            @ApiError(code = "finishDate.incorrect",
+            @ApiError(code = "finishDate_incorrect",
                     description = "If finishDate was incorrect"),
-            @ApiError(code = "invalid.kudos.amount",
+            @ApiError(code = "invalid_kudos_amount",
                     description = "If user does not have enough KUDOS to spent"),
-            @ApiError(code = "receiver.not.exist",
+            @ApiError(code = "receiver_not_exist",
                     description = "If kudos receiver does not exist"),
-            @ApiError(code = "participant.not.exist",
+            @ApiError(code = "participant_not_exist",
                     description = "If participant user does not exist"),
-            @ApiError(code = "referee.not.exist",
+            @ApiError(code = "referee_not_exist",
                     description = "If referee user does not exist")
     })
     @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -116,15 +116,15 @@ public class ChallengeController extends BaseController {
     @ApiErrors(apierrors = {
             @ApiError(code = "challenge.id.not.specified",
                     description = "If challenge id was not specified"),
-            @ApiError(code = "not.a.participant",
+            @ApiError(code = "not_a_participant",
                     description = "If user is not a participant"),
-            @ApiError(code = "challenge.already.accepted",
+            @ApiError(code = "challenge_already_accepted",
                     description = "If challenge is already accepted"),
-            @ApiError(code = "challenge.already.accomplished",
+            @ApiError(code = "challenge_already_accomplished",
                     description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge.already.declined",
+            @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge.already.failed",
+            @ApiError(code = "challenge_already_failed",
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
@@ -136,12 +136,12 @@ public class ChallengeController extends BaseController {
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
         if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge.not.found");
+            throw new ChallengeException("challenge_not_found");
         }
 
         Challenge challenge = maybeChallenge.get();
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
-            throw new WrongChallengeEditorException("not.a.participant");
+            throw new WrongChallengeEditorException("not_a_participant");
         }
         return challengeService.accept(challenge);
     }
@@ -151,34 +151,34 @@ public class ChallengeController extends BaseController {
             @ApiQueryParam(name = "id")
     })
     @ApiErrors(apierrors = {
-            @ApiError(code = "challenge.id.not.specified",
+            @ApiError(code = "challenge_id_not_specified",
                     description = "If challenge id was not specified"),
-            @ApiError(code = "not.a.participant",
+            @ApiError(code = "not_a_participant",
                     description = "If user is not referee"),
-            @ApiError(code = "challenge.already.accepted",
+            @ApiError(code = "challenge_already_accepted",
                     description = "If challenge is already accepted"),
-            @ApiError(code = "challenge.already.accomplished",
+            @ApiError(code = "challenge_already_accomplished",
                     description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge.already.declined",
+            @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge.already.failed",
+            @ApiError(code = "challenge_already_failed",
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id.not.specified");
+            throw new IdNotSpecifiedException("id_not_specified");
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
 
         if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge.not.found");
+            throw new ChallengeException("challenge_not_found");
         }
 
         Challenge challenge = maybeChallenge.get();
         if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
-            throw new WrongChallengeEditorException("not.a.participant");
+            throw new WrongChallengeEditorException("not_a_participant");
         }
         return challengeService.decline(challenge);
     }
@@ -188,31 +188,31 @@ public class ChallengeController extends BaseController {
             @ApiQueryParam(name = "id")
     })
     @ApiErrors(apierrors = {
-            @ApiError(code = "challenge.id.not.specified",
+            @ApiError(code = "challenge_id_not_specified",
                     description = "If challenge id was not specified"),
-            @ApiError(code = "not.a.referee",
+            @ApiError(code = "not_a_referee",
                     description = "If user is not a referee"),
-            @ApiError(code = "challenge.already.accomplished",
+            @ApiError(code = "challenge_already_accomplished",
                     description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge.already.declined",
+            @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge.already.failed",
+            @ApiError(code = "challenge_already_failed",
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id.not.specified");
+            throw new IdNotSpecifiedException("id_not_specified");
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
         if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge.not.found");
+            throw new ChallengeException("challenge_not_found");
         }
 
         Challenge challenge = maybeChallenge.get();
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
-            throw new WrongChallengeEditorException("not.a.referee");
+            throw new WrongChallengeEditorException("not_a_referee");
         }
         return challengeService.accomplish(challenge);
     }
@@ -222,31 +222,31 @@ public class ChallengeController extends BaseController {
             @ApiQueryParam(name = "id")
     })
     @ApiErrors(apierrors = {
-            @ApiError(code = "challenge.id.not.specified",
+            @ApiError(code = "challenge_id_not_specified",
                     description = "If challenge id was not specified"),
-            @ApiError(code = "not.a.referee",
+            @ApiError(code = "not_a_referee",
                     description = "If user is not a referee"),
-            @ApiError(code = "challenge.already.accomplished",
+            @ApiError(code = "challenge_already_accomplished",
                     description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge.already.declined",
+            @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge.already.failed",
+            @ApiError(code = "challenge_already_failed",
                     description = "If challenge is already failed")
     })
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id.not.specified");
+            throw new IdNotSpecifiedException("id_not_specified");
 
         Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
         if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge.not.found");
+            throw new ChallengeException("challenge_not_found");
         }
 
         Challenge challenge = maybeChallenge.get();
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
-            throw new WrongChallengeEditorException("not.a.referee");
+            throw new WrongChallengeEditorException("not_a_referee");
         }
         return challengeService.fail(challenge);
     }
