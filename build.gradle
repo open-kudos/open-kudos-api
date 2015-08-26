@@ -60,7 +60,7 @@ dependencies {
     compile name: 'spring-boot-starter-jsondoc-1.2.2-SNAPSHOT'
     compile name: 'jsondoc-springmvc'
     compile name: 'jsondoc-core'
-    compile 'org.reflections:reflections:0.9.8'
+    compile 'org.reflections:reflections:0.9.10'
 
 }
 
