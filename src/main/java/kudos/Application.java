@@ -19,7 +19,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @SpringBootApplication
 @EnableScheduling
 @EnableWebMvc
-@ComponentScan
 @EnableJSONDoc
 @EnableMongoRepositories({"kudos.repositories"})
 @PropertySource("classpath:application.properties")
