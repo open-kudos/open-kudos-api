@@ -71,7 +71,7 @@ public class UserController extends BaseController {
             @ApiError(code = "newPasswordConfirm_not_specified", description = "If new password confirm was not specified"),
             @ApiError(code = "no_new_password_match", description = "If confirm passwords do not match")
     })
-    @RequestMapping(value = "complete-profile", method = RequestMethod.POST)
+    @RequestMapping(value = "complete", method = RequestMethod.POST)
     public @ResponseBody User completeUserProfile(MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
         new MyProfileForm.MyProfileValidator().validate(myProfileForm, errors);
         if (errors.hasErrors()) {

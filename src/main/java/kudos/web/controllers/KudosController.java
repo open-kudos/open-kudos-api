@@ -41,7 +41,7 @@ public class KudosController extends BaseController {
             @ApiError(code = "receiver_not_exist",
                     description = "If kudos receiver does not exist")
     })
-    @RequestMapping(value = "/send-kudos", method = RequestMethod.POST)
+    @RequestMapping(value = "/send", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Transaction sendKudos(KudosTransferForm kudosTransferForm, Errors errors)
             throws FormValidationException, BusinessException, UserException {
 
@@ -57,25 +57,25 @@ public class KudosController extends BaseController {
     }
 
     @ApiMethod(description = "Service to get all incoming kudos transactions")
-    @RequestMapping(value = "/incoming-transactions", method = RequestMethod.GET)
+    @RequestMapping(value = "/incoming", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Transaction> showIncomingTransactionHistory() throws UserException {
         return kudosService.getAllLoggedUserIncomingTransactions();
     }
 
     @ApiMethod(description = "Service to get all outgoing kudos transactions")
-    @RequestMapping(value = "/outgoing-transactions", method = RequestMethod.GET)
+    @RequestMapping(value = "/outgoing", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Transaction> showOutcomingTransactionHistory() throws UserException {
         return kudosService.getAllLoggedUserOutgoingTransactions();
     }
 
     @ApiMethod(description = "Service to get remaining kudos amount")
-    @RequestMapping(value = "/remaining-kudos", method = RequestMethod.GET)
+    @RequestMapping(value = "/remaining", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody int showRemainingKudos(Principal principal) throws UserException {
         return kudosService.getFreeKudos(usersService.getLoggedUser().get());
     }
 
     @ApiMethod(description = "Service to get received kudos")
-    @RequestMapping(value = "/received-kudos", method = RequestMethod.GET)
+    @RequestMapping(value = "/received", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody int receivedKudos(Principal principal) throws UserException {
         return kudosService.getKudos(usersService.getLoggedUser().get());
     }
