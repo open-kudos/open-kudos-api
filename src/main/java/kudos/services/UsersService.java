@@ -25,7 +25,11 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by chc on 15.8.11.
@@ -204,4 +208,11 @@ public class UsersService {
 
     }
 
+    public List<User> list(String email) {
+        List<Predicate<User>> options = new ArrayList<>();
+
+        if (email != null) options.add(user -> user.getEmail().equals(email));
+
+        return userRepository.findAll().stream().filter(options.stream().reduce(user -> true, Predicate::and)).collect(Collectors.toList());
+    }
 }

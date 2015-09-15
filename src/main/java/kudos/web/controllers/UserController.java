@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -82,5 +83,14 @@ public class UserController extends BaseController {
             throw new FormValidationException(errors);
         }
         return usersService.completeUser(myProfileForm);
+    }
+
+    @ApiMethod(description = "Service to listing users")
+    @ApiParams(queryparams = {
+            @ApiQueryParam(name = "email", required = false, description = "Searched user email fragment")
+    })
+    @RequestMapping(value = "list", method = RequestMethod.GET)
+    public List<User> listUsers(String email) throws Exception{
+        return usersService.list(email);
     }
 }

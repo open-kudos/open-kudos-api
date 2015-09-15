@@ -15,6 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -42,6 +44,13 @@ public class UsersServiceTest {
 
     private User mockedUser;
 
+    private static List<User> users = new ArrayList<>();
+    static {
+        users.add(new User("", "aaa@aaa.com"));
+        users.add(new User("", "aaa@aaa.com"));
+        users.add(new User("", "bbb@bbb.com"));
+    }
+
     @Before
     public void before() throws UserException {
         mockedUser = mock(User.class);
@@ -66,6 +75,20 @@ public class UsersServiceTest {
 
         assertTrue(savedUser.getValue().getEmail().equals(mockedUser.getEmail()));
         assertNotNull(savedUser.getValue().getPassword());
+    }
+
+    @Test
+    public void testUserFilter(){
+        when(userRepository.findAll()).thenReturn(users);
+        List<User> result = usersService.list("aaa@aaa.com");
+        assertTrue(result.size() == 2);
+    }
+
+    @Test
+    public void testEmptyFilter(){
+        when(userRepository.findAll()).thenReturn(users);
+        List<User> result = usersService.list(null);
+        assertTrue(result.size() == 3);
     }
 
 }
