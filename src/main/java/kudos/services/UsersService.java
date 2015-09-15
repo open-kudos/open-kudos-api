@@ -3,18 +3,14 @@ package kudos.services;
 
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
-import kudos.model.Challenge;
 import kudos.model.Email;
-import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
-import org.omg.IOP.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,9 +25,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -74,7 +67,7 @@ public class UsersService {
 
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
 
-        if(userRepository.exists(user.getEmail())){
+        if (userRepository.exists(user.getEmail())) {
             throw new UserException("user_already_exists");
         }
         /*emailService.send(
@@ -108,7 +101,7 @@ public class UsersService {
         return updatedUser;
     }
 
-    public void disableUsersAcount() throws UserException {
+    public void disableUsersAccount() throws UserException {
         wipeAllUserData();
     }
 
@@ -132,19 +125,19 @@ public class UsersService {
     }
 
     private User loginValidation(String email, String password) throws UserException {
-        if(Strings.isNullOrEmpty(email)){
+        if (Strings.isNullOrEmpty(email)) {
             throw new UserException("email_not_specified");
         }
 
-        if(Strings.isNullOrEmpty(password)){
+        if (Strings.isNullOrEmpty(password)) {
             throw new UserException("password_not_specified");
         }
 
-        if(getLoggedUser().isPresent()) {
+        if (getLoggedUser().isPresent()) {
             throw new UserException("user_already_logged");
         }
-        Optional<User>maybeUser = findByEmail(email);
-        if(!maybeUser.isPresent()){
+        Optional<User> maybeUser = findByEmail(email);
+        if (!maybeUser.isPresent()) {
             throw new UserException("user_not_exist");
         }
 
@@ -153,12 +146,12 @@ public class UsersService {
     }
 
     public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {
-        if(Strings.isNullOrEmpty(email)){
+        if (Strings.isNullOrEmpty(email)) {
             throw new UserException("email_not_specified");
         }
 
         Optional<User> maybeUser = findByEmail(email);
-        if(maybeUser.isPresent()){
+        if (maybeUser.isPresent()) {
             throw new UserException("user_not_exist");
         }
         User user = maybeUser.get();
@@ -166,7 +159,7 @@ public class UsersService {
         user.setEmailHash(resetHash);
 
         emailService.send(
-                new Email(email, LocalDateTime.now().toString(), "Click this link to reset your password: ","http://localhost:8080/reset-password-by-id?id="+resetHash)
+                new Email(email, LocalDateTime.now().toString(), "Click this link to reset your password: ", "http://localhost:8080/reset-password-by-id?id=" + resetHash)
         );
         userRepository.save(user);
     }
@@ -178,34 +171,34 @@ public class UsersService {
     private void wipeAllUserData() throws UserException {
 
         challengeService.getAllUserCreatedChallenges().stream()
-        .forEach(challenge -> {
-            challenge.setCreator(DELETED_USER_TAG);
-            challengeService.save(challenge);
-        });
+                .forEach(challenge -> {
+                    challenge.setCreator(DELETED_USER_TAG);
+                    challengeService.save(challenge);
+                });
 
         challengeService.getAllUserParticipatedChallenges().stream()
-        .forEach(challenge -> {
-            challenge.setParticipant(DELETED_USER_TAG);
-            challengeService.save(challenge);
-        });
+                .forEach(challenge -> {
+                    challenge.setParticipant(DELETED_USER_TAG);
+                    challengeService.save(challenge);
+                });
 
         challengeService.getAllUserReferredChallenges().stream()
-        .forEach(challenge -> {
-            challenge.setReferee(DELETED_USER_TAG);
-            challengeService.save(challenge);
-        });
+                .forEach(challenge -> {
+                    challenge.setReferee(DELETED_USER_TAG);
+                    challengeService.save(challenge);
+                });
 
         kudosService.getAllLoggedUserIncomingTransactions().stream()
-        .forEach(transaction -> {
-            transaction.setReceiverEmail(DELETED_USER_TAG);
-            kudosService.save(transaction);
-        });
+                .forEach(transaction -> {
+                    transaction.setReceiverEmail(DELETED_USER_TAG);
+                    kudosService.save(transaction);
+                });
 
         kudosService.getAllLoggedUserOutgoingTransactions().stream()
-        .forEach(transaction -> {
-            transaction.setSenderEmail(DELETED_USER_TAG);
-            kudosService.save(transaction);
-        });
+                .forEach(transaction -> {
+                    transaction.setSenderEmail(DELETED_USER_TAG);
+                    kudosService.save(transaction);
+                });
 
         userRepository.delete(getLoggedUser().get());
 

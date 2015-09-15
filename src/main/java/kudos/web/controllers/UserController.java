@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
@@ -29,7 +31,7 @@ public class UserController extends BaseController {
     @ApiMethod(description = "Service to disable user account")
     @RequestMapping(value = "/disable", method = RequestMethod.GET)
     public void disableMyAccount(HttpSession session) throws UserException {
-        usersService.disableUsersAcount();
+        usersService.disableUsersAccount();
         session.invalidate();
 
     }
@@ -53,7 +55,7 @@ public class UserController extends BaseController {
             @ApiQueryParam(name = "department", required = false, description = "The department of user, for testing use Wix"),
             @ApiQueryParam(name = "location", required = false, description = "The location of user company. For testing use Lithuania"),
             @ApiQueryParam(name = "team", required = false, description = "The team of user. For testing use TDI"),
-            @ApiQueryParam(name = "showBirthday", required = false, allowedvalues = {"true","false"},
+            @ApiQueryParam(name = "showBirthday", required = false, allowedvalues = {"true", "false"},
                     description = "The decision of user to show his birthday date or not. For testing use true"),
             @ApiQueryParam(name = "oldPassword", required = false, description = "Old user password, for testing use google"),
             @ApiQueryParam(name = "newPassword", required = true,
@@ -72,7 +74,9 @@ public class UserController extends BaseController {
             @ApiError(code = "no_new_password_match", description = "If confirm passwords do not match")
     })
     @RequestMapping(value = "complete", method = RequestMethod.POST)
-    public @ResponseBody User completeUserProfile(MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
+    public
+    @ResponseBody
+    User completeUserProfile(MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
         new MyProfileForm.MyProfileValidator().validate(myProfileForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
