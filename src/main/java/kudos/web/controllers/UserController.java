@@ -74,7 +74,7 @@ public class UserController extends BaseController {
             @ApiError(code = "newPasswordConfirm_not_specified", description = "If new password confirm was not specified"),
             @ApiError(code = "no_new_password_match", description = "If confirm passwords do not match")
     })
-    @RequestMapping(value = "complete", method = RequestMethod.POST)
+    @RequestMapping(value = "/complete", method = RequestMethod.POST)
     public
     @ResponseBody
     User completeUserProfile(MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
@@ -89,8 +89,8 @@ public class UserController extends BaseController {
     @ApiParams(queryparams = {
             @ApiQueryParam(name = "email", required = false, description = "Searched user email fragment")
     })
-    @RequestMapping(value = "list", method = RequestMethod.GET)
-    public List<User> listUsers(String email) throws Exception{
-        return usersService.list(email);
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    public List<User> listUsers(String seed) throws Exception{
+        return usersService.list(seed);
     }
 }

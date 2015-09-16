@@ -65,6 +65,8 @@ public class User {
 
         if (!Strings.isNullOrEmpty(newPassword) && !new StrongPasswordEncryptor().checkPassword(newPassword, this.password)) {
             u.password = new StrongPasswordEncryptor().encryptPassword(newPassword);
+        } else {
+            u.password = this.password;
         }
 
         if (!Strings.isNullOrEmpty(newFirstName) && !newFirstName.equals(this.firstName)) {
