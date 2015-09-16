@@ -10,14 +10,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.annotation.concurrent.Immutable;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by chc on 15.7.23.
@@ -48,7 +44,7 @@ public class User {
     protected String location;
     protected String team;
 
-    public User(String password, String email){
+    public User(String password, String email) {
         this.password = password;
         this.email = email;
     }
@@ -71,11 +67,11 @@ public class User {
             u.password = new StrongPasswordEncryptor().encryptPassword(newPassword);
         }
 
-        if (!Strings.isNullOrEmpty(newFirstName) && !this.firstName.equals(newFirstName)) {
+        if (!Strings.isNullOrEmpty(newFirstName) && !newFirstName.equals(this.firstName)) {
             u.firstName = newFirstName;
         }
 
-        if (!Strings.isNullOrEmpty(newLastName) && !this.lastName.equals(newLastName)) {
+        if (!Strings.isNullOrEmpty(newLastName) && !newLastName.equals(this.lastName)) {
             u.lastName = newLastName;
         }
 
@@ -137,23 +133,23 @@ public class User {
         return isConfirmed;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return this.password;
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return this.email;
     }
 
-    public String getFirstName(){
+    public String getFirstName() {
         return this.firstName;
     }
 
-    public String getLastName(){
+    public String getLastName() {
         return this.lastName;
     }
 
-    public void markUserAsConfirmed(){
+    public void markUserAsConfirmed() {
         this.isConfirmed = true;
     }
 
