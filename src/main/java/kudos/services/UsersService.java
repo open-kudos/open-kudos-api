@@ -205,7 +205,7 @@ public class UsersService {
 
     }
 
-    public List<User> list(String seed) {
-        return userRepository.searchAllFields(seed);
+    public List<User> list(String filter) {
+        return userRepository.searchAllFields(filter);
     }
 }

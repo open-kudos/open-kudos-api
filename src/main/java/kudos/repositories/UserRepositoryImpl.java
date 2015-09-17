@@ -24,24 +24,24 @@ public class UserRepositoryImpl implements CustomUserRepository {
     }
 
     @Override
-    public List<User> searchAllFields(String seed) {
-        if (Strings.isNullOrEmpty(seed)) {
+    public List<User> searchAllFields(String filter) {
+        if (Strings.isNullOrEmpty(filter)) {
             return operations.findAll(User.class);
         } else {
             Query searchQuery = new Query();
             Criteria searchCriteria = new Criteria();
 
             List<Criteria> orCriterias = new ArrayList<>();
-            orCriterias.add(Criteria.where("email").regex(seed));
-            orCriterias.add(Criteria.where("firstName").regex(seed));
-            orCriterias.add(Criteria.where("lastName").regex(seed));
-            orCriterias.add(Criteria.where("birthday").regex(seed));
-            orCriterias.add(Criteria.where("phone").regex(seed));
-            orCriterias.add(Criteria.where("startedToWorkDate").regex(seed));
-            orCriterias.add(Criteria.where("position").regex(seed));
-            orCriterias.add(Criteria.where("department").regex(seed));
-            orCriterias.add(Criteria.where("location").regex(seed));
-            orCriterias.add(Criteria.where("team").regex(seed));
+            orCriterias.add(Criteria.where("email").regex(filter));
+            orCriterias.add(Criteria.where("firstName").regex(filter));
+            orCriterias.add(Criteria.where("lastName").regex(filter));
+            orCriterias.add(Criteria.where("birthday").regex(filter));
+            orCriterias.add(Criteria.where("phone").regex(filter));
+            orCriterias.add(Criteria.where("startedToWorkDate").regex(filter));
+            orCriterias.add(Criteria.where("position").regex(filter));
+            orCriterias.add(Criteria.where("department").regex(filter));
+            orCriterias.add(Criteria.where("location").regex(filter));
+            orCriterias.add(Criteria.where("team").regex(filter));
 
             searchCriteria.orOperator(orCriterias.toArray(new Criteria[orCriterias.size()]));
 

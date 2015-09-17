@@ -87,10 +87,10 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Service to listing users")
     @ApiParams(queryparams = {
-            @ApiQueryParam(name = "email", required = false, description = "Searched user email fragment")
+            @ApiQueryParam(name = "filter", required = false, description = "User list filter")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public List<User> listUsers(String seed) throws Exception{
-        return usersService.list(seed);
+    public List<User> listUsers(String filter) throws Exception{
+        return usersService.list(filter);
     }
 }
