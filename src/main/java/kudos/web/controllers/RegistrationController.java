@@ -73,6 +73,8 @@ public class RegistrationController extends BaseController {
             @ApiQueryParam(name = "email", description = "The email of user that is wanted to be reset")
     })
     @ApiErrors(apierrors = {
+            @ApiError(code = "first_name_is_required", description = "If first name was not specified"),
+            @ApiError(code = "last_name_is_required", description = "If last name was not specified"),
             @ApiError(code = "email_not_specified", description = "If email was not specified"),
             @ApiError(code = "user_not_exist", description = "If user does not exist"),
             @ApiError(code = "user_not_registered", description = "If user is not registered(disabled his account")

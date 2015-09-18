@@ -48,9 +48,9 @@ public class UserController extends BaseController {
             @ApiQueryParam(name = "email", required = false, description = "New email, for testing use newEM@gmail.com"),
             @ApiQueryParam(name = "firstName", required = false, description = "New name, for testing use XYZ"),
             @ApiQueryParam(name = "lastName", required = false, description = "New surname, for testing use ZYX"),
-            @ApiQueryParam(name = "birthday", required = true, description = "User birthday. For testing use 1970-08-08"),
+            @ApiQueryParam(name = "birthday", required = false, description = "User birthday. For testing use 1970-08-08"),
             @ApiQueryParam(name = "phone", required = false, description = "User phone number. For testing use +37067504333"),
-            @ApiQueryParam(name = "startedToWorkDate", required = true,
+            @ApiQueryParam(name = "startedToWorkDate", required = false,
                     description = "The date when user started to work. For testing use 2015-05-05"),
             @ApiQueryParam(name = "position", required = false, description = "The position in company, for testing use CEO"),
             @ApiQueryParam(name = "department", required = false, description = "The department of user, for testing use Wix"),
@@ -59,7 +59,7 @@ public class UserController extends BaseController {
             @ApiQueryParam(name = "showBirthday", required = false, allowedvalues = {"true", "false"},
                     description = "The decision of user to show his birthday date or not. For testing use true"),
             @ApiQueryParam(name = "oldPassword", required = false, description = "Old user password, for testing use google"),
-            @ApiQueryParam(name = "newPassword", required = true,
+            @ApiQueryParam(name = "newPassword", required = false,
                     description = "New user password. Required if old password was specified. For testing use microsoft"),
             @ApiQueryParam(name = "newPasswordConfirm", required = true,
                     description = "The confirm of new password. Must match with the new password. For testing use microsoft")
@@ -74,13 +74,15 @@ public class UserController extends BaseController {
             @ApiError(code = "newPasswordConfirm_not_specified", description = "If new password confirm was not specified"),
             @ApiError(code = "no_new_password_match", description = "If confirm passwords do not match")
     })
-    @RequestMapping(value = "/complete", method = RequestMethod.POST)
-    public @ResponseBody User completeUserProfile(MyProfileForm myProfileForm, Errors errors) throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    public @ResponseBody User updateUserProfile(MyProfileForm myProfileForm, Errors errors)
+            throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
+
         new MyProfileForm.MyProfileValidator().validate(myProfileForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
         }
-        return usersService.completeUser(myProfileForm);
+        return usersService.updateUser(myProfileForm);
     }
 
     @ApiMethod(description = "Service to listing users")

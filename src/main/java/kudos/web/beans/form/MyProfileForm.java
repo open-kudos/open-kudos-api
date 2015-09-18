@@ -175,10 +175,7 @@ public class MyProfileForm {
             MyProfileForm form = (MyProfileForm)target;
 
             String birthdayDate = form.getBirthday();
-            if(Strings.isNullOrEmpty(birthdayDate)){
-                errors.rejectValue("birthday","birthday_date_not_specified");
-            }
-            else if(!isEnteredDateValid(birthdayDate)){
+            if(!Strings.isNullOrEmpty(birthdayDate) && !isEnteredDateValid(birthdayDate)){
                 errors.rejectValue("birthday","birthday_date_incorrect");
             }
 
@@ -193,9 +190,7 @@ public class MyProfileForm {
             }
 
             String startedToWorkDate = form.getStartedToWorkDate();
-            if(Strings.isNullOrEmpty(startedToWorkDate)){
-                errors.rejectValue("startedToWorkDate","startedToWorkDate_not_specified");
-            } else if(!isEnteredDateValid(startedToWorkDate)){
+            if(!Strings.isNullOrEmpty(startedToWorkDate) && !isEnteredDateValid(startedToWorkDate)){
                 errors.rejectValue("startedToWorkDate","startedToWorkDate_incorrect");
             }
 

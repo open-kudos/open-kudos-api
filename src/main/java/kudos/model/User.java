@@ -44,6 +44,13 @@ public class User {
     protected String location;
     protected String team;
 
+    public User(String firstName, String lastName, String password, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.email = email;
+    }
+
     public User(String password, String email) {
         this.password = password;
         this.email = email;
@@ -59,35 +66,32 @@ public class User {
         String newFirstName = myProfileForm.getFirstName();
         String newLastName = myProfileForm.getLastName();
 
-        User u = new User();
-
-        u.email = !Strings.isNullOrEmpty(newEmail) ? newEmail : this.email;
+        this.email = !Strings.isNullOrEmpty(newEmail) ? newEmail : this.email;
 
         if (!Strings.isNullOrEmpty(newPassword) && !new StrongPasswordEncryptor().checkPassword(newPassword, this.password)) {
-            u.password = new StrongPasswordEncryptor().encryptPassword(newPassword);
-        } else {
-            u.password = this.password;
+            this.password = new StrongPasswordEncryptor().encryptPassword(newPassword);
         }
 
         if (!Strings.isNullOrEmpty(newFirstName) && !newFirstName.equals(this.firstName)) {
-            u.firstName = newFirstName;
+            this.firstName = newFirstName;
         }
 
         if (!Strings.isNullOrEmpty(newLastName) && !newLastName.equals(this.lastName)) {
-            u.lastName = newLastName;
+            this.lastName = newLastName;
         }
 
-        u.birthday = myProfileForm.getBirthday();
-        u.phone = myProfileForm.getPhone();
-        u.startedToWorkDate = myProfileForm.getStartedToWorkDate();
-        u.position = myProfileForm.getPosition();
-        u.department = myProfileForm.getDepartment();
-        u.location = myProfileForm.getLocation();
-        u.team = myProfileForm.getTeam();
-        u.showBirthday = myProfileForm.getShowBirthday();
-        u.isCompleted = true;
+        this.birthday = myProfileForm.getBirthday();
+        this.phone = myProfileForm.getPhone();
+        this.startedToWorkDate = myProfileForm.getStartedToWorkDate();
+        this.position = myProfileForm.getPosition();
+        this.department = myProfileForm.getDepartment();
+        this.location = myProfileForm.getLocation();
+        this.team = myProfileForm.getTeam();
+        this.showBirthday = myProfileForm.getShowBirthday();
 
-        return u;
+        this.isCompleted = isUserCompleted();
+
+        return this;
 
     }
 
@@ -162,4 +166,11 @@ public class User {
     public void setEmailHash(String emailHash) {
         this.emailHash = emailHash;
     }
+
+    private boolean isUserCompleted() {
+        return !Strings.isNullOrEmpty(this.getStartedToWorkDate()) && !Strings.isNullOrEmpty(this.getBirthday());
+    }
+
+
+
 }

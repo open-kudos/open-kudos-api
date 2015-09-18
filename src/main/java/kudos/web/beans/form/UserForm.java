@@ -10,6 +10,8 @@ import org.springframework.validation.Validator;
  */
 public class UserForm {
 
+    private String firstName;
+    private String lastName;
     private String password;
     private String confirmPassword;
     private String email;
@@ -38,8 +40,24 @@ public class UserForm {
         this.email = email;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public User toUser(){
-        return new User(password,email);
+        return new User(firstName, lastName, password,email);
     }
 
     public static class FormValidator implements Validator {
@@ -66,6 +84,14 @@ public class UserForm {
                 errors.rejectValue("email", "email_not_specified");
             } else if(!form.getEmail().matches(EMAIL_PATTERN)){
                 errors.rejectValue("email", "email_incorrect");
+            }
+
+            if (Strings.isNullOrEmpty(form.getFirstName())) {
+                errors.rejectValue("firstName", "first_name_is_required");
+            }
+
+            if (Strings.isNullOrEmpty(form.getLastName())) {
+                errors.rejectValue("lastName", "last_name_is_required");
             }
 
             if(Strings.isNullOrEmpty(form.getPassword())){

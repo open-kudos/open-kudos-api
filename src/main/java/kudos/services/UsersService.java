@@ -71,14 +71,9 @@ public class UsersService {
         if (userRepository.exists(user.getEmail())) {
             throw new UserException("user_already_exists");
         }
-        /*emailService.send(
-                new Email(email,
-                        new Date().toString(),
-                        "Welcome to KUDOS app. Click this link to complete registration",
-                        "http://localhost:8080/reset-password-by-id?id="+getRandomHash())
-        );*/
+
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
-        User newUser = new User(password, user.getEmail());
+        User newUser = new User(user.getFirstName(), user.getLastName(), password, user.getEmail());
         newUser.setEmailHash(getRandomHash());
         return userRepository.save(newUser);
     }
@@ -95,7 +90,7 @@ public class UsersService {
         }
     }
 
-    public User completeUser(MyProfileForm myProfileForm) throws UserException, MessagingException, IOException, TemplateException {
+    public User updateUser(MyProfileForm myProfileForm) throws UserException, MessagingException, IOException, TemplateException {
         User user = getLoggedUser().get();
         User updatedUser = user.getUpdatedUser(myProfileForm);
         userRepository.save(updatedUser);
