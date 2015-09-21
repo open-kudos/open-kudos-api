@@ -18,9 +18,6 @@ war {
 
 repositories {
    mavenCentral()
-   flatDir {
-        dirs 'libs'
-   }
 }
 
 sourceCompatibility = 1.8
@@ -58,11 +55,7 @@ dependencies {
    testCompile 'junit:junit'
 
     /* JSONDoc.org dependencies */
-    compile name: 'spring-boot-starter-jsondoc-1.2.2-SNAPSHOT'
-    compile name: 'jsondoc-springmvc'
-    compile name: 'jsondoc-core'
-    compile 'org.reflections:reflections:0.9.10'
-
+    compile 'org.jsondoc:spring-boot-starter-jsondoc:1.2.4'
 }
 
 sourceSets {
@@ -77,5 +70,5 @@ sourceSets {
 }
 
 task wrapper(type:Wrapper){
-   gradleVersion = '2.3'
+   gradleVersion = '2.7'
 }
