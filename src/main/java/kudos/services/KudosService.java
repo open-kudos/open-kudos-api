@@ -133,7 +133,6 @@ public class KudosService {
      * @param startTime
      * @return
      */
-
     public int calculateSpentKudos(User user, LocalDateTime startTime){
         return repository.findTransactionBySenderEmailOrderByTimestampDesc(user.getEmail()).stream()
                 .filter(t -> dateTimeFormatter.parseLocalDateTime(t.getTimestamp()).isAfter(startTime))

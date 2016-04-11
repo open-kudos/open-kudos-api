@@ -30,7 +30,8 @@ public abstract class KudosBusinessStrategy {
 
             @Override
             public LocalDateTime getStartTime() {
-                return new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY);
+                System.out.println("STRATEGY START TIME: " + new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0));
+                return new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
             }
         };
     }
