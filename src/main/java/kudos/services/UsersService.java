@@ -103,8 +103,9 @@ public class UsersService {
 
     public User getCompletedUser() throws UserException {
         User user = getLoggedUser().get();
+        user.isCompleted();
         if (!user.isCompleted()) {
-            throw new UserException("user_not_completed");
+            user.setCompleted(true);                        // TODO Temporary completed all users
         }
         return user;
     }

@@ -1,7 +1,6 @@
 package kudos.web.beans.form;
 
 import com.google.common.base.Strings;
-import kudos.model.User;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -159,11 +158,12 @@ public class MyProfileForm {
 
         private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
                 "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-        private static final String PHONE_PATTERN = "([\\\\+(]?(\\\\d){2,}[)]?[- \\\\.]?(\\\\d)"+
+       private static final String PHONE_PATTERN = "([+]\\d+)";
+    /*   private static final String PHONE_PATTERN = "([\\\\+(]?(\\\\d){2,}[)]?[- \\\\.]?(\\\\d)"+
                 "{2,}[- \\\\.]?(\\\\d){2,}[- \\\\.]?(\\\\d){2,}[- \\\\.]?(\\\\d){2,})|([\\\\+(]?"+
                 "(\\\\d){2,}[)]?[- \\\\.]?(\\\\d){2,}[- \\\\.]?(\\\\d){2,}[- \\\\.]?(\\\\d){2,})|"+
                 "([\\\\+(]?(\\\\d){2,}[)]?[- \\\\.]?(\\\\d){2,}[- \\\\.]?(\\\\d){2,})";
-
+    */
         @Override
         public boolean supports(Class<?> clazz) {
             return false;
@@ -184,8 +184,8 @@ public class MyProfileForm {
                 errors.rejectValue("email","incorrect_email");
             }
 
-            String phone = form.getPhone();
-            if(!Strings.isNullOrEmpty(phone)  && !phone.matches(PHONE_PATTERN)){
+            String phone = form.getPhone().substring(1);
+            if(!Strings.isNullOrEmpty(phone)  && !phone.matches(PHONE_PATTERN)){ // TODO FIX REGEX LATER
                 errors.rejectValue("phone","incorrect_phone");
             }
 

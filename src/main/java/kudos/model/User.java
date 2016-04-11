@@ -171,6 +171,7 @@ public class User {
         return !Strings.isNullOrEmpty(this.getStartedToWorkDate()) && !Strings.isNullOrEmpty(this.getBirthday());
     }
 
-
-
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
+    }
 }
