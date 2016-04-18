@@ -15,6 +15,7 @@ public abstract class KudosBusinessStrategy {
         this.deposit = deposit;
         this.minDeposit = minDeposit;
     }
+
     public int getDeposit() {
         return deposit;
     }
@@ -30,7 +31,6 @@ public abstract class KudosBusinessStrategy {
 
             @Override
             public LocalDateTime getStartTime() {
-                System.out.println("STRATEGY START TIME: " + new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0));
                 return new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
             }
         };
