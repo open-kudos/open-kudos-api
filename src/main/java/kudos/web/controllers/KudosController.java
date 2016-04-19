@@ -47,6 +47,10 @@ public class KudosController extends BaseController {
 
         new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
 
+        if (usersService.getLoggedUser().get().getEmail().equals(kudosTransferForm.getReceiverEmail())){
+            throw new UserException("cant.send.kudos.to.yourself");
+        }
+
         if (errors.hasErrors())
             throw new FormValidationException(errors);
 
