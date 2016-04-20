@@ -30,7 +30,7 @@ public class Transaction {
         this.receiverEmail = receiverEmail;
         this.amount = amount;
         this.message = message;
-        this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date());
     }
 
     public String getMessage() {
