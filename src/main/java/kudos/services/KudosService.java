@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +28,8 @@ import java.util.List;
 public class KudosService {
 
     private final Logger LOG = Logger.getLogger(KudosService.class.getName());
+    SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+    SimpleDateFormat responseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @Autowired
     private UsersService usersService;
@@ -142,12 +147,33 @@ public class KudosService {
 
     public List<Transaction> getAllLoggedUserOutgoingTransactions() throws UserException {
         User user = usersService.getLoggedUser().get();
-        return repository.findTransactionsBySenderEmail(user.getEmail());
+
+        List<Transaction> formattedDateTransactions = new ArrayList<>();
+
+        for (Transaction transaction : repository.findTransactionsBySenderEmail(user.getEmail())){
+            try {
+                transaction.setTimestamp(responseFormat.format(transactionDateFormat.parse(transaction.getTimestamp())));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            formattedDateTransactions.add(transaction);
+        }
+        return formattedDateTransactions;
     }
 
     public List<Transaction>getAllLoggedUserIncomingTransactions() throws UserException {
         User user = usersService.getLoggedUser().get();
-        return repository.findTransactionsByReceiverEmail(user.getEmail());
+        List<Transaction> formattedDateTransactions = new ArrayList<>();
+
+        for (Transaction transaction : repository.findTransactionsByReceiverEmail(user.getEmail())){
+            try {
+                transaction.setTimestamp(responseFormat.format(transactionDateFormat.parse(transaction.getTimestamp())));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            formattedDateTransactions.add(transaction);
+        }
+        return formattedDateTransactions;
     }
 
     public Transaction save(Transaction transaction){
