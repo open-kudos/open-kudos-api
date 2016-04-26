@@ -25,6 +25,8 @@ public class ChallengeTransferForm {
     @ApiObjectField
     private String name;
     @ApiObjectField
+    private String description;
+    @ApiObjectField
     private String finishDate;
     @ApiObjectField
     private String amount;
@@ -67,6 +69,14 @@ public class ChallengeTransferForm {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public static class ChallengeTransferFormValidator implements Validator {
@@ -114,17 +124,15 @@ public class ChallengeTransferForm {
                 errors.rejectValue("amount", "amount_not_digit");
             }
 
-
             if (Strings.isNullOrEmpty(challengeName)) {
                 errors.rejectValue("name", "name_not_specified");
             }
 
-            if (Strings.isNullOrEmpty(estimatedDate)) {
-                errors.rejectValue("finishDate", "finishDate_not_specified");
-            } else if (!isEnteredDateValid(estimatedDate)) {
-                errors.rejectValue("finishDate", "finishDate_incorrect");
+            if (!Strings.isNullOrEmpty(estimatedDate)) {
+                if (!isEnteredDateValid(estimatedDate)) {
+                    errors.rejectValue("finishDate", "finishDate_incorrect");
+                }
             }
-
         }
 
         public boolean isEnteredDateValid(String text) {

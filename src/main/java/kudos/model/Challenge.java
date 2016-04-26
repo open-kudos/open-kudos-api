@@ -27,6 +27,8 @@ public class Challenge {
 
     @ApiObjectField
     private String name;
+    @ApiObjectField
+    private String description;
 
     @ApiObjectField
     private String dueDate;
@@ -38,12 +40,13 @@ public class Challenge {
     private Status status;
 
 
-    public Challenge(String creator, String participant, String referee, String name, String dueDate, String finishDate, int amount, Status status) {
+    public Challenge(String creator, String participant, String referee, String name, String description, String dueDate, String finishDate, int amount, Status status) {
         this.creator = creator;
         this.participant = participant;
         this.referee = referee;
 
         this.name = name;
+        this.description = description;
 
         this.dueDate = dueDate;
         this.finishDate = finishDate;
@@ -89,6 +92,14 @@ public class Challenge {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getDueDate() {

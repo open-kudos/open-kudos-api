@@ -86,7 +86,8 @@ public class ChallengeController extends BaseController {
                 participant,
                 referee,
                 form.getName(),
-                formatter.parseLocalDateTime(form.getFinishDate()),
+                form.getDescription(),
+                form.getFinishDate(),
                 Integer.parseInt(form.getAmount())
         );
     }

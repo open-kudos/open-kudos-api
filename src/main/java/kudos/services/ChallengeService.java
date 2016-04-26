@@ -42,7 +42,7 @@ public class ChallengeService {
         return challengeRepository.save(challenge);
     }
 
-    public Challenge create(User participant, User referee, String name, LocalDateTime finishDate, int amount) throws BusinessException, UserException {
+    public Challenge create(User participant, User referee, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
 
         String userEmail = usersService.getLoggedUser().get().getEmail();
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
@@ -52,8 +52,10 @@ public class ChallengeService {
                         participant.getEmail(),
                         referee.getEmail(),
                         name,
+                        description,
                         LocalDateTime.now().toString(dateTimeFormatter),
-                        finishDate.toString(dateTimeFormatter), amount, Challenge.Status.CREATED
+                        finishDate,
+                        amount, Challenge.Status.CREATED
                 )
         );
     }

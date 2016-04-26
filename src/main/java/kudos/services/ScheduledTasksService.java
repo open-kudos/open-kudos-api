@@ -39,6 +39,7 @@ public class ScheduledTasksService {
 
         challengesToCheck.stream()
                 .filter(c -> !c.getStatus().equals(Challenge.Status.FAILED))
+                .filter(c -> !(c.getFinishDate() == null))
                 .filter(c -> dateTimeFormatter.parseLocalDateTime(c.getFinishDate()).isBefore(LocalDateTime.now()))
                 .forEach((challenge) -> {
                     try {
