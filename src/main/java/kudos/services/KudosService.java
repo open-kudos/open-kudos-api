@@ -14,6 +14,7 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -50,11 +51,10 @@ public class KudosService {
      * @param to User who receives Kudos
      * @param amount The amount of Kudos
      * @param message The message of the transaction
-     * @return
+     * @return Transaction
      * @throws BusinessException
      * @throws MongoException
      */
-
     public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException, UserException, UserException {
         User user = usersService.getLoggedUser().get();
         return transferKudos(to, user, amount, message);
@@ -65,10 +65,9 @@ public class KudosService {
      * @param user User who's free Kudos are reduced
      * @param amount The amount of Kudos
      * @param message The message of the transaction.
-     * @return
+     * @return Transaction
      * @throws BusinessException
      */
-
     public Transaction reduceFreeKudos(User user, int amount, String message) throws BusinessException {
         return transferKudos(usersService.getKudosMaster(), user, amount, message);
     }
@@ -77,10 +76,9 @@ public class KudosService {
      * Transfers kudos points from System to Users Kudos account
      * @param amount The amount of Kudos
      * @param message The message of the transaction.
-     * @return
+     * @return Transaction
      * @throws BusinessException
      */
-
     public Transaction giveSystemKudos(User from, int amount, String message) throws BusinessException {
         return transferKudos(usersService.getKudosMaster(),from, amount, message);
     }
@@ -91,13 +89,13 @@ public class KudosService {
 
     public Transaction retrieveSystemKudos(User to, int amount, String message) throws BusinessException {
         //TODO works, but need better approach
-        Transaction newTransaction = new Transaction(to.getEmail(), to.getEmail(), -amount, message);
+        Transaction newTransaction = new Transaction(to.getEmail(), to.getFirstName(), to.getEmail(), to.getFirstName(), -amount, message);
         newTransaction.setReceiverBalance(getKudos(to));
         return repository.insert(newTransaction);
     }
 
     private Transaction transferKudos(User to, User from, int amount, String message) throws BusinessException {
-        Transaction newTransaction = new Transaction(to.getEmail(), from.getEmail(), amount, message);
+        Transaction newTransaction = new Transaction(to.getEmail(), to.getFirstName(), from.getEmail(), from.getFirstName(), amount, message);
 
         if (amount < strategy.getMinDeposit()) {
             throw new InvalidKudosAmountException("invalid_kudos_amount");
@@ -114,10 +112,9 @@ public class KudosService {
 
     /**
      * Returns the balance of Kudos for the user
-     * @param user
-     * @return
+     * @param user which user kudos it should return
+     * @return int
      */
-
     public int getKudos(User user) {
         Transaction lastTransaction = repository.findTransactionByReceiverEmailOrderByTimestampDesc(user.getEmail());
         return lastTransaction == null ? 0 : lastTransaction.getReceiverBalance();
@@ -125,8 +122,8 @@ public class KudosService {
 
     /**
      * Returns the balance of free Kudos for the user for the current period
-     * @param user
-     * @return
+     * @param user which user kudos it should calculate
+     * @return int
      */
     public int getFreeKudos(User user) {
         return strategy.getDeposit() - calculateSpentKudos(user, strategy.getStartTime());
@@ -134,9 +131,9 @@ public class KudosService {
 
     /**
      * Return the amount of Kudos spent since the start time provided
-     * @param user
-     * @param startTime
-     * @return
+     * @param user which user kudos it should be calculate
+     * @param startTime start time which is declared in @KudosBusinessStrategy
+     * @return int
      */
     public int calculateSpentKudos(User user, LocalDateTime startTime){
         return repository.findTransactionBySenderEmailOrderByTimestampDesc(user.getEmail()).stream()
@@ -145,6 +142,11 @@ public class KudosService {
                 .sum();
     }
 
+    /**
+     * Return list of outgoing transactions to currently logged user, before
+     * returning list it formats dates of transactions to yyyy-MM-dd HH:mm and returns formatted result
+     * @return List
+     */
     public List<Transaction> getAllLoggedUserOutgoingTransactions() throws UserException {
         User user = usersService.getLoggedUser().get();
 
@@ -161,7 +163,12 @@ public class KudosService {
         return formattedDateTransactions;
     }
 
-    public List<Transaction>getAllLoggedUserIncomingTransactions() throws UserException {
+    /**
+     * Return list of incoming transactions to currently logged user, before
+     * returning list it formats dates of transactions to yyyy-MM-dd HH:mm and returns formatted result
+     * @return List
+     */
+    public List<Transaction> getAllLoggedUserIncomingTransactions() throws UserException {
         User user = usersService.getLoggedUser().get();
         List<Transaction> formattedDateTransactions = new ArrayList<>();
 
@@ -174,6 +181,24 @@ public class KudosService {
             formattedDateTransactions.add(transaction);
         }
         return formattedDateTransactions;
+    }
+
+    /**
+     * Return list of all transactions made by users this week
+     * @return List
+     */
+    public List<Transaction> getTransactionsFeed() {
+        return repository.findTransactionByTimestampGreaterThanOrderByTimestampDesc(transactionDateFormat.format(strategy.getStartTime().toDate()));
+    }
+
+    /**
+     * Return list of transactions made by all users, can be paged
+     * @param page which page now should be shown
+     * @param pageSize size of elements in page
+     * @return List
+     */
+    public List<Transaction> getPageableTransactionsFeed(int page, int pageSize) {
+       return repository.findTransactionByTimestampGreaterThanOrderByTimestampDesc(transactionDateFormat.format(strategy.getStartTime().toDate()), new PageRequest(page, pageSize));
     }
 
     public Transaction save(Transaction transaction){

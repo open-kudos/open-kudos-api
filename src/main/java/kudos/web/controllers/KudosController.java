@@ -84,4 +84,5 @@ public class KudosController extends BaseController {
         return kudosService.getKudos(usersService.getLoggedUser().get());
     }
 
+
 }

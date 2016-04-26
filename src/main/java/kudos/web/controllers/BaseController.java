@@ -1,13 +1,14 @@
 package kudos.web.controllers;
 
 import kudos.KudosBusinessStrategy;
-import kudos.repositories.TransactionRepository;
-import kudos.repositories.UserRepository;
-import kudos.services.*;
+import kudos.services.ChallengeService;
+import kudos.services.KudosService;
+import kudos.services.RelationService;
+import kudos.services.TransactionService;
+import kudos.services.UsersService;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 
 
@@ -24,6 +25,9 @@ public abstract class BaseController {
 
     @Autowired
     protected KudosService kudosService;
+
+    @Autowired
+    protected TransactionService transactionService;
 
     @Autowired
     protected KudosBusinessStrategy kudosBusinessStrategy;

@@ -17,7 +17,9 @@ public class Transaction {
     @Id
     private String id;
     private String senderEmail;
+    private String senderName;
     private String receiverEmail;
+    private String receiverName;
     private String message;
     private int amount;
     private String timestamp;
@@ -25,9 +27,11 @@ public class Transaction {
     private int receiverBalance;
 // WHERE timestamp > NOW-2days AND kudosType === 'KIND' GROUP BY receiver ORDER BY sum(kudosAmount) DESC LIMIT 0,1
 
-    public Transaction(String receiverEmail, String senderEmail, int amount, String message) {
+    public Transaction(String receiverEmail, String receiverName, String senderEmail, String senderName, int amount, String message) {
         this.senderEmail = senderEmail;
+        this.senderName = senderName;
         this.receiverEmail = receiverEmail;
+        this.receiverName = receiverName;
         this.amount = amount;
         this.message = message;
         this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date());
@@ -75,5 +79,25 @@ public class Transaction {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
+    public String getReceiverEmail() {
+        return receiverEmail;
     }
 }

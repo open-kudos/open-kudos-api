@@ -1,6 +1,7 @@
 package kudos.repositories;
 
 import kudos.model.Transaction;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -12,10 +13,15 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     Transaction findTransactionByReceiverEmailOrderByTimestampDesc(String receiverEmail);
 
+    Transaction findFirstByOrderByTimestampDesc();
+
     List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
 
     List<Transaction> findTransactionsBySenderEmail(String senderEmail);
 
     List<Transaction> findTransactionBySenderEmailOrderByTimestampDesc (String senderEmail);
 
+    List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp);
+
+    List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp, Pageable pageable);
 }
