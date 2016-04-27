@@ -158,7 +158,9 @@ public class KudosService {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            formattedDateTransactions.add(transaction);
+            if (!transaction.getReceiver().equals("master@of.kudos"))
+                if (!transaction.getReceiver().equals(user.getEmail()))
+                    formattedDateTransactions.add(transaction);
         }
         return formattedDateTransactions;
     }
@@ -178,7 +180,8 @@ public class KudosService {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            formattedDateTransactions.add(transaction);
+            if (!transaction.getSenderEmail().equals(user.getEmail()))
+                formattedDateTransactions.add(transaction);
         }
         return formattedDateTransactions;
     }

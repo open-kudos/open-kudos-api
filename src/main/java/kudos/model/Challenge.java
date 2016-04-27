@@ -31,7 +31,7 @@ public class Challenge {
     private String description;
 
     @ApiObjectField
-    private String dueDate;
+    private String createDate;
     @ApiObjectField
     private String finishDate;
     @ApiObjectField
@@ -40,7 +40,7 @@ public class Challenge {
     private Status status;
 
 
-    public Challenge(String creator, String participant, String referee, String name, String description, String dueDate, String finishDate, int amount, Status status) {
+    public Challenge(String creator, String participant, String referee, String name, String description, String createDate, String finishDate, int amount, Status status) {
         this.creator = creator;
         this.participant = participant;
         this.referee = referee;
@@ -48,7 +48,7 @@ public class Challenge {
         this.name = name;
         this.description = description;
 
-        this.dueDate = dueDate;
+        this.createDate = createDate;
         this.finishDate = finishDate;
         this.amount = amount;
         this.status = status;
@@ -102,12 +102,12 @@ public class Challenge {
         this.description = description;
     }
 
-    public String getDueDate() {
-        return dueDate;
+    public String getCreateDateDate() {
+        return createDate;
     }
 
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
+    public void setCreateDateDate(String dueDate) {
+        this.createDate = dueDate;
     }
 
     public String getFinishDate() {
