@@ -126,7 +126,9 @@ public class ChallengeController extends BaseController {
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
             @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed")
+                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_canceled",
+                    description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge accept(String id)
@@ -163,7 +165,9 @@ public class ChallengeController extends BaseController {
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
             @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed")
+                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_canceled",
+                    description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
@@ -184,6 +188,45 @@ public class ChallengeController extends BaseController {
         return challengeService.decline(challenge);
     }
 
+    @ApiMethod(description = "Cancels challenge by its id")
+    @ApiParams(queryparams = {
+            @ApiQueryParam(name = "id")
+    })
+    @ApiErrors(apierrors = {
+            @ApiError(code = "challenge_id_not_specified",
+                    description = "If challenge id was not specified"),
+            @ApiError(code = "not_a_creator",
+                    description = "If user is not a creator"),
+            @ApiError(code = "challenge_already_accepted",
+                    description = "If challenge is already accepted"),
+            @ApiError(code = "challenge_already_accomplished",
+                    description = "If challenge is already accomplished"),
+            @ApiError(code = "challenge_already_declined",
+                    description = "If challenge is already declined"),
+            @ApiError(code = "challenge_already_failed",
+                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_canceled",
+                    description = "If challenge is already canceled")
+    })
+    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody Challenge cancel(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+
+        if(Strings.isNullOrEmpty(id))
+            throw new IdNotSpecifiedException("id_not_specified");
+
+        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
+
+        if(!maybeChallenge.isPresent()){
+            throw new ChallengeException("challenge_not_found");
+        }
+
+        Challenge challenge = maybeChallenge.get();
+        if(!challenge.getCreator().equals(usersService.getLoggedUser().get().getEmail())) {
+            throw new WrongChallengeEditorException("not_a_creator");
+        }
+        return challengeService.cancel(challenge);
+    }
+
     @ApiMethod(description = "Accomplishes challenge by its id")
     @ApiParams(queryparams = {
             @ApiQueryParam(name = "id")
@@ -198,7 +241,9 @@ public class ChallengeController extends BaseController {
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
             @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed")
+                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_canceled",
+                    description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
@@ -232,7 +277,9 @@ public class ChallengeController extends BaseController {
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
             @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed")
+                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_canceled",
+                    description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
