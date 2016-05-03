@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * Created by chc on 15.8.10.
  */
-@Api(name = "registration controller", description = "Controller fo registering")
+@Api(name = "Registration Controller", description = "Controller fo registering")
 @Controller
 public class RegistrationController extends BaseController {
 

@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by chc on 15.8.11.
  */
-@Api(name = "kudos controller", description = "Controller for giving/pending/receiving kudos")
+@Api(name = "Kudos Controller", description = "Controller for giving/pending/receiving kudos")
 @Controller
 @RequestMapping("/kudos")
 public class KudosController extends BaseController {

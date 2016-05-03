@@ -16,7 +16,7 @@ import java.security.Principal;
 /**
  * Created by chc on 15.8.10.
  */
-@Api(name = "user authentication", description = "Login and logout for a user. For testing purposes use test1@google.lt with password google")
+@Api(name = "Authentication Controller", description = "Login and logout for a user. For testing purposes use test1@google.lt with password google")
 @Controller
 public class AuthenticationController extends BaseController {
 

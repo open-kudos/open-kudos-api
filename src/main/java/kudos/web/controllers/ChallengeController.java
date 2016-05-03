@@ -21,7 +21,7 @@ import java.util.Optional;
 /**
  * Created by chc on 15.8.11.
  */
-@Api(name = "challenge controller", description = "Controller for managing challenges")
+@Api(name = "Challenge Controller", description = "Controller for managing challenges")
 @RequestMapping("/challenges")
 @Controller
 public class ChallengeController extends BaseController {

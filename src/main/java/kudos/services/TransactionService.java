@@ -32,10 +32,6 @@ public class TransactionService {
         return repository.findTransactionByTimestampGreaterThanOrderByTimestampDesc(transactionDateFormat.format(strategy.getStartTime().toDate()), new PageRequest(page, pageSize));
     }
 
-    public List<Transaction> getAllTransactionsByStatus(Transaction.Status status) {
-        return repository.findTransactionByStatusOrderByTimestampDesc(status);
-    }
-
     public List<Transaction> getPageableTransactionsByStatus(Transaction.Status status, int page, int pageSize){
         return repository.findTransactionByStatusOrderByTimestampDesc(status, new PageRequest(page, pageSize));
     }

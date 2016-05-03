@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * Created by vytautassugintas on 25/04/16.
  */
-@Api(name = "Kudos transactions controller", description = "Controller for kudos transactions")
+@Api(name = "Transactions Controller", description = "Controller for kudos transactions")
 @Controller
-@RequestMapping("/feed")
+@RequestMapping("/transaction")
 public class TransactionController extends BaseController {
 
     @ApiMethod(description = "Service to watch if kudos feed list has changed")
@@ -29,44 +29,14 @@ public class TransactionController extends BaseController {
         return lastTransactionTimestamp != null && transactionService.isLastTransactionChanged(lastTransactionTimestamp);
     }
 
-    @ApiMethod(description = "Service to get kudos transactions feed, can be paged")
-    @RequestMapping(value = "/feedPaged", method = RequestMethod.GET)
+    @ApiMethod(description = "Service to get paged transactions by status." + "<p> status=status&page=0&pageSize=1 <p>")
+    @RequestMapping(value = "/transactions", method = RequestMethod.GET)
     public
     @ApiResponseObject
     @ResponseBody
-    List<Transaction> showKudosTransactionsFeed(int page, int pageSize) throws UserException {
-        return transactionService.getPageableTransactionsMadeThisWeek(page, pageSize);
+    List<Transaction> listOfTransactionsByStatus(Transaction.Status status, int page, int pageSize) throws UserException {
+        return transactionService.getPageableTransactionsByStatus(status, page, pageSize);
     }
-
-    /*
-    @ApiMethod(description = "Service to get kudos transactions which is completed")
-    @RequestMapping(value = "/completed", method = RequestMethod.GET)
-    public
-    @ApiResponseObject
-    @ResponseBody
-    List<Transaction> listOfCompletedTransactions() throws UserException {
-        return transactionService.getCompletedTransactions();
-    }
-
-    @ApiMethod(description = "Service to get kudos transactions which status is pending")
-    @RequestMapping(value = "/pending", method = RequestMethod.GET)
-    public
-    @ApiResponseObject
-    @ResponseBody
-    List<Transaction> listOfPendingTransactions() throws UserException {
-        return transactionService.getPendingTransactions();
-    }
-
-    @ApiMethod(description = "Service to get kudos transactions which is made from challenges")
-    @RequestMapping(value = "/challenge", method = RequestMethod.GET)
-    public
-    @ApiResponseObject
-    @ResponseBody
-    List<Transaction> listOfTransactionsFromChallenge() throws UserException {
-        return transactionService.getTransactionsFromChallenge();
-    }
-    */
-
 
     //COMPLETED, FROM_CHALLENGE, PENDING_CHALLENGE
 

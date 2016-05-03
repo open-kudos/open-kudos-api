@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Created by chc on 15.7.23.
  */
-@Api(name = "user controller", description = "Controller for managing user account")
+@Api(name = "User Controller", description = "Controller for managing user account")
 @Controller
 @RequestMapping("/user")
 public class UserController extends BaseController {
