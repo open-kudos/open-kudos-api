@@ -98,6 +98,12 @@ public class ChallengeController extends BaseController {
         return challengeService.getAllUserCreatedChallenges();
     }
 
+    @ApiMethod(description = "Gets all challenges that logged user has created by its status")
+    @RequestMapping(value = "/createdByStatus", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> createdChallengesByStatus(Challenge.Status status) throws UserException {
+        return challengeService.getAllUserCreatedChallengesByStatus(status);
+    }
+
     @ApiMethod(description = "Gets all challenges that logged user has participated")
     @RequestMapping(value = "/participated", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> participatedChallenges() throws UserException {
