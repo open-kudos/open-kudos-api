@@ -14,6 +14,10 @@ import java.util.Date;
 @Document
 public class Transaction {
 
+    public enum Status {
+        COMPLETED, PENDING_CHALLENGE, COMPLETED_CHALLENGE, DECLINED_CHALLENGE, CANCELED_CHALLENGE, FAILED_CHALENGE
+    }
+
     @Id
     private String id;
     private String senderEmail;
@@ -23,11 +27,12 @@ public class Transaction {
     private String message;
     private int amount;
     private String timestamp;
+    private Status status;
 
     private int receiverBalance;
 // WHERE timestamp > NOW-2days AND kudosType === 'KIND' GROUP BY receiver ORDER BY sum(kudosAmount) DESC LIMIT 0,1
 
-    public Transaction(String receiverEmail, String receiverName, String senderEmail, String senderName, int amount, String message) {
+    public Transaction(String receiverEmail, String receiverName, String senderEmail, String senderName, int amount, String message, Transaction.Status status) {
         this.senderEmail = senderEmail;
         this.senderName = senderName;
         this.receiverEmail = receiverEmail;
@@ -35,6 +40,7 @@ public class Transaction {
         this.amount = amount;
         this.message = message;
         this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date());
+        this.status = status;
     }
 
     public String getMessage() {
@@ -79,6 +85,14 @@ public class Transaction {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getSenderName() {

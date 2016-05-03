@@ -3,6 +3,7 @@ package kudos.services;
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.model.Challenge;
+import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
 import kudos.web.exceptions.UserException;
@@ -71,25 +72,25 @@ public class ChallengeService {
 
     public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName());
+        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName());
+        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
 
     public Challenge accomplish(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.takeSystemKudos(usersService.findByEmail(challenge.getParticipant()).get(), challenge.getAmount(), challenge.getName());
+        kudosService.takeSystemKudos(usersService.findByEmail(challenge.getParticipant()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
     public Challenge fail(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName());
+        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
         return setStatusAndSave(challenge, Challenge.Status.FAILED);
     }
 

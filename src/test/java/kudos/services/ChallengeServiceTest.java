@@ -34,121 +34,121 @@ public class ChallengeServiceTest {
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfAcceptMethodDoesNotLetDeclineAlreadyAcceptedChallenge() throws InvalidChallengeStatusException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.DECLINED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.DECLINED);
         challengeService.accept(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfAcceptMethodDoesNotLetAcceptAlreadyFailedChallenge() throws InvalidChallengeStatusException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.FAILED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.FAILED);
         challengeService.accept(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfAcceptMethodDoesNotLetAcceptAlreadyAccomplishedChallenge() throws InvalidChallengeStatusException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
         challengeService.accept(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfAcceptMethodDoesNotLetAcceptAlreadyAcceptedChallenge() throws InvalidChallengeStatusException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
         challengeService.accept(challenge);
     }
 
     @Test(expected = NullPointerException.class)
     public void testIfAcceptMethodLetsAcceptAlreadyCreatedChallenge() throws InvalidChallengeStatusException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.CREATED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.CREATED);
         challengeService.accept(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfDeclineMethodDoesNotLetDeclineAlreadyAccomplishedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
         challengeService.decline(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfDeclineMethodDoesNotLetDeclineAlreadyFailedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.FAILED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.FAILED);
         challengeService.decline(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfDeclineMethodDoesNotLetDeclineAlreadyAcceptedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
         challengeService.decline(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfDeclineMethodDoesNotLetDeclineAlreadyDeclinedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.DECLINED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.DECLINED);
         challengeService.decline(challenge);
     }
 
     @Test(expected = NullPointerException.class)
     public void testIfDeclineMethodLetsDeclineAlreadyCreatedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.CREATED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.CREATED);
         challengeService.decline(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfAccomplishMethodDoesNotLetAccomplishAlreadyFailedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.FAILED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.FAILED);
         challengeService.accomplish(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfAccomplishMethodDoesNotLetAccomplishAlreadyDeclinedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.DECLINED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.DECLINED);
         challengeService.accomplish(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfAccomplishMethodDoesNotLetAccomplishAlreadyAccomplishedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
         challengeService.accomplish(challenge);
     }
 
     @Test(expected = NullPointerException.class)
     public void testIfAccomplishMethodLetsAccomplishAlreadyAcceptedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
         challengeService.accomplish(challenge);
     }
 
     @Test(expected = NullPointerException.class)
     public void testIfAccomplishMethodLetsAccomplishAlreadyCreatedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.CREATED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.CREATED);
         challengeService.accomplish(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfFailMethodDoesNotLetFailAlreadyAccomplishedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCOMPLISHED);
         challengeService.fail(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfFailMethodDoesNotLetFailAlreadyDeclinedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.DECLINED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.DECLINED);
         challengeService.fail(challenge);
     }
 
     @Test(expected = InvalidChallengeStatusException.class)
     public void testIfFailMethodDoesNotLetFailAlreadyFailedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.FAILED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.FAILED);
         challengeService.fail(challenge);
     }
 
     @Test(expected = NullPointerException.class)
     public void testIfFailMethodLetsFailCreatedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.CREATED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.CREATED);
         challengeService.fail(challenge);
     }
 
     @Test(expected = NullPointerException.class)
     public void testIfFailMethodLetsFailAcceptedChallenge() throws BusinessException, UserException {
-        Challenge challenge = new Challenge("", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
+        Challenge challenge = new Challenge("", "", "", "", "", "", "", 0, Challenge.Status.ACCEPTED);
         challengeService.fail(challenge);
     }
 
