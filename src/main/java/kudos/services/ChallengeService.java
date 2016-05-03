@@ -93,6 +93,10 @@ public class ChallengeService {
         return setStatusAndSave(challenge, Challenge.Status.FAILED);
     }
 
+    public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
+        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), status);
+    }
+
     public List<Challenge> getAllUserCreatedChallenges() throws UserException {
         return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get().getEmail());
     }
