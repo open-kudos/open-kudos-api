@@ -148,7 +148,7 @@ public class KudosService {
 
         List<Transaction> formattedDateTransactions = new ArrayList<>();
 
-        for (Transaction transaction : repository.findTransactionsBySenderEmail(user.getEmail())){
+        for (Transaction transaction : repository.findTransactionsBySenderEmailAndStatus(user.getEmail(), Transaction.Status.COMPLETED)){
             try {
                 transaction.setTimestamp(responseFormat.format(transactionDateFormat.parse(transaction.getTimestamp())));
             } catch (ParseException e) {
@@ -170,7 +170,7 @@ public class KudosService {
         User user = usersService.getLoggedUser().get();
         List<Transaction> formattedDateTransactions = new ArrayList<>();
 
-        for (Transaction transaction : repository.findTransactionsByReceiverEmail(user.getEmail())){
+        for (Transaction transaction : repository.findTransactionsByReceiverEmailAndStatus(user.getEmail(), Transaction.Status.COMPLETED)){
             try {
                 transaction.setTimestamp(responseFormat.format(transactionDateFormat.parse(transaction.getTimestamp())));
             } catch (ParseException e) {

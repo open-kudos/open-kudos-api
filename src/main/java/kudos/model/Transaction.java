@@ -30,7 +30,6 @@ public class Transaction {
     private Status status;
 
     private int receiverBalance;
-// WHERE timestamp > NOW-2days AND kudosType === 'KIND' GROUP BY receiver ORDER BY sum(kudosAmount) DESC LIMIT 0,1
 
     public Transaction(String receiverEmail, String receiverName, String senderEmail, String senderName, int amount, String message, Transaction.Status status) {
         this.senderEmail = senderEmail;
