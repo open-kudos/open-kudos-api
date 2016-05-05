@@ -110,6 +110,10 @@ public class ChallengeService {
        return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
     }
 
+    public List<Challenge> getAllUserReferredChallengesByStatus(Challenge.Status status) throws UserException {
+        return challengeRepository.findAllChallengesByRefereeAndStatus(usersService.getLoggedUser().get().getEmail(), status);
+    }
+
     public List<Challenge> getAllUserReferredChallenges() throws UserException {
         return challengeRepository.findAllChallengesByReferee(usersService.getLoggedUser().get().getEmail());
     }

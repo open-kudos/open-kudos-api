@@ -110,7 +110,7 @@ public class ChallengeController extends BaseController {
         return challengeService.getAllUserParticipatedChallenges();
     }
 
-    @ApiMethod(description = "Gets all challenges that logged user has participated")
+    @ApiMethod(description = "Gets all challenges that logged user has participated by status")
     @RequestMapping(value = "/participatedByStatus", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> participatedChallengesByStatus(Challenge.Status status) throws UserException {
         return challengeService.getAllUserParticipatedChallengesByStatus(status);
@@ -120,6 +120,12 @@ public class ChallengeController extends BaseController {
     @RequestMapping(value = "/referred", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> refferedChallenges() throws UserException {
         return challengeService.getAllUserReferredChallenges();
+    }
+
+    @ApiMethod(description = "Gets all challenges that logged user has referred by status")
+    @RequestMapping(value = "/referredByStatus", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> refferedChallengesByStatus(Challenge.Status status) throws UserException {
+        return challengeService.getAllUserReferredChallengesByStatus(status);
     }
 
     @ApiMethod(description = "Accepts challenge by its id")
