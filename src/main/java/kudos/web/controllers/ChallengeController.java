@@ -116,6 +116,12 @@ public class ChallengeController extends BaseController {
         return challengeService.getAllUserParticipatedChallengesByStatus(status);
     }
 
+    @ApiMethod(description = "Gets all challenges that logged user has participated by status pageable")
+    @RequestMapping(value = "/participatedByStatusPageable", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> participatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
+        return challengeService.getAllUserParticipatedChallengesByStatusPageable(status, page, pageSize);
+    }
+
     @ApiMethod(description = "Gets all challenges that logged user has referred")
     @RequestMapping(value = "/referred", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> refferedChallenges() throws UserException {
