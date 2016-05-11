@@ -12,6 +12,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -107,6 +108,10 @@ public class ChallengeService {
 
     public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
         return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), status);
+    }
+
+    public List<Challenge> getAllUserParticipatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
+        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), status, new PageRequest(page, pageSize));
     }
 
     public List<Challenge> getAllUserCreatedChallengesByStatus(Challenge.Status status) throws UserException {
