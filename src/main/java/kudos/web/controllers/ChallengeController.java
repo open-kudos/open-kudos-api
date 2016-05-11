@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import kudos.exceptions.*;
 import kudos.model.Challenge;
 import kudos.model.User;
+import kudos.services.ChallengeService;
 import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
@@ -245,6 +246,7 @@ public class ChallengeController extends BaseController {
         return challengeService.cancel(challenge);
     }
 
+
     @ApiMethod(description = "Accomplishes challenge by its id")
     @ApiParams(queryparams = {
             @ApiQueryParam(name = "id")
@@ -264,7 +266,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge accomplish(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody void accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -275,10 +277,19 @@ public class ChallengeController extends BaseController {
         }
 
         Challenge challenge = maybeChallenge.get();
-        if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
-            throw new WrongChallengeEditorException("not_a_referee");
+        if(challenge.getCreator().equals(usersService.getLoggedUser().get().getEmail())) {
+            challenge.setCreatorStatus(status);
+
         }
-        return challengeService.accomplish(challenge);
+        if (challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
+            challenge.setParticipantStatus(status);
+        }
+
+        challengeService.accomplish(challenge);
+
+//        if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
+//            throw new WrongChallengeEditorException("not_a_referee");
+//        }
     }
 
     @ApiMethod(description = "Marks challenge as failed by its id")

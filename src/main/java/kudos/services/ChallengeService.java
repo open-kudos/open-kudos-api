@@ -84,7 +84,18 @@ public class ChallengeService {
 
     public Challenge accomplish(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.takeSystemKudos(usersService.findByEmail(challenge.getParticipant()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
+
+        if (challenge.getParticipantStatus() == null) {
+            return setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
+        } else if (challenge.getCreatorStatus() == null) {
+            return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
+        } else if (challenge.getCreatorStatus() == challenge.getParticipantStatus()) {
+            challenge.setCreatorStatus(null);
+            challenge.setParticipantStatus(null);
+            setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
+            return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
+        }
+        kudosService.takeSystemKudos(usersService.findByEmail(checkWhoIsWinner(challenge)).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
@@ -147,9 +158,30 @@ public class ChallengeService {
         }
     }
 
+
+
+    private String checkWhoIsWinner(Challenge challenge) {
+        if (challenge.getCreatorStatus() && !challenge.getParticipantStatus()) {
+            return challenge.getCreator();
+        }
+        return challenge.getParticipant();
+    }
+
     private Challenge setStatusAndSave(Challenge challenge, Challenge.Status status) {
         Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
         databaseChallenge.setStatus(status);
+        return challengeRepository.save(databaseChallenge);
+    }
+
+    private Challenge setCreatorStatusAndSave(Challenge challenge, Boolean status) {
+        Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
+        databaseChallenge.setCreatorStatus(status);
+        return challengeRepository.save(databaseChallenge);
+    }
+
+    private Challenge setParticipantStatusAndSave(Challenge challenge, Boolean status) {
+        Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
+        databaseChallenge.setParticipantStatus(status);
         return challengeRepository.save(databaseChallenge);
     }
 
