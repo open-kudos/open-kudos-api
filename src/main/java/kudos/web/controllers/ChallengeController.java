@@ -81,11 +81,11 @@ public class ChallengeController extends BaseController {
             throw new FormValidationException(errors);
 
         User participant = usersService.findByEmail(form.getParticipant()).orElseThrow(() -> new UserException("participant.not.exist"));
-        User referee = usersService.findByEmail(form.getReferee()).orElseThrow(() -> new UserException("referee.not.exist"));
+        //User referee = usersService.findByEmail(form.getReferee()).orElseThrow(() -> new UserException("referee.not.exist"));
 
         return challengeService.create(
                 participant,
-                referee,
+                //referee,
                 form.getName(),
                 form.getDescription(),
                 form.getFinishDate(),
@@ -122,18 +122,18 @@ public class ChallengeController extends BaseController {
     public @ApiResponseObject @ResponseBody List<Challenge> participatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
         return challengeService.getAllUserParticipatedChallengesByStatusPageable(status, page, pageSize);
     }
-
+/*
     @ApiMethod(description = "Gets all challenges that logged user has referred")
     @RequestMapping(value = "/referred", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> refferedChallenges() throws UserException {
         return challengeService.getAllUserReferredChallenges();
-    }
-
+    }*/
+/*
     @ApiMethod(description = "Gets all challenges that logged user has referred by status")
     @RequestMapping(value = "/referredByStatus", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> refferedChallengesByStatus(Challenge.Status status) throws UserException {
         return challengeService.getAllUserReferredChallengesByStatus(status);
-    }
+    }*/
 
     @ApiMethod(description = "Accepts challenge by its id")
     @ApiParams(queryparams = {
@@ -327,10 +327,10 @@ public class ChallengeController extends BaseController {
             throw new ChallengeException("challenge_not_found");
         }
 
-        Challenge challenge = maybeChallenge.get();
+        Challenge challenge = maybeChallenge.get();/*
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not_a_referee");
-        }
+        }*/
         return challengeService.fail(challenge);
     }
 

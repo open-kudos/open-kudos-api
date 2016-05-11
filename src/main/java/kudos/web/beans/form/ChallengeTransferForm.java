@@ -19,9 +19,9 @@ import java.text.SimpleDateFormat;
 public class ChallengeTransferForm {
 
     @ApiObjectField
-    private String participant;
+    private String participant;/*
     @ApiObjectField
-    private String referee;
+    private String referee;*/
     @ApiObjectField
     private String name;
     @ApiObjectField
@@ -38,7 +38,7 @@ public class ChallengeTransferForm {
     public void setParticipant(String participant) {
         this.participant = participant;
     }
-
+/*
     public String getReferee() {
         return referee;
     }
@@ -46,7 +46,7 @@ public class ChallengeTransferForm {
     public void setReferee(String judge) {
         this.referee = judge;
     }
-
+*/
     public String getName() {
         return name;
     }
@@ -94,7 +94,7 @@ public class ChallengeTransferForm {
             ChallengeTransferForm challengeTransferForm = (ChallengeTransferForm) target;
 
             String receiverEmail = challengeTransferForm.getParticipant();
-            String judgeEmail = challengeTransferForm.getReferee();
+            //String judgeEmail = challengeTransferForm.getReferee();
             String amountInString = challengeTransferForm.getAmount();
             String challengeName = challengeTransferForm.getName();
             String estimatedDate = challengeTransferForm.getFinishDate();
@@ -104,12 +104,12 @@ public class ChallengeTransferForm {
             } else if (!receiverEmail.matches(EMAIL_PATTERN)) {
                 errors.rejectValue("participant", "receiver_email_incorrect");
             }
-
+/*
             if (Strings.isNullOrEmpty(judgeEmail)) {
                 errors.rejectValue("referee", "referee_email_not_specified");
             } else if (!judgeEmail.matches(EMAIL_PATTERN)) {
                 errors.rejectValue("referee", "referee_email_incorrect");
-            }
+            }*/
 
             if (Strings.isNullOrEmpty(amountInString)) {
                 errors.rejectValue("amount", "amount_not_specified");

@@ -178,12 +178,12 @@ public class UsersService {
                     challenge.setParticipant(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
-
+/*
         challengeService.getAllUserReferredChallenges().stream()
                 .forEach(challenge -> {
                     challenge.setReferee(DELETED_USER_TAG);
                     challengeService.save(challenge);
-                });
+                });*/
 
         kudosService.getAllLoggedUserIncomingTransactions().stream()
                 .forEach(transaction -> {

@@ -22,8 +22,9 @@ public class Challenge {
     private String creator;
     @ApiObjectField
     private String participant;
+    /*
     @ApiObjectField
-    private String referee;
+    private String referee;*/
 
     @ApiObjectField
     private Boolean creatorStatus;
@@ -45,10 +46,10 @@ public class Challenge {
     private Status status;
 
 
-    public Challenge(String creator, String participant, String referee, String name, String description, String createDate, String finishDate, int amount, Status status) {
+    public Challenge(String creator, String participant, String name, String description, String createDate, String finishDate, int amount, Status status) {
         this.creator = creator;
         this.participant = participant;
-        this.referee = referee;
+        //this.referee = referee;
 
         this.creatorStatus = null;
         this.participantStatus = null;
@@ -85,7 +86,7 @@ public class Challenge {
     public void setParticipant(String participant) {
         this.participant = participant;
     }
-
+/*
     public String getReferee() {
         return referee;
     }
@@ -93,7 +94,7 @@ public class Challenge {
     public void setReferee(String referee) {
         this.referee = referee;
     }
-
+*/
     public String getName() {
         return name;
     }

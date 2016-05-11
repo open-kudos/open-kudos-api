@@ -44,7 +44,7 @@ public class ChallengeService {
         return challengeRepository.save(challenge);
     }
 
-    public Challenge create(User participant, User referee, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
+    public Challenge create(User participant, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
 
         String userEmail = usersService.getLoggedUser().get().getEmail();
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
@@ -52,7 +52,7 @@ public class ChallengeService {
                 new Challenge(
                         userEmail,
                         participant.getEmail(),
-                        referee.getEmail(),
+                        //referee.getEmail(),
                         name,
                         description,
                         LocalDateTime.now().toString(dateTimeFormatter),
@@ -125,14 +125,14 @@ public class ChallengeService {
     public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
        return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
     }
-
+/*
     public List<Challenge> getAllUserReferredChallengesByStatus(Challenge.Status status) throws UserException {
         return challengeRepository.findAllChallengesByRefereeAndStatus(usersService.getLoggedUser().get().getEmail(), status);
-    }
-
+    }*/
+/*
     public List<Challenge> getAllUserReferredChallenges() throws UserException {
         return challengeRepository.findAllChallengesByReferee(usersService.getLoggedUser().get().getEmail());
-    }
+    }*/
 
     public List<Challenge> getAllAcceptedChallenges() {
         return challengeRepository.findAllChallengesByStatus(Challenge.Status.ACCEPTED);

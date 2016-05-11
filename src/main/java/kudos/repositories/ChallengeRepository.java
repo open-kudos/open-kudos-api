@@ -16,9 +16,9 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
     List<Challenge> findChallengesByParticipant(String participant);
 
-    List<Challenge> findAllChallengesByReferee(String referee);
+    //List<Challenge> findAllChallengesByReferee(String referee);
 
-    List<Challenge> findAllChallengesByRefereeAndStatus(String referee, Challenge.Status status);
+    //List<Challenge> findAllChallengesByRefereeAndStatus(String referee, Challenge.Status status);
 
     Challenge findChallengeById(String id);
 
