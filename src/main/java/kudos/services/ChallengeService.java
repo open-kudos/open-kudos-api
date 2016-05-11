@@ -66,8 +66,9 @@ public class ChallengeService {
         return Optional.ofNullable(challengeRepository.findChallengeById(id));
     }
 
-    public Challenge accept(Challenge challenge) throws InvalidChallengeStatusException {
+    public Challenge accept(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
+        kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), challenge.getAmount(), "");
         return setStatusAndSave(challenge, Challenge.Status.ACCEPTED);
     }
 
@@ -96,7 +97,9 @@ public class ChallengeService {
             setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
             return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
         }
-        kudosService.takeSystemKudos(usersService.findByEmail(checkWhoIsWinner(challenge)).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
+        System.out.println(checkWhoIsWinner(challenge));
+
+        kudosService.takeSystemKudos(usersService.findByEmail(checkWhoIsWinner(challenge)).get(), 2 * challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
@@ -162,8 +165,6 @@ public class ChallengeService {
                 throw new InvalidChallengeStatusException("challenge_already_canceled");
         }
     }
-
-
 
     private String checkWhoIsWinner(Challenge challenge) {
         if (challenge.getCreatorStatus() && !challenge.getParticipantStatus()) {
