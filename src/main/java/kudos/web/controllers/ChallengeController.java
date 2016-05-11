@@ -157,7 +157,7 @@ public class ChallengeController extends BaseController {
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge accept(String id)
-            throws InvalidChallengeStatusException, WrongChallengeEditorException, IdNotSpecifiedException, UserException, ChallengeException {
+            throws BusinessException, IdNotSpecifiedException, ChallengeException, UserException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id.not.specified");
