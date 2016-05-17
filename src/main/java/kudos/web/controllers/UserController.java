@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -111,6 +110,10 @@ public class UserController extends BaseController {
             int amount = kudosService.getKudos(user);
             leaders.put(user.getEmail(), amount);
         }
-        return leaders;
-        }
+
+        return leaders.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (e1, e2) -> e2, LinkedHashMap::new));
+    }
 }
