@@ -2,6 +2,7 @@ package kudos.web.controllers;
 
 import freemarker.template.TemplateException;
 import kudos.model.User;
+import kudos.services.KudosService;
 import kudos.web.beans.form.MyProfileForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -99,4 +102,15 @@ public class UserController extends BaseController {
     public @ApiResponseObject @ResponseBody List<User> confirmedUsers() throws UserException {
         return usersService.getAllConfirmedUsers();
     }
+
+    @ApiMethod(description = "Gets leaderboard")
+    @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody Map<String, Integer> getLeaderboard() throws UserException {
+        Map<String, Integer> leaders = new HashMap<>();
+        for (User user : usersService.getAllConfirmedUsers()) {
+            int amount = kudosService.getKudos(user);
+            leaders.put(user.getEmail(), amount);
+        }
+        return leaders;
+        }
 }
