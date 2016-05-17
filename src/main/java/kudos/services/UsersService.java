@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -203,5 +204,9 @@ public class UsersService {
 
     public List<User> list(String filter) {
         return userRepository.searchAllFields(filter);
+    }
+
+    public List<User> getAllConfirmedUsers() {
+        return userRepository.findUsersByIsConfirmed(true);
     }
 }

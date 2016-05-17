@@ -20,6 +20,8 @@ public interface UserRepository extends MongoRepository<User, String>, CustomUse
 
     Optional<User> findUserByEmailHash(String emailHash);
 
+    List<User> findUsersByIsConfirmed(Boolean isConfirmed);
+
     @Query(value = "{'_id': ?0}", count = true)
     Long countUsersByEmail(String email);
 }

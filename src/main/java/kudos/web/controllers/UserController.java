@@ -93,4 +93,10 @@ public class UserController extends BaseController {
     public List<User> listUsers(String filter) throws Exception{
         return usersService.list(filter);
     }
+
+    @ApiMethod(description = "Gets all confirmed users")
+    @RequestMapping(value = "/confirmedUsers", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<User> confirmedUsers() throws UserException {
+        return usersService.getAllConfirmedUsers();
+    }
 }
