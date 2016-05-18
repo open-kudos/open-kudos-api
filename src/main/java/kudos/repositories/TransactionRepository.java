@@ -17,6 +17,8 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
 
+    List<Transaction> findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, Transaction.Status status, String timestamp);
+
     List<Transaction> findTransactionsByReceiverEmailAndStatus(String receiverEmail, Transaction.Status status);
 
     List<Transaction> findTransactionsBySenderEmail(String senderEmail);

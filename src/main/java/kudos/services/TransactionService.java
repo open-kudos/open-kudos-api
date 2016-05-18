@@ -3,6 +3,7 @@ package kudos.services;
 import kudos.KudosBusinessStrategy;
 import kudos.model.Transaction;
 import kudos.repositories.TransactionRepository;
+import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,8 @@ public class TransactionService {
 
     SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 
-
+    @Autowired
+    private UsersService usersService;
     @Autowired
     private TransactionRepository repository;
     @Autowired
@@ -34,6 +36,10 @@ public class TransactionService {
 
     public List<Transaction> getPageableTransactionsByStatus(Transaction.Status status, int page, int pageSize){
         return repository.findTransactionByStatusOrderByTimestampDesc(status, new PageRequest(page, pageSize));
+    }
+
+    public List<Transaction> getNewTransactions(String timestamp) throws UserException{
+        return repository.findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(usersService.getLoggedUser().get().getEmail(), Transaction.Status.COMPLETED, timestamp);
     }
 
     public boolean isLastTransactionChanged(String lastTransactionTimestamp){

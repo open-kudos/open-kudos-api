@@ -38,6 +38,13 @@ public class TransactionController extends BaseController {
         return transactionService.getPageableTransactionsByStatus(status, page, pageSize);
     }
 
-    //COMPLETED, FROM_CHALLENGE, PENDING_CHALLENGE
+    @ApiMethod(description = "Service to get new transactions like notifications")
+    @RequestMapping(value = "/newTransactions", method = RequestMethod.GET)
+    public
+    @ApiResponseObject
+    @ResponseBody
+    List<Transaction> listOfNewTransactions(String timestamp) throws UserException {
+        return transactionService.getNewTransactions(timestamp);
+    }
 
 }
