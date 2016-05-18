@@ -4,6 +4,7 @@ package kudos.services;
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
 import kudos.model.Email;
+import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
@@ -209,4 +210,5 @@ public class UsersService {
     public List<User> getAllConfirmedUsers() {
         return userRepository.findUsersByIsConfirmed(true);
     }
+
 }

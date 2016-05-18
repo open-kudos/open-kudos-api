@@ -1,6 +1,7 @@
 package kudos.web.controllers;
 
 import freemarker.template.TemplateException;
+import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.services.KudosService;
 import kudos.web.beans.form.MyProfileForm;
@@ -107,8 +108,8 @@ public class UserController extends BaseController {
     public @ApiResponseObject @ResponseBody Map<String, Integer> getTopReceivers() throws UserException {
         Map<String, Integer> topReceivers = new HashMap<>();
         for (User user : usersService.getAllConfirmedUsers()) {
-            int amount = kudosService.getKudos(user);
-            topReceivers.put(user.getFirstName() + " " + user.getLastName(), amount);
+            int incomingKudos = kudosService.getKudos(user);
+            topReceivers.put(user.getFirstName() + " " + user.getLastName(), incomingKudos);
         }
 
         return topReceivers.entrySet().stream()
@@ -116,4 +117,24 @@ public class UserController extends BaseController {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (e1, e2) -> e2, LinkedHashMap::new));
     }
+
+    @ApiMethod(description = "Gets top kudos senders")
+    @RequestMapping(value = "/topsenders", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody Map<String, Integer> getTopSenders() throws UserException {
+        Map<String, Integer> topSenders = new HashMap<>();
+        int outgoingKudos;
+        for (User user : usersService.getAllConfirmedUsers()) {
+            outgoingKudos = 0;
+            for (Transaction transaction : transactionService.getTransactionsByEmailAndStatus(user.getEmail())) {
+                outgoingKudos += transaction.getAmount();
+            }
+            topSenders.put(user.getFirstName() + " " + user.getLastName(), outgoingKudos);
+        }
+
+        return topSenders.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (e1, e2) -> e2, LinkedHashMap::new));
+    }
+    
 }

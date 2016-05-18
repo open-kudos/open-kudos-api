@@ -46,4 +46,8 @@ public class TransactionService {
         return !lastTransactionTimestamp.equals(repository.findFirstByOrderByTimestampDesc().getTimestamp());
     }
 
+    public List<Transaction> getTransactionsByEmailAndStatus(String email) {
+        return repository.findTransactionsBySenderEmailAndStatus(email, Transaction.Status.COMPLETED);
+    }
+
 }
