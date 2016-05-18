@@ -102,16 +102,16 @@ public class UserController extends BaseController {
         return usersService.getAllConfirmedUsers();
     }
 
-    @ApiMethod(description = "Gets leaderboard")
-    @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody Map<String, Integer> getLeaderboard() throws UserException {
-        Map<String, Integer> leaders = new HashMap<>();
+    @ApiMethod(description = "Gets top kudos receivers")
+    @RequestMapping(value = "/topreceivers", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody Map<String, Integer> getTopReceivers() throws UserException {
+        Map<String, Integer> topReceivers = new HashMap<>();
         for (User user : usersService.getAllConfirmedUsers()) {
             int amount = kudosService.getKudos(user);
-            leaders.put(user.getEmail(), amount);
+            topReceivers.put(user.getFirstName() + " " + user.getLastName(), amount);
         }
 
-        return leaders.entrySet().stream()
+        return topReceivers.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (e1, e2) -> e2, LinkedHashMap::new));
