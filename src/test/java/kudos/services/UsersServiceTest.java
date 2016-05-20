@@ -1,25 +1,22 @@
 package kudos.services;
 
-import freemarker.template.TemplateException;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.exceptions.UserException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.authentication.AuthenticationManager;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * UsersService tests suite
@@ -60,21 +57,6 @@ public class UsersServiceTest {
     public void testIfUsersServiceFindsUserByEmail() throws UserException {
         when(userRepository.findOne("")).thenReturn(mockedUser);
         assertEquals(mockedUser, usersService.findByEmail("").get());
-    }
-
-    @Test
-    public void testIfUsersServiceRegistersUser() throws MessagingException, TemplateException, UserException, IOException {
-        when(mockedUser.getEmail()).thenReturn("none@none.no");
-        when(mockedUser.getPassword()).thenReturn("123");
-        when(userRepository.exists(any(String.class))).thenReturn(false);
-        when(userRepository.save(any(User.class))).thenReturn(mock(User.class));
-        ArgumentCaptor<User> savedUser = ArgumentCaptor.forClass(User.class);
-
-        usersService.registerUser(mockedUser);
-        verify(userRepository).save(savedUser.capture());
-
-        assertTrue(savedUser.getValue().getEmail().equals(mockedUser.getEmail()));
-        assertNotNull(savedUser.getValue().getPassword());
     }
 
 //    @Test
