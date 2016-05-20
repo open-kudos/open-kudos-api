@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -60,12 +61,13 @@ public class RegistrationController extends BaseController {
             @ApiError(code = "id_not_specified", description = "If unique id received by email was not specified"),
             @ApiError(code = "user_not_found", description = "If user with unique id was not found")
     })
-    @RequestMapping(value = "/confirm", method = RequestMethod.POST)
-    public User confirmEmail(String id) throws UserException {
+    @RequestMapping(value = "/confirm", method = RequestMethod.GET)
+    public void confirmEmail(HttpServletResponse httpServletResponse, String id) throws MessagingException, TemplateException, UserException, IOException {
         if(Strings.isNullOrEmpty(id))
             throw new UserException("id_not_specified");
+        usersService.confirmUser(id);
 
-        return usersService.confirmUser(id);
+        httpServletResponse.sendRedirect("http://openkudos.com/#/login");
     }
 
     @ApiMethod(description = "Resets user password by sending email. To perform this action it is not mandatory to log into system")
@@ -85,6 +87,13 @@ public class RegistrationController extends BaseController {
         usersService.resetPassword(email);
         return "Success";
     }
+
+    @RequestMapping(value = "/sendMeEmail", method = RequestMethod.POST)
+    public String sendEmail(String email) throws MessagingException, TemplateException, UserException, IOException {
+        usersService.sendEmail(email);
+        return "Success www.openkudos.com";
+    }
+
 
 
 }

@@ -3,8 +3,6 @@ package kudos.services;
 
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
-import kudos.model.Email;
-import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
@@ -25,9 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -77,7 +73,9 @@ public class UsersService {
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
         User newUser = new User(user.getFirstName(), user.getLastName(), password, user.getEmail());
         newUser.setEmailHash(getRandomHash());
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+        sendEmail(user.getEmail());
+        return newUser;
     }
 
     public User confirmUser(String hashedEmail) throws UserException {
@@ -105,15 +103,10 @@ public class UsersService {
 
     public User getCompletedUser() throws UserException {
         User user = getLoggedUser().get();
-        user.isCompleted();
-        if (!user.isCompleted()) {
-            user.setCompleted(true);                        // TODO Temporary completed all users
-        }
         return user;
     }
 
     public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
-
         loginValidation(email, password);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(
@@ -140,8 +133,11 @@ public class UsersService {
             throw new UserException("user_not_exist");
         }
 
-        return maybeUser.get();
+        if (!maybeUser.get().isConfirmed()){
+            throw new UserException("user_not_confirmed");
+        }
 
+        return maybeUser.get();
     }
 
     public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {
@@ -157,10 +153,14 @@ public class UsersService {
         String resetHash = getRandomHash();
         user.setEmailHash(resetHash);
 
-        emailService.send(
-                new Email(email, LocalDateTime.now().toString(), "Click this link to reset your password: ", "http://localhost:8080/reset-password-by-id?id=" + resetHash)
-        );
         userRepository.save(user);
+    }
+
+    public void sendEmail(String email) throws UserException, MessagingException, IOException, TemplateException {
+        Optional<User> maybeUser = findByEmail(email);
+        User user = maybeUser.get();
+        String message = "Click this link to confirm your registration: http://openkudos.com/api/confirm?id=" + user.getEmailHash();
+        emailService.generateAndSendEmail(email, message);
     }
 
     private String getRandomHash() {

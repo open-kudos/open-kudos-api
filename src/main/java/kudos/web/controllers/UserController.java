@@ -3,7 +3,6 @@ package kudos.web.controllers;
 import freemarker.template.TemplateException;
 import kudos.model.Transaction;
 import kudos.model.User;
-import kudos.services.KudosService;
 import kudos.web.beans.form.MyProfileForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
@@ -37,7 +36,6 @@ public class UserController extends BaseController {
     public void disableMyAccount(HttpSession session) throws UserException {
         usersService.disableUsersAccount();
         session.invalidate();
-
     }
 
     @ApiMethod(description = "Service to show user account")
