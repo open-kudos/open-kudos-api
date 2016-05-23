@@ -159,7 +159,7 @@ public class UsersService {
     public void sendEmail(String email) throws UserException, MessagingException, IOException, TemplateException {
         Optional<User> maybeUser = findByEmail(email);
         User user = maybeUser.get();
-        String message = "Click this link to confirm your registration: http://openkudos.com/api/confirm?id=" + user.getEmailHash();
+        String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
         emailService.generateAndSendEmail(email, message);
     }
 
