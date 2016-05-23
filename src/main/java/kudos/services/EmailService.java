@@ -30,7 +30,7 @@ public class EmailService {
 
         getMailSession = Session.getDefaultInstance(mailServerProperties, null);
         generateMailMessage = new MimeMessage(getMailSession);
-        generateMailMessage.addRecipient(Message.RecipientType.CC, new InternetAddress(email));
+        generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
         generateMailMessage.setSubject("Greetings from Acorns app");
         generateMailMessage.setContent(message, "text/html");
         Transport transport = getMailSession.getTransport("smtp");
