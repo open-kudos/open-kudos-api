@@ -8,6 +8,8 @@ import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class WisdomWallService {
@@ -17,10 +19,18 @@ public class WisdomWallService {
     @Autowired
     private UsersService usersService;
 
-
-    public Idea addIdeaToWisdomWall(User author, String idea) throws UserException {
+    public Idea addIdeaToWisdomWall(String author, String idea) throws UserException {
         User postedBy = usersService.getLoggedUser().get();
-        Idea newIdea = new Idea(author.getEmail(), postedBy.getEmail(), idea);
+        Idea newIdea = new Idea(author, postedBy.getEmail(), idea);
         return repository.insert(newIdea);
     }
+
+    /**
+     * Returns list of ideas posted by certain user
+     * @return List
+     */
+    public List<Idea> getIdeasByPostedBy(String postedBy) {
+        return repository.findIdeasByPostedByEmail(postedBy);
+    }
+
 }

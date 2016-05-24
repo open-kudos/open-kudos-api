@@ -6,19 +6,19 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 public class WisdomWallForm {
-    String authorEmail;
+    String authorName;
     String idea;
 
-    public String getAuthorEmail() {
-        return authorEmail;
+    public String getAuthorName() {
+        return authorName;
     }
 
     public String getIdea() {
         return idea;
     }
 
-    public void setAuthorEmail(String authorEmail) {
-        this.authorEmail = authorEmail;
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 
     public void setIdea(String idea) {
@@ -26,9 +26,6 @@ public class WisdomWallForm {
     }
 
     public static class WisdomWallFormValidator implements Validator {
-
-        private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*" +
-                "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
         @Override
         public boolean supports(Class<?> clazz) {
@@ -39,12 +36,10 @@ public class WisdomWallForm {
         public void validate(Object target, Errors errors) {
             WisdomWallForm form = (WisdomWallForm) target;
 
-            String authorEmail = form.getAuthorEmail();
+            String authorName = form.getAuthorName();
 
-            if (Strings.isNullOrEmpty(authorEmail)) {
-                errors.rejectValue("authorEmail", "author_email_not_specified");
-            } else if (!authorEmail.matches(EMAIL_PATTERN)) {
-                errors.rejectValue("authorEmail", "author_email_incorrect");
+            if (Strings.isNullOrEmpty(authorName)) {
+                errors.rejectValue("authorName", "author_name_not_specified");
             }
 
             if (Strings.isNullOrEmpty(form.getIdea())) {

@@ -24,34 +24,29 @@ import java.util.Map;
 @RequestMapping("/wisdomwall")
 public class WisdomWallController extends BaseController {
 
-//    @ApiMethod(description = "Service to get all ideas of wisdom wall by author")
-//    @RequestMapping(value = "/byauthor", method = RequestMethod.GET)
-//    public @ApiResponseObject
-//    @ResponseBody
-//    List<Idea> getIdeasByAuthor() {
-//        List<Idea> ideasByAuthor = new ArrayList<>();
-//        for (User user : usersService.getAllConfirmedUsers()) {
-//            ideasByAuthor.add(wisdomWallService.getWisdomWallIdeasByPostedBy(user.getEmail()));
-//        }
-//        return ideasByAuthor;
-//    }
-
     @ApiMethod(description = "Service to add idea to wisdom wall")
     @RequestMapping(value = "/addidea", method = RequestMethod.POST)
     public @ApiResponseObject
     @ResponseBody Idea addIdea(WisdomWallForm wisdomWallForm, Errors errors) throws UserException, FormValidationException {
-
         new WisdomWallForm.WisdomWallFormValidator().validate(wisdomWallForm, errors);
 
         if (errors.hasErrors())
             throw new FormValidationException(errors);
 
-        User author = usersService.findByEmail(wisdomWallForm.getAuthorEmail())
-                .orElseThrow(() -> new UserException("receiver.not.exist"));
-
-        return wisdomWallService.addIdeaToWisdomWall(author, wisdomWallForm.getIdea());
+        return wisdomWallService.addIdeaToWisdomWall(wisdomWallForm.getAuthorName(), wisdomWallForm.getIdea());
     }
 
-
+    @ApiMethod(description = "Service to get all posted ideas")
+    @RequestMapping(value = "/getideas", method = RequestMethod.GET)
+    public @ApiResponseObject
+    @ResponseBody List<Idea> getAllIdeas() {
+        List<Idea> allIdeas = new ArrayList<>();
+        for (User user : usersService.getAllConfirmedUsers()) {
+            for (Idea idea : wisdomWallService.getIdeasByPostedBy(user.getEmail())){
+                allIdeas.add(idea);
+            }
+        }
+        return allIdeas;
+    }
 
 }

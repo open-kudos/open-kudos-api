@@ -10,18 +10,18 @@ public class Idea {
 
     @Id
     private String id;
-    private String authorEmail;
+    private String authorName;
     private String postedByEmail;
     private String idea;
 
-    public Idea(String authorEmail, String postedByEmail, String idea) {
-        this.authorEmail = authorEmail;
+    public Idea(String authorName, String postedByEmail, String idea) {
+        this.authorName = authorName;
         this.postedByEmail = postedByEmail;
         this.idea = idea;
     }
 
     public String getAuthorOfIdea() {
-        return authorEmail;
+        return authorName;
     }
 
     public String getPostedBy() {
