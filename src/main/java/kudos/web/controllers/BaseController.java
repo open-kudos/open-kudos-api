@@ -38,6 +38,9 @@ public abstract class BaseController {
     protected WisdomWallService wisdomWallService;
 
     @Autowired
+    protected EmailService emailService;
+
+    @Autowired
     @Qualifier(value = "DBTimeFormatter")
     protected DateTimeFormatter formatter;
 
