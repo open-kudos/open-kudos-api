@@ -174,27 +174,6 @@ public class MyProfileForm {
 
             MyProfileForm form = (MyProfileForm)target;
 
-            String birthdayDate = form.getBirthday();
-            if(!Strings.isNullOrEmpty(birthdayDate) && !isEnteredDateValid(birthdayDate)){
-                errors.rejectValue("birthday","birthday_date_incorrect");
-            }
-
-            String email = form.getEmail();
-            if(!Strings.isNullOrEmpty(email) && !email.matches(EMAIL_PATTERN)){
-                errors.rejectValue("email","incorrect_email");
-            }
-
-            String phone = form.getPhone().substring(1);
-            if(!Strings.isNullOrEmpty(phone)  && !phone.matches(PHONE_PATTERN)){ // TODO FIX REGEX LATER
-                errors.rejectValue("phone","incorrect_phone");
-            }
-
-            String startedToWorkDate = form.getStartedToWorkDate();
-            if(!Strings.isNullOrEmpty(startedToWorkDate) && !isEnteredDateValid(startedToWorkDate)){
-                errors.rejectValue("startedToWorkDate","startedToWorkDate_incorrect");
-            }
-
-
             String oldPassword = form.getOldPassword();
             if(!Strings.isNullOrEmpty(oldPassword)){
 
