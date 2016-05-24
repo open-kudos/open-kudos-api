@@ -1,11 +1,7 @@
 package kudos.web.controllers;
 
 import kudos.KudosBusinessStrategy;
-import kudos.services.ChallengeService;
-import kudos.services.KudosService;
-import kudos.services.RelationService;
-import kudos.services.TransactionService;
-import kudos.services.UsersService;
+import kudos.services.*;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,6 +33,9 @@ public abstract class BaseController {
 
     @Autowired
     protected RelationService relationService;
+
+    @Autowired
+    protected WisdomWallService wisdomWallService;
 
     @Autowired
     @Qualifier(value = "DBTimeFormatter")

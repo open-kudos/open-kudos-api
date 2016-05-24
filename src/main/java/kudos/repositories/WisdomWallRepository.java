@@ -1,7 +1,11 @@
 package kudos.repositories;
 
-/**
- * Created by Robertas on 5/23/2016.
- */
-public interface WisdomWallRepository {
+import kudos.model.Idea;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+
+
+public interface WisdomWallRepository extends MongoRepository<Idea, String> {
+
 }
