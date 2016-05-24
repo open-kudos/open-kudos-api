@@ -2,7 +2,6 @@ package kudos.services;
 
 import kudos.exceptions.RelationException;
 import kudos.model.Relation;
-import kudos.model.User;
 import kudos.repositories.RelationRepository;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,6 @@ public class RelationService {
         return relationList.stream().collect(() -> new ArrayList<>(),
                 (c, e) -> c.add(e.getUserEmail()),
                 (c1, c2) -> c1.addAll(c2));
-
     }
 
     public List<String> getAllFollowers() throws UserException {

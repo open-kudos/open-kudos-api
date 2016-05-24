@@ -90,7 +90,7 @@ public class RegistrationController extends BaseController {
 
     @RequestMapping(value = "/sendMeEmail", method = RequestMethod.POST)
     public String sendEmail(String email) throws MessagingException, TemplateException, UserException, IOException {
-        usersService.sendEmail(email);
+        usersService.sendConfirmationCodeEmail(email);
         return "Success www.openkudos.com";
     }
 

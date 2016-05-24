@@ -1,6 +1,5 @@
 package kudos.services;
 
-
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
 import kudos.model.User;
@@ -26,9 +25,6 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by chc on 15.8.11.
- */
 @Service
 public class UsersService {
 
@@ -51,6 +47,10 @@ public class UsersService {
 
     private static final String DELETED_USER_TAG = "undefined";
 
+    public User getKudosMaster() {
+        return new User("pass", "master@of.kudos");
+    }
+
     public Optional<User> findByEmail(String email) throws UserException {
         return Optional.ofNullable(userRepository.findOne(email));
     }
@@ -60,21 +60,15 @@ public class UsersService {
         return findByEmail(name);
     }
 
-    public User getKudosMaster() {
-        return new User("pass", "master@of.kudos");
-    }
 
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
-
-        if (userRepository.exists(user.getEmail())) {
-            throw new UserException("user_already_exists");
-        }
+        if (userRepository.exists(user.getEmail().toLowerCase())) throw new UserException("user_already_exists");
 
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
-        User newUser = new User(user.getFirstName(), user.getLastName(), password, user.getEmail());
+        User newUser = new User(user.getFirstName(), user.getLastName(), password, user.getEmail().toLowerCase());
         newUser.setEmailHash(getRandomHash());
         userRepository.save(newUser);
-        sendEmail(user.getEmail());
+        sendConfirmationCodeEmail(user.getEmail().toLowerCase());
         return newUser;
     }
 
@@ -107,48 +101,36 @@ public class UsersService {
     }
 
     public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
-        loginValidation(email, password);
+        loginValidation(email.toLowerCase(), password);
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password))
-        );
+        securityContext.setAuthentication(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email.toLowerCase(), password)));
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-        return findByEmail(email).get();
+        return findByEmail(email.toLowerCase()).get();
     }
 
     private User loginValidation(String email, String password) throws UserException {
-        if (Strings.isNullOrEmpty(email)) {
-            throw new UserException("email_not_specified");
-        }
-
-        if (Strings.isNullOrEmpty(password)) {
-            throw new UserException("password_not_specified");
-        }
-
-        if (getLoggedUser().isPresent()) {
-            throw new UserException("user_already_logged");
-        }
         Optional<User> maybeUser = findByEmail(email);
-        if (!maybeUser.isPresent()) {
-            throw new UserException("user_not_exist");
-        }
 
-        if (!maybeUser.get().isConfirmed()){
-            throw new UserException("user_not_confirmed");
-        }
+        if (Strings.isNullOrEmpty(email)) throw new UserException("email_not_specified");
+
+        if (Strings.isNullOrEmpty(password)) throw new UserException("password_not_specified");
+
+        if (getLoggedUser().isPresent()) throw new UserException("user_already_logged");
+
+        if (!maybeUser.isPresent()) throw new UserException("user_not_exist");
+
+        if (!maybeUser.get().isConfirmed()) throw new UserException("user_not_confirmed");
 
         return maybeUser.get();
     }
 
     public void resetPassword(String email) throws UserException, MessagingException, IOException, TemplateException {
-        if (Strings.isNullOrEmpty(email)) {
-            throw new UserException("email_not_specified");
-        }
-
         Optional<User> maybeUser = findByEmail(email);
-        if (maybeUser.isPresent()) {
-            throw new UserException("user_not_exist");
-        }
+
+        if (Strings.isNullOrEmpty(email)) throw new UserException("email_not_specified");
+
+        if (maybeUser.isPresent()) throw new UserException("user_not_exist");
+
         User user = maybeUser.get();
         String resetHash = getRandomHash();
         user.setEmailHash(resetHash);
@@ -156,7 +138,7 @@ public class UsersService {
         userRepository.save(user);
     }
 
-    public void sendEmail(String email) throws UserException, MessagingException, IOException, TemplateException {
+    public void sendConfirmationCodeEmail(String email) throws UserException, MessagingException, IOException, TemplateException {
         Optional<User> maybeUser = findByEmail(email);
         User user = maybeUser.get();
         String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
@@ -180,12 +162,6 @@ public class UsersService {
                     challenge.setParticipant(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
-/*
-        challengeService.getAllUserReferredChallenges().stream()
-                .forEach(challenge -> {
-                    challenge.setReferee(DELETED_USER_TAG);
-                    challengeService.save(challenge);
-                });*/
 
         kudosService.getAllLoggedUserIncomingTransactions().stream()
                 .forEach(transaction -> {
