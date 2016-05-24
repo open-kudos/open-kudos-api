@@ -66,8 +66,6 @@ public class RegistrationController extends BaseController {
         if(Strings.isNullOrEmpty(id))
             throw new UserException("id_not_specified");
         usersService.confirmUser(id);
-
-        httpServletResponse.sendRedirect("http://openkudos.com/#/login");
     }
 
     @ApiMethod(description = "Resets user password by sending email. To perform this action it is not mandatory to log into system")
