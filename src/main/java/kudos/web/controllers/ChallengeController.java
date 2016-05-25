@@ -1,10 +1,12 @@
 package kudos.web.controllers;
 
 import com.google.common.base.Strings;
-import kudos.exceptions.*;
+import kudos.exceptions.BusinessException;
+import kudos.exceptions.ChallengeException;
+import kudos.exceptions.IdNotSpecifiedException;
+import kudos.exceptions.WrongChallengeEditorException;
 import kudos.model.Challenge;
 import kudos.model.User;
-import kudos.services.ChallengeService;
 import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
@@ -287,6 +289,7 @@ public class ChallengeController extends BaseController {
             challenge.setCreatorStatus(status);
 
         }
+
         if (challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
             challenge.setParticipantStatus(status);
         }

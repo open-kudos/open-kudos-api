@@ -72,7 +72,7 @@ public class KudosService {
             throw new InvalidKudosAmountException("invalid_kudos_amount");
         }
 
-        if (getFreeKudos(from) < amount){
+        if (getFreeKudos(from) < amount && status != Transaction.Status.COMPLETED_CHALLENGE){
             throw new KudosExceededException("exceeded_kudos");
         }
 
