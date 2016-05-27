@@ -35,6 +35,9 @@ public abstract class BaseController {
     protected RelationService relationService;
 
     @Autowired
+    protected WisdomWallService wisdomWallService;
+
+    @Autowired
     protected EmailService emailService;
 
     @Autowired
