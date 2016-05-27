@@ -20,7 +20,7 @@ public class Idea {
         this.idea = idea;
     }
 
-    public String getAuthorOfIdea() {
+    public String getAuthorName() {
         return authorName;
     }
 

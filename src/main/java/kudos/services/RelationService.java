@@ -2,12 +2,12 @@ package kudos.services;
 
 import kudos.exceptions.RelationException;
 import kudos.model.Relation;
+import kudos.model.User;
 import kudos.repositories.RelationRepository;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,32 +26,41 @@ public class RelationService {
         if(relationRepository.getRelationByFollowerEmailAndUserEmail(relation.getFollowerEmail(),relation.getUserEmail()) != null){
             throw new RelationException("relation_already_exists");
         }
+
+        if(relation.getFollowerEmail().equals(relation.getUserEmail())){
+            throw new RelationException("cant_follow_yourself");
+        }
+
         return relationRepository.save(relation);
     }
 
-    public List<String> getAllFollowedUsers() throws UserException {
+    public List<Relation> getAllFollowedUsers() throws UserException {
         String followerEmail = usersService.getLoggedUser().get().getEmail();
-        List<Relation>relationList = relationRepository.getRelationsByFollowerEmail(followerEmail);
+        return relationRepository.getRelationsByFollowerEmail(followerEmail);
 
-        return relationList.stream().collect(() -> new ArrayList<>(),
+        /* return relationList.stream().collect(() -> new ArrayList<>(),
                 (c, e) -> c.add(e.getUserEmail()),
-                (c1, c2) -> c1.addAll(c2));
+                (c1, c2) -> c1.addAll(c2)); */
     }
 
-    public List<String> getAllFollowers() throws UserException {
+    public List<Relation> getAllFollowers() throws UserException {
         String userEmail = usersService.getLoggedUser().get().getEmail();
-        List<Relation>relationList = relationRepository.getRelationsByUserEmail(userEmail);
+        return relationRepository.getRelationsByUserEmail(userEmail);
 
-        return relationList.stream().collect(() -> new ArrayList<>(),
+         /*relationList.stream().collect(() -> new ArrayList<>(),
                 (c, e) -> c.add(e.getFollowerEmail()),
-                (c1, c2) -> c1.addAll(c2));
+                (c1, c2) -> c1.addAll(c2)); */
     }
 
-    public void removeRelation(Relation relation) throws RelationException {
-        if(relationRepository.getRelationByFollowerEmailAndUserEmail(relation.getFollowerEmail(),relation.getUserEmail()) == null){
+
+    public void removeRelation(String followerUserEmail) throws RelationException, UserException {
+        User follower = usersService.getLoggedUser().get();
+        Relation relationToRemove = relationRepository.getRelationByFollowerEmailAndUserEmail(follower.getEmail(), followerUserEmail);
+
+        if(relationToRemove == null){
             throw new RelationException("relation_not_exist");
         }
-        relationRepository.delete(relation);
+        relationRepository.delete(relationToRemove);
     }
 
 }
