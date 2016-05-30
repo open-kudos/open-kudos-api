@@ -72,7 +72,7 @@ public class TeamChallengeTransferForm {
         this.amount = amount;
     }
 
-    public static class ChallengeTransferFormValidator implements Validator {
+    public static class TeamChallengeTransferFormValidator implements Validator {
 
         private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*" +
                 "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";

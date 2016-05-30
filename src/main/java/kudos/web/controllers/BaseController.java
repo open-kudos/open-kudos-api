@@ -32,6 +32,9 @@ public abstract class BaseController {
     protected ChallengeService challengeService;
 
     @Autowired
+    protected TeamChallengeService teamChallengeService;
+
+    @Autowired
     protected RelationService relationService;
 
     @Autowired

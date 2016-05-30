@@ -32,19 +32,16 @@ public class TeamChallenge {
     @ApiObjectField
     private int amount;
     @ApiObjectField
-    private Status firstTeamStatus;
-    @ApiObjectField
-    private Status secondTeamStatus;
+    private Status status;
 
-    public TeamChallenge(String name, Map<String, Boolean> firstTeam, Map<String, Boolean> secondTeam, String description, String finishDate, int amount, Status firstTeamStatus, Status secondTeamStatus) {
+    public TeamChallenge(String name, Map<String, Boolean> firstTeam, Map<String, Boolean> secondTeam, String description, String finishDate, int amount, Status status) {
         this.name = name;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
         this.description = description;
         this.finishDate = finishDate;
         this.amount = amount;
-        this.firstTeamStatus = firstTeamStatus;
-        this.secondTeamStatus = secondTeamStatus;
+        this.status = status;
     }
 
     public String getId() {
@@ -103,19 +100,11 @@ public class TeamChallenge {
         this.secondTeam = secondTeam;
     }
 
-    public Status getFirstTeamStatus() {
-        return firstTeamStatus;
+    public Status getStatus() {
+        return status;
     }
 
-    public Status getSecondTeamStatus() {
-        return secondTeamStatus;
-    }
-
-    public void setFirstTeamStatus(Status firstTeamStatus) {
-        this.firstTeamStatus = firstTeamStatus;
-    }
-
-    public void setSecondTeamStatus(Status secondTeamStatus) {
-        this.secondTeamStatus = secondTeamStatus;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }
