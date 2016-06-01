@@ -22,24 +22,21 @@ public class TeamChallenge {
     @ApiObjectField
     private String name;
     @ApiObjectField
-    private Map<String, Boolean> firstTeam;
+    private List<TeamMember> firstTeam;
     @ApiObjectField
-    private Map<String, Boolean> secondTeam;
+    private List<TeamMember> secondTeam;
     @ApiObjectField
     private String description;
-    @ApiObjectField
-    private String finishDate;
     @ApiObjectField
     private int amount;
     @ApiObjectField
     private Status status;
 
-    public TeamChallenge(String name, Map<String, Boolean> firstTeam, Map<String, Boolean> secondTeam, String description, String finishDate, int amount, Status status) {
+    public TeamChallenge(String name, List<TeamMember> firstTeam, List<TeamMember> secondTeam, String description, int amount, Status status) {
         this.name = name;
         this.firstTeam = firstTeam;
         this.secondTeam = secondTeam;
         this.description = description;
-        this.finishDate = finishDate;
         this.amount = amount;
         this.status = status;
     }
@@ -54,10 +51,6 @@ public class TeamChallenge {
 
     public String getDescription() {
         return description;
-    }
-
-    public String getFinishDate() {
-        return finishDate;
     }
 
     public int getAmount() {
@@ -76,27 +69,24 @@ public class TeamChallenge {
         this.description = description;
     }
 
-    public void setFinishDate(String finishDate) {
-        this.finishDate = finishDate;
-    }
 
     public void setAmount(int amount) {
         this.amount = amount;
     }
 
-    public Map<String, Boolean> getFirstTeam() {
+    public List<TeamMember> getFirstTeam() {
         return firstTeam;
     }
 
-    public Map<String, Boolean> getSecondTeam() {
+    public List<TeamMember> getSecondTeam() {
         return secondTeam;
     }
 
-    public void setFirstTeam(Map<String, Boolean> firstTeam) {
+    public void setFirstTeam(List<TeamMember> firstTeam) {
         this.firstTeam = firstTeam;
     }
 
-    public void setSecondTeam(Map<String, Boolean> secondTeam) {
+    public void setSecondTeam(List<TeamMember> secondTeam) {
         this.secondTeam = secondTeam;
     }
 
@@ -107,4 +97,5 @@ public class TeamChallenge {
     public void setStatus(Status status) {
         this.status = status;
     }
+
 }

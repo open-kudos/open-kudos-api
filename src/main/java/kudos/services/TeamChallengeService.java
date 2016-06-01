@@ -3,15 +3,13 @@ package kudos.services;
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.model.TeamChallenge;
-import kudos.model.User;
+import kudos.model.TeamMember;
 import kudos.repositories.TeamChallengeRepository;
-import kudos.repositories.UserRepository;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TeamChallengeService {
@@ -23,24 +21,31 @@ public class TeamChallengeService {
     @Autowired
     private KudosService kudosService;
 
-    public TeamChallenge createTeamChallenge(String name, Map<String, Boolean> firstTeam, Map<String, Boolean> secondTeam, String description, String finishDate, int amount) throws UserException, BusinessException {
+    public TeamChallenge createTeamChallenge(String name, List<TeamMember> firstTeam, List<TeamMember> secondTeam, String description, int amount) throws UserException, BusinessException {
 
-        if (firstTeam.containsKey(usersService.getLoggedUser().get().getEmail())) {
-            firstTeam.put(usersService.getLoggedUser().get().getEmail(), true);
-        }
-        kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
-        TeamChallenge challenge = new TeamChallenge(name, firstTeam, secondTeam, description, finishDate, amount, TeamChallenge.Status.CREATED);
+        TeamChallenge challenge = new TeamChallenge(name, firstTeam, secondTeam, description, amount, TeamChallenge.Status.CREATED);
         return repository.insert(challenge);
     }
 
     public TeamChallenge accept(TeamChallenge teamChallenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
-        if (teamChallenge.getSecondTeam().containsKey(usersService.getLoggedUser().get().getEmail())) {
-            teamChallenge.getSecondTeam().put(usersService.getLoggedUser().get().getEmail(), true);
+
+        for (TeamMember participant : teamChallenge.getFirstTeam()) {
+            if (participant.getMemberEmail().equals(usersService.getLoggedUser().get().getEmail()) && !participant.getAccepted()) {
+                participant.setAccepted(true);
+                System.out.println(participant.getAccepted());
+            }
         }
 
-        kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), teamChallenge.getAmount(), "");
-        if (areAllTrue(teamChallenge.getSecondTeam())) {
+        for (TeamMember participant : teamChallenge.getSecondTeam()) {
+            if (participant.getMemberEmail().equals(usersService.getLoggedUser().get().getEmail()) && !participant.getAccepted()) {
+                participant.setAccepted(true);
+            }
+        }
+
+        //kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), teamChallenge.getAmount(), "");
+
+        if (areAllTrue(teamChallenge.getFirstTeam()) && areAllTrue(teamChallenge.getSecondTeam())) {
             return setStatusAndSave(teamChallenge, TeamChallenge.Status.ACCEPTED);
         }
         return setStatusAndSave(teamChallenge, TeamChallenge.Status.CREATED);
@@ -70,12 +75,14 @@ public class TeamChallengeService {
     private TeamChallenge setStatusAndSave(TeamChallenge challenge, TeamChallenge.Status status) {
         TeamChallenge databaseChallenge = repository.findChallengeById(challenge.getId());
         databaseChallenge.setStatus(status);
+        databaseChallenge.setFirstTeam(challenge.getFirstTeam());
+        databaseChallenge.setSecondTeam(challenge.getSecondTeam());
         return repository.save(databaseChallenge);
     }
 
-    public boolean areAllTrue(Map<String, Boolean> participants) {
-        for (Map.Entry<String, Boolean> participant : participants.entrySet()) {
-            if (!participant.getValue())
+    public boolean areAllTrue(List<TeamMember> participants) {
+        for (TeamMember participant : participants) {
+            if (!participant.getAccepted())
                 return false;
         }
         return true;
@@ -84,4 +91,5 @@ public class TeamChallengeService {
     public Optional<TeamChallenge> getChallenge(String id) {
         return Optional.ofNullable(repository.findChallengeById(id));
     }
+
 }

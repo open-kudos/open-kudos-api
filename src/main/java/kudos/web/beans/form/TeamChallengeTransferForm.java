@@ -7,20 +7,18 @@ import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import java.util.Map;
+import java.util.List;
 
 @ApiObject
 public class TeamChallengeTransferForm {
     @ApiObjectField
     private String name;
     @ApiObjectField
-    private Map<String, Boolean> firstTeam;
+    private List<String> firstTeam;
     @ApiObjectField
-    private Map<String, Boolean> secondTeam;
+    private List<String> secondTeam;
     @ApiObjectField
     private String description;
-    @ApiObjectField
-    private String finishDate;
     @ApiObjectField
     private String amount;
 
@@ -28,20 +26,16 @@ public class TeamChallengeTransferForm {
         return name;
     }
 
-    public Map<String, Boolean> getFirstTeam() {
+    public List<String> getFirstTeam() {
         return firstTeam;
     }
 
-    public Map<String, Boolean> getSecondTeam() {
+    public List<String> getSecondTeam() {
         return secondTeam;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public String getFinishDate() {
-        return finishDate;
     }
 
     public String getAmount() {
@@ -52,20 +46,16 @@ public class TeamChallengeTransferForm {
         this.name = name;
     }
 
-    public void setFirstTeam(Map<String, Boolean> firstTeam) {
+    public void setFirstTeam(List<String> firstTeam) {
         this.firstTeam = firstTeam;
     }
 
-    public void setSecondTeam(Map<String, Boolean> secondTeam) {
+    public void setSecondTeam(List<String> secondTeam) {
         this.secondTeam = secondTeam;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setFinishDate(String finishDate) {
-        this.finishDate = finishDate;
     }
 
     public void setAmount(String amount) {
@@ -86,27 +76,24 @@ public class TeamChallengeTransferForm {
         public void validate(Object target, Errors errors) {
             TeamChallengeTransferForm teamChallengeTransferForm = (TeamChallengeTransferForm) target;
 
-            for (Map.Entry<String, Boolean> participant : teamChallengeTransferForm.getFirstTeam().entrySet()) {
-                String participantEmail = participant.getKey();
-                if (Strings.isNullOrEmpty(participantEmail)) {
+            for (String participant : teamChallengeTransferForm.getFirstTeam()) {
+                if (Strings.isNullOrEmpty(participant)) {
                     errors.rejectValue("participant", "participant_email_not_specified");
-                } else if (!participantEmail.matches(EMAIL_PATTERN)) {
+                } else if (!participant.matches(EMAIL_PATTERN)) {
                     errors.rejectValue("participant", "participant_email_incorrect");
                 }
             }
 
-            for (Map.Entry<String, Boolean> participant : teamChallengeTransferForm.getSecondTeam().entrySet()) {
-                String participantEmail = participant.getKey();
-                if (Strings.isNullOrEmpty(participantEmail)) {
+            for (String participant : teamChallengeTransferForm.getSecondTeam()) {
+                if (Strings.isNullOrEmpty(participant)) {
                     errors.rejectValue("participant", "participant_email_not_specified");
-                } else if (!participantEmail.matches(EMAIL_PATTERN)) {
+                } else if (!participant.matches(EMAIL_PATTERN)) {
                     errors.rejectValue("participant", "participant_email_incorrect");
                 }
             }
 
             String amountInString = teamChallengeTransferForm.getAmount();
             String challengeName = teamChallengeTransferForm.getName();
-            String estimatedDate = teamChallengeTransferForm.getFinishDate();
 
             if (Strings.isNullOrEmpty(amountInString)) {
                 errors.rejectValue("amount", "amount_not_specified");
@@ -123,21 +110,6 @@ public class TeamChallengeTransferForm {
 
             if (Strings.isNullOrEmpty(challengeName)) {
                 errors.rejectValue("name", "name_not_specified");
-            }
-
-            if (!Strings.isNullOrEmpty(estimatedDate)) {
-                if (!isEnteredDateValid(estimatedDate)) {
-                    errors.rejectValue("finishDate", "finishDate_incorrect");
-                }
-            }
-        }
-
-        public boolean isEnteredDateValid(String text) {
-            try {
-                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss,SSS").parseLocalDate(text);
-                return true;
-            } catch (IllegalArgumentException p) {
-                return false;
             }
 
         }
