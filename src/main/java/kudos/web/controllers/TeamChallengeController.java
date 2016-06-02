@@ -87,12 +87,28 @@ public class TeamChallengeController extends BaseController{
         if(!maybeChallenge.isPresent()){
             throw new ChallengeException("challenge_not_found");
         }
-
         TeamChallenge teamChallenge = maybeChallenge.get();
 
         //TODO: Check if user is a participant of the challenge
 
         return teamChallengeService.decline(teamChallenge);
+    }
+
+    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody TeamChallenge cancel(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+
+        if(Strings.isNullOrEmpty(id))
+            throw new IdNotSpecifiedException("id.not.specified");
+
+        Optional<TeamChallenge> maybeChallenge = teamChallengeService.getChallenge(id);
+
+        if(!maybeChallenge.isPresent()){
+            throw new ChallengeException("challenge_not_found");
+        }
+
+        TeamChallenge teamChallenge = maybeChallenge.get();
+        //TODO: Check if user is a participant of the challenge
+        return teamChallengeService.cancel(teamChallenge);
     }
 
 

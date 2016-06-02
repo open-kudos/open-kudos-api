@@ -62,6 +62,17 @@ public class TeamChallengeService {
         return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.DECLINED);
     }
 
+    public TeamChallenge cancel(TeamChallenge teamChallenge) throws BusinessException, UserException {
+        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
+
+        for (TeamMember participant : teamChallenge.getFirstTeam()) {
+            if (participant.getAccepted())
+                kudosService.retrieveSystemKudos(usersService.findByEmail(participant.getMemberEmail()).get(), teamChallenge.getAmount(), teamChallenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
+        }
+
+        return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.CANCELED);
+    }
+
     private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
         switch (teamChallenge.getStatus()) {
             case ACCEPTED:
