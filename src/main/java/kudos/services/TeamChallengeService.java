@@ -4,6 +4,7 @@ import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.model.TeamChallenge;
 import kudos.model.TeamMember;
+import kudos.model.Transaction;
 import kudos.repositories.TeamChallengeRepository;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,6 @@ public class TeamChallengeService {
         for (TeamMember participant : teamChallenge.getFirstTeam()) {
             if (participant.getMemberEmail().equals(usersService.getLoggedUser().get().getEmail()) && !participant.getAccepted()) {
                 participant.setAccepted(true);
-                System.out.println(participant.getAccepted());
             }
         }
 
@@ -43,12 +43,23 @@ public class TeamChallengeService {
             }
         }
 
-        //kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), teamChallenge.getAmount(), "");
+        kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), teamChallenge.getAmount(), "");
 
         if (areAllTrue(teamChallenge.getFirstTeam()) && areAllTrue(teamChallenge.getSecondTeam())) {
-            return setStatusAndSave(teamChallenge, TeamChallenge.Status.ACCEPTED);
+            return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.ACCEPTED);
         }
-        return setStatusAndSave(teamChallenge, TeamChallenge.Status.CREATED);
+        return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.CREATED);
+    }
+
+    public TeamChallenge decline(TeamChallenge teamChallenge) throws BusinessException, UserException {
+        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
+
+        for (TeamMember participant : teamChallenge.getFirstTeam()) {
+            if (participant.getAccepted())
+                kudosService.retrieveSystemKudos(usersService.findByEmail(participant.getMemberEmail()).get(), teamChallenge.getAmount(), teamChallenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
+        }
+
+        return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.DECLINED);
     }
 
     private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
@@ -72,7 +83,7 @@ public class TeamChallengeService {
         }
     }
 
-    private TeamChallenge setStatusAndSave(TeamChallenge challenge, TeamChallenge.Status status) {
+    private TeamChallenge setStatusAndTeamsAndSave(TeamChallenge challenge, TeamChallenge.Status status) {
         TeamChallenge databaseChallenge = repository.findChallengeById(challenge.getId());
         databaseChallenge.setStatus(status);
         databaseChallenge.setFirstTeam(challenge.getFirstTeam());
