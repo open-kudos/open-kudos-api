@@ -110,10 +110,10 @@ public class TeamChallengeController extends BaseController{
         //TODO: Check if user is a participant of the challenge
         return teamChallengeService.cancel(teamChallenge);
     }
-    @ApiMethod(description = "Gets all challenges that logged user has participated by status")
+
     @RequestMapping(value = "/participatedByStatus", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<TeamChallenge> participatedChallengesByStatus(TeamChallenge.Status status) throws UserException {
-        return teamChallengeService.getAllUserParticipatedChallengesByStatus(status);
+    public @ApiResponseObject @ResponseBody List<TeamChallenge> getAllUserTeamChallengesByStatus(TeamChallenge.Status status) throws UserException {
+        return teamChallengeService.getUserChallengesByStatus(status);
     }
 
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)

@@ -11,4 +11,5 @@ public interface TeamChallengeRepository extends MongoRepository<TeamChallenge, 
     TeamChallenge findChallengeById(String id);
     List<TeamChallenge> findAllChallengesByStatus(TeamChallenge.Status status);
     List<TeamChallenge> findAllChallengesByFirstTeamMemberEmailAndStatus(String memberEmail, TeamChallenge.Status status);
+    List<TeamChallenge> findAllChallengesBySecondTeamMemberEmailAndStatus(String memberEmail, TeamChallenge.Status status);
 }

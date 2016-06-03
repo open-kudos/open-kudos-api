@@ -10,6 +10,7 @@ import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.jws.soap.SOAPBinding;
 import java.util.*;
 
 @Service
@@ -164,8 +165,11 @@ public class TeamChallengeService {
         return Optional.ofNullable(teamChallengeRepository.findChallengeById(id));
     }
 
-    public List<TeamChallenge> getAllUserParticipatedChallengesByStatus(TeamChallenge.Status status) throws UserException {
-        return teamChallengeRepository.findAllChallengesByFirstTeamMemberEmailAndStatus(usersService.getLoggedUser().get().getEmail(), status);
+    public List<TeamChallenge> getUserChallengesByStatus(TeamChallenge.Status status) throws UserException {
+        List<TeamChallenge> allChallenges = teamChallengeRepository.findAllChallengesByFirstTeamMemberEmailAndStatus(usersService.getLoggedUser().get().getEmail(), status);
+        allChallenges.addAll(teamChallengeRepository.findAllChallengesBySecondTeamMemberEmailAndStatus(usersService.getLoggedUser().get().getEmail(), status));
+        return allChallenges;
+
     }
 
 }
