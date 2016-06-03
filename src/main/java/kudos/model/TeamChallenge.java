@@ -30,6 +30,10 @@ public class TeamChallenge {
     @ApiObjectField
     private int amount;
     @ApiObjectField
+    private Boolean firstTeamStatus;
+    @ApiObjectField
+    private Boolean secondTeamStatus;
+    @ApiObjectField
     private Status status;
 
     public TeamChallenge(String name, List<TeamMember> firstTeam, List<TeamMember> secondTeam, String description, int amount, Status status) {
@@ -38,6 +42,8 @@ public class TeamChallenge {
         this.secondTeam = secondTeam;
         this.description = description;
         this.amount = amount;
+        this.firstTeamStatus = null;
+        this.secondTeamStatus = null;
         this.status = status;
     }
 
@@ -98,4 +104,19 @@ public class TeamChallenge {
         this.status = status;
     }
 
+    public Boolean getFirstTeamStatus() {
+        return firstTeamStatus;
+    }
+
+    public Boolean getSecondTeamStatus() {
+        return secondTeamStatus;
+    }
+
+    public void setFirstTeamStatus(Boolean firstTeamStatus) {
+        this.firstTeamStatus = firstTeamStatus;
+    }
+
+    public void setSecondTeamStatus(Boolean secondTeamStatus) {
+        this.secondTeamStatus = secondTeamStatus;
+    }
 }

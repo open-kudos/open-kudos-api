@@ -15,17 +15,21 @@ import java.util.*;
 @Service
 public class TeamChallengeService {
 
-    @Autowired
-    private TeamChallengeRepository repository;
-    @Autowired
+    private TeamChallengeRepository teamChallengeRepository;
     private UsersService usersService;
-    @Autowired
     private KudosService kudosService;
+
+    @Autowired
+    public TeamChallengeService(TeamChallengeRepository teamChallengeRepository, UsersService usersService, KudosService kudosService) {
+        this.teamChallengeRepository = teamChallengeRepository;
+        this.usersService = usersService;
+        this.kudosService = kudosService;
+    }
 
     public TeamChallenge createTeamChallenge(String name, List<TeamMember> firstTeam, List<TeamMember> secondTeam, String description, int amount) throws UserException, BusinessException {
 
         TeamChallenge challenge = new TeamChallenge(name, firstTeam, secondTeam, description, amount, TeamChallenge.Status.CREATED);
-        return repository.insert(challenge);
+        return teamChallengeRepository.insert(challenge);
     }
 
     public TeamChallenge accept(TeamChallenge teamChallenge) throws BusinessException, UserException {
@@ -73,6 +77,26 @@ public class TeamChallengeService {
         return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.CANCELED);
     }
 
+    public TeamChallenge accomplish(TeamChallenge teamChallenge) throws BusinessException, UserException {
+        checkNotAccomplishedDeclinedFailedOrCanceled(teamChallenge);
+
+        if (teamChallenge.getFirstTeamStatus() == null) {
+            return setSecondTeamStatusAndSave(teamChallenge, teamChallenge.getSecondTeamStatus());
+        } else if (teamChallenge.getSecondTeamStatus() == null) {
+            return setFirstTeamStatusAndSave(teamChallenge, teamChallenge.getFirstTeamStatus());
+        } else if (teamChallenge.getFirstTeamStatus() == teamChallenge.getSecondTeamStatus()) {
+            teamChallenge.setFirstTeamStatus(null);
+            teamChallenge.setSecondTeamStatus(null);
+            return setBothTeamsStatusAndSave(teamChallenge, teamChallenge.getFirstTeamStatus(), teamChallenge.getSecondTeamStatus());
+        }
+
+        for (TeamMember participant : checkWhoIsWinner(teamChallenge)) {
+            kudosService.takeSystemKudos(usersService.findByEmail(participant.getMemberEmail()).get(), 2 * teamChallenge.getAmount(), teamChallenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
+        }
+
+        return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.ACCOMPLISHED);
+    }
+
     private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
         switch (teamChallenge.getStatus()) {
             case ACCEPTED:
@@ -95,11 +119,37 @@ public class TeamChallengeService {
     }
 
     private TeamChallenge setStatusAndTeamsAndSave(TeamChallenge challenge, TeamChallenge.Status status) {
-        TeamChallenge databaseChallenge = repository.findChallengeById(challenge.getId());
+        TeamChallenge databaseChallenge = teamChallengeRepository.findChallengeById(challenge.getId());
         databaseChallenge.setStatus(status);
         databaseChallenge.setFirstTeam(challenge.getFirstTeam());
         databaseChallenge.setSecondTeam(challenge.getSecondTeam());
-        return repository.save(databaseChallenge);
+        return teamChallengeRepository.save(databaseChallenge);
+    }
+
+    private TeamChallenge setFirstTeamStatusAndSave(TeamChallenge challenge, Boolean status) {
+        TeamChallenge databaseChallenge = teamChallengeRepository.findChallengeById(challenge.getId());
+        databaseChallenge.setFirstTeamStatus(status);
+        return teamChallengeRepository.save(databaseChallenge);
+    }
+
+    private TeamChallenge setSecondTeamStatusAndSave(TeamChallenge challenge, Boolean status) {
+        TeamChallenge databaseChallenge = teamChallengeRepository.findChallengeById(challenge.getId());
+        databaseChallenge.setSecondTeamStatus(status);
+        return teamChallengeRepository.save(databaseChallenge);
+    }
+
+    private TeamChallenge setBothTeamsStatusAndSave (TeamChallenge challenge, Boolean firstTeamStatus, Boolean secondTeamStatus) {
+        TeamChallenge databaseChallenge = teamChallengeRepository.findChallengeById(challenge.getId());
+        databaseChallenge.setFirstTeamStatus(firstTeamStatus);
+        databaseChallenge.setSecondTeamStatus(secondTeamStatus);
+        return teamChallengeRepository.save(databaseChallenge);
+    }
+
+    private List<TeamMember> checkWhoIsWinner(TeamChallenge challenge) {
+        if (challenge.getFirstTeamStatus() && !challenge.getSecondTeamStatus()) {
+            return challenge.getFirstTeam();
+        }
+        return challenge.getSecondTeam();
     }
 
     public boolean areAllTrue(List<TeamMember> participants) {
@@ -111,7 +161,11 @@ public class TeamChallengeService {
     }
 
     public Optional<TeamChallenge> getChallenge(String id) {
-        return Optional.ofNullable(repository.findChallengeById(id));
+        return Optional.ofNullable(teamChallengeRepository.findChallengeById(id));
+    }
+
+    public List<TeamChallenge> getAllUserParticipatedChallengesByStatus(TeamChallenge.Status status) throws UserException {
+        return teamChallengeRepository.findAllChallengesByFirstTeamMemberEmailAndStatus(usersService.getLoggedUser().get().getEmail(), status);
     }
 
 }

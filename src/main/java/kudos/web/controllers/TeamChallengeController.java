@@ -110,7 +110,38 @@ public class TeamChallengeController extends BaseController{
         //TODO: Check if user is a participant of the challenge
         return teamChallengeService.cancel(teamChallenge);
     }
+    @ApiMethod(description = "Gets all challenges that logged user has participated by status")
+    @RequestMapping(value = "/participatedByStatus", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<TeamChallenge> participatedChallengesByStatus(TeamChallenge.Status status) throws UserException {
+        return teamChallengeService.getAllUserParticipatedChallengesByStatus(status);
+    }
 
+    @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody void accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+
+        if(Strings.isNullOrEmpty(id))
+            throw new IdNotSpecifiedException("id.not.specified");
+
+        Optional<TeamChallenge> maybeChallenge = teamChallengeService.getChallenge(id);
+        if(!maybeChallenge.isPresent()){
+            throw new ChallengeException("challenge_not_found");
+        }
+
+        TeamChallenge teamChallenge = maybeChallenge.get();
+
+        for (TeamMember participant : teamChallenge.getFirstTeam()) {
+            if (participant.getMemberEmail().equals(usersService.getLoggedUser().get().getEmail()))
+                teamChallenge.setFirstTeamStatus(status);
+        }
+
+        for (TeamMember participant : teamChallenge.getSecondTeam()) {
+            if (participant.getMemberEmail().equals(usersService.getLoggedUser().get().getEmail()))
+                teamChallenge.setSecondTeamStatus(status);
+        }
+
+        teamChallengeService.accomplish(teamChallenge);
+
+    }
 
 
 }
