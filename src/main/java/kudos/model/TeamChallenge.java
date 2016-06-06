@@ -75,7 +75,6 @@ public class TeamChallenge {
         this.description = description;
     }
 
-
     public void setAmount(int amount) {
         this.amount = amount;
     }

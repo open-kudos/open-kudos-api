@@ -169,7 +169,8 @@ public class TeamChallengeService {
         List<TeamChallenge> allChallenges = teamChallengeRepository.findAllChallengesByFirstTeamMemberEmailAndStatus(usersService.getLoggedUser().get().getEmail(), status);
         allChallenges.addAll(teamChallengeRepository.findAllChallengesBySecondTeamMemberEmailAndStatus(usersService.getLoggedUser().get().getEmail(), status));
         return allChallenges;
-
     }
+
+
 
 }

@@ -15,13 +15,24 @@ public class LoginForm {
     @ApiObjectField
     private String email;
     @ApiObjectField
+    private String domainSuffix;
+    @ApiObjectField
     private String password;
 
     public LoginForm(){}
 
-    public LoginForm(String email, String password) {
+    public LoginForm(String email, String domainSuffix, String password) {
         this.email = email;
+        this.domainSuffix = domainSuffix;
         this.password = password;
+    }
+
+    public void setDomainSuffix(String domainSuffix) {
+        this.domainSuffix = domainSuffix;
+    }
+
+    public String getDomainSuffix() {
+        return domainSuffix;
     }
 
     public String getEmail() {
@@ -42,8 +53,7 @@ public class LoginForm {
 
     public static class LoginFormValidator implements Validator {
 
-        private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
-                "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*";
 
         @Override
         public boolean supports(Class clazz) {
@@ -55,12 +65,17 @@ public class LoginForm {
 
             final LoginForm form = (LoginForm) target;
             final String email = form.getEmail();
+            final String domainSuffix = form.getDomainSuffix();
             final String password = form.getPassword();
 
             if (Strings.isNullOrEmpty(email)) {
                 errors.rejectValue("email", "email_not_specified");
             } else if (!email.matches(EMAIL_PATTERN)) {
                 errors.rejectValue("email", "email_incorrect");
+            }
+
+            if (Strings.isNullOrEmpty(domainSuffix)) {
+                errors.rejectValue("domainSuffix", "domain_suffix_not_specified");
             }
 
             if (Strings.isNullOrEmpty(password)) {

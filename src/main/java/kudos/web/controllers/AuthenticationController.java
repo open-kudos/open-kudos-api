@@ -5,6 +5,7 @@ import kudos.web.beans.form.LoginForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,8 @@ import java.security.Principal;
 @Api(name = "Authentication Controller", description = "Login and logout for a user. For testing purposes use test1@google.lt with password google")
 @Controller
 public class AuthenticationController extends BaseController {
+    @Value("${kudos.domain}")
+    private String domain;
 
     @ApiMethod(description = "Service to log into system")
     @ApiErrors(apierrors = {
@@ -31,7 +34,8 @@ public class AuthenticationController extends BaseController {
             @ApiError(code = "user_already_logged", description = "If user is already logged")})
     @RequestMapping(value = "/login", method = RequestMethod.POST, headers = {"Content-type=application/json"})
     public @ApiResponseObject @ResponseBody User login(@RequestBody LoginForm loginForm, HttpServletRequest request) throws FormValidationException, UserException {
-        return usersService.login(loginForm.getEmail(), loginForm.getPassword(), request);
+
+        return usersService.login(loginForm.getEmail() + domain + loginForm.getDomainSuffix(), loginForm.getPassword(), request);
     }
 
     @ApiMethod(description = "Service to log out of system")
