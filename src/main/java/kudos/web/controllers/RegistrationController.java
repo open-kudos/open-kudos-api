@@ -7,6 +7,7 @@ import kudos.web.beans.form.UserForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,6 +25,8 @@ import java.io.IOException;
 @Api(name = "Registration Controller", description = "Controller fo registering")
 @Controller
 public class RegistrationController extends BaseController {
+    @Value("${kudos.domain}")
+    private String domain;
 
     @ApiMethod(description = "Service to register into system")
     @ApiParams(queryparams = {
@@ -42,11 +45,11 @@ public class RegistrationController extends BaseController {
             @ApiError(code = "password_not_specified", description = "If password is not specified"),
             @ApiError(code = "confirm_password_not_specified", description = "If confirm password is not specified")
     })
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public @ResponseBody User register(@ModelAttribute("form") UserForm userForm, Errors errors)
             throws FormValidationException, MessagingException, UserException, IOException, TemplateException {
-
-        new UserForm.FormValidator().validate(userForm, errors);
+        new UserForm.FormValidator(domain).validate(userForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
         }

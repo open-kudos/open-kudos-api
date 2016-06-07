@@ -2,6 +2,10 @@ package kudos.web.beans.form;
 
 import com.google.common.base.Strings;
 import kudos.model.User;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -62,8 +66,11 @@ public class UserForm {
 
     public static class FormValidator implements Validator {
 
-        private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
-                "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        private String EmailPattern;
+        public FormValidator(String domain) {
+            EmailPattern = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
+                    "@" + domain + "+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        }
 
         @Override
         public boolean supports(Class clazz) {
@@ -82,7 +89,7 @@ public class UserForm {
 
             if (Strings.isNullOrEmpty(form.getEmail())) {
                 errors.rejectValue("email", "email_not_specified");
-            } else if(!form.getEmail().matches(EMAIL_PATTERN)){
+            } else if(!form.getEmail().matches(EmailPattern)){
                 errors.rejectValue("email", "email_incorrect");
             }
 
