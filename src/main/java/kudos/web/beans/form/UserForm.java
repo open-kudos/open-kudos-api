@@ -20,6 +20,17 @@ public class UserForm {
     private String confirmPassword;
     private String email;
 
+    public UserForm() {
+    }
+
+    public UserForm(String firstName, String lastName, String password, String confirmPassword, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.email = email;
+    }
+
     public String getPassword() {
         return password;
     }
