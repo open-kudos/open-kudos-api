@@ -2,7 +2,9 @@ package kudos.services;
 
 import kudos.KudosBusinessStrategy;
 import kudos.model.Transaction;
+import kudos.model.User;
 import kudos.repositories.TransactionRepository;
+import kudos.repositories.UserRepository;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,8 @@ public class TransactionService {
     @Autowired
     private UsersService usersService;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private TransactionRepository repository;
     @Autowired
     private KudosBusinessStrategy strategy;
@@ -39,15 +43,23 @@ public class TransactionService {
     }
 
     public List<Transaction> getNewTransactions(String timestamp) throws UserException{
-        return repository.findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(usersService.getLoggedUser().get().getEmail(), Transaction.Status.COMPLETED, timestamp);
+        User currentUser = usersService.getLoggedUser().get();
+        return repository.findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(currentUser.getEmail(), Transaction.Status.COMPLETED, timestamp);
     }
 
-    public boolean isLastTransactionChanged(String lastTransactionTimestamp){
-        return !lastTransactionTimestamp.equals(repository.findFirstByOrderByTimestampDesc().getTimestamp());
+    public boolean isLastTransactionChanged() throws UserException{
+        User currentUser = usersService.getLoggedUser().get();
+        return !currentUser.getLastSeenTransactionTimestamp().equals(repository.findTransactionByReceiverEmailOrderByTimestampDesc(currentUser.getEmail()).getTimestamp());
     }
 
     public List<Transaction> getTransactionsByEmailAndStatus(String email) {
         return repository.findTransactionsBySenderEmailAndStatus(email, Transaction.Status.COMPLETED);
+    }
+
+    public void setLastSeenTransactionTimestamp(String timestamp) throws UserException{
+        User currentUser = usersService.getLoggedUser().get();
+        currentUser.setLastSeenTransactionTimestamp(timestamp);
+        userRepository.save(currentUser);
     }
 
 }
