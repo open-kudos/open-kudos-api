@@ -44,6 +44,8 @@ public class User {
     protected String location;
     protected String team;
 
+    protected String lastSeenTransactionTimestamp;
+
     public User(String firstName, String lastName, String password, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -56,9 +58,7 @@ public class User {
         this.email = email;
     }
 
-    private User() {
-
-    }
+    public User() {}
 
     public User getUpdatedUser(MyProfileForm myProfileForm) throws MessagingException, IOException, TemplateException {
         String newEmail = myProfileForm.getEmail();
@@ -165,6 +165,14 @@ public class User {
 
     public void setEmailHash(String emailHash) {
         this.emailHash = emailHash;
+    }
+
+    public String getLastSeenTransactionTimestamp() {
+        return lastSeenTransactionTimestamp;
+    }
+
+    public void setLastSeenTransactionTimestamp(String lastSeenTransactionTimestamp) {
+        this.lastSeenTransactionTimestamp = lastSeenTransactionTimestamp;
     }
 
     private boolean isUserCompleted() {

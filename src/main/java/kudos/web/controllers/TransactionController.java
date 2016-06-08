@@ -25,8 +25,8 @@ public class TransactionController extends BaseController {
     public
     @ApiResponseObject
     @ResponseBody
-    boolean kudosTransferChanged(String lastTransactionTimestamp) throws UserException {
-        return lastTransactionTimestamp != null && transactionService.isLastTransactionChanged(lastTransactionTimestamp);
+    boolean kudosTransferChanged() throws UserException {
+        return transactionService.isLastTransactionChanged();
     }
 
     @ApiMethod(description = "Service to get paged transactions by status." + "<p> status=status&page=0&pageSize=1 <p>")
@@ -43,8 +43,28 @@ public class TransactionController extends BaseController {
     public
     @ApiResponseObject
     @ResponseBody
-    List<Transaction> listOfNewTransactions(String timestamp) throws UserException {
-        return transactionService.getNewTransactions(timestamp);
+    List<Transaction> listOfNewTransactions() throws UserException {
+        return transactionService.getNewTransactions(usersService.getLoggedUser().get().getLastSeenTransactionTimestamp());
     }
+
+    @ApiMethod(description = "Service to set new transactions timestamp for notifications")
+    @RequestMapping(value = "/timestamp", method = RequestMethod.POST)
+    public
+    @ApiResponseObject
+    @ResponseBody
+    void setLastSeenTransaction(String timestamp) throws UserException {
+         transactionService.setLastSeenTransactionTimestamp(timestamp);
+    }
+
+    @ApiMethod(description = "Service to set new transactions timestamp for notifications")
+    @RequestMapping(value = "/testTime", method = RequestMethod.GET)
+    public
+    @ApiResponseObject
+    @ResponseBody
+    String getLastSeenTransaction() throws UserException {
+        return usersService.getLoggedUser().get().getLastSeenTransactionTimestamp();
+    }
+
+
 
 }
