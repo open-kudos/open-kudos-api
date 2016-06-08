@@ -104,6 +104,7 @@ public class UsersService {
         loginValidation(email.toLowerCase(), password);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email.toLowerCase(), password)));
+        request.getSession().setMaxInactiveInterval(0);
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
         return findByEmail(email.toLowerCase()).get();
     }
