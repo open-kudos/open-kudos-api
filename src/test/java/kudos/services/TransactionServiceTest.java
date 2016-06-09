@@ -60,7 +60,7 @@ public class TransactionServiceTest {
     @Test
     public void testIfServiceFindsLastChangedTransaction() throws TransactionException, UserException{
         when(transactionRepository.findTransactionsBySenderEmail(any(String.class))).thenReturn(transactions);
-        assertEquals(false, transactionService.isLastTransactionChanged());
+        assertEquals(false, transactionService.isLastTransactionChanged(""));
     }
 
 

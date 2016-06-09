@@ -65,6 +65,4 @@ public class TransactionController extends BaseController {
         return usersService.getLoggedUser().get().getLastSeenTransactionTimestamp();
     }
 
-
-
 }
