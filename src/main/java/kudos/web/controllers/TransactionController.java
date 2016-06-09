@@ -25,8 +25,8 @@ public class TransactionController extends BaseController {
     public
     @ApiResponseObject
     @ResponseBody
-    boolean kudosTransferChanged() throws UserException {
-        return transactionService.isLastTransactionChanged();
+    boolean kudosTransferChanged(String lastTransactionTimestamp) throws UserException {
+        return transactionService.isLastTransactionChanged(lastTransactionTimestamp);
     }
 
     @ApiMethod(description = "Service to get paged transactions by status." + "<p> status=status&page=0&pageSize=1 <p>")

@@ -63,4 +63,5 @@ public class TransactionServiceTest {
         assertEquals(false, transactionService.isLastTransactionChanged());
     }
 
+
 }
