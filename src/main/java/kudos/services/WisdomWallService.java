@@ -21,8 +21,7 @@ public class WisdomWallService {
 
     public Idea addIdeaToWisdomWall(String author, String idea) throws UserException {
         User postedBy = usersService.getLoggedUser().get();
-        Idea newIdea = new Idea(author, postedBy.getEmail(), idea);
-        return repository.insert(newIdea);
+        return repository.insert(new Idea(author, postedBy.getEmail(), idea));
     }
 
     /**
