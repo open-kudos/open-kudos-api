@@ -13,7 +13,7 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     Transaction findTransactionByReceiverEmailOrderByTimestampDesc(String receiverEmail);
 
-    //Transaction findByReceiverEmailByOrderByTimestampDesc(String receiverEmail);
+    Transaction findFirstByOrderByTimestampDesc();
 
     List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
 

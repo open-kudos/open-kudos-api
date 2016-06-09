@@ -47,9 +47,8 @@ public class TransactionService {
         return repository.findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(currentUser.getEmail(), Transaction.Status.COMPLETED, timestamp);
     }
 
-    public boolean isLastTransactionChanged() throws UserException{
-        User currentUser = usersService.getLoggedUser().get();
-        return !currentUser.getLastSeenTransactionTimestamp().equals(repository.findTransactionByReceiverEmailOrderByTimestampDesc(currentUser.getEmail()).getTimestamp());
+    public boolean isLastTransactionChanged(String lastTransactionTimestamp){
+        return !lastTransactionTimestamp.equals(repository.findFirstByOrderByTimestampDesc().getTimestamp());
     }
 
     public List<Transaction> getTransactionsByEmailAndStatus(String email) {
