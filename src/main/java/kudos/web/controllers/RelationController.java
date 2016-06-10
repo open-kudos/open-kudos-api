@@ -60,30 +60,27 @@ public class RelationController extends BaseController {
             @ApiError(code = "relation_not_exist", description = "If relationship which is wanted to be discontinued does not exist")
     })
     @RequestMapping(value = "/remove", method = RequestMethod.GET)
-    public void removeRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
-        if(Strings.isNullOrEmpty(email)){
-            throw new IdNotSpecifiedException("email_not_specified");
-        }
+    public void removeRelation(String email) throws UserException, RelationException {
+
+        if(Strings.isNullOrEmpty(email)) throw new RelationException("email_not_specified");
+
         Optional<User> maybeUser = usersService.findByEmail(email);
-        if(!maybeUser.isPresent()){
-            throw new UserException("user_not_exist");
-        }
-        User user = maybeUser.get();
-        User follower = usersService.getLoggedUser().get();
-        relationService.removeRelation(new Relation(follower.getEmail(),follower.getFirstName(),follower.getLastName(),
-                user.getEmail(),user.getFirstName(),user.getLastName()));
+        if(!maybeUser.isPresent()) throw new UserException("user_not_exist");
+
+        relationService.removeRelation(email);
     }
 
     @ApiMethod(description = "service to get all emails of users that follows logged user")
     @RequestMapping(value = "/followers", method = RequestMethod.GET)
-    public @ResponseBody List<String> getFollowers() throws UserException {
+    public @ResponseBody List<Relation> getFollowers() throws UserException {
         return relationService.getAllFollowers();
     }
 
     @ApiMethod(description = "service to get all email of users that are followed by logged user")
     @RequestMapping(value = "/followed", method = RequestMethod.GET)
-    public @ResponseBody List<String> getFollowed() throws UserException {
+    public @ResponseBody List<Relation> getFollowed() throws UserException {
         return relationService.getAllFollowedUsers();
     }
+
 
 }

@@ -3,6 +3,7 @@ package kudos.services;
 import kudos.exceptions.TransactionException;
 import kudos.model.Transaction;
 import kudos.repositories.TransactionRepository;
+import kudos.web.exceptions.UserException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,4 +56,12 @@ public class TransactionServiceTest {
         when(transactionRepository.findTransactionsBySenderEmail(any(String.class))).thenReturn(transactions);
         assertEquals("test@test.lt", transactionRepository.findTransactionsBySenderEmail("").get(0).getSenderEmail());
     }
+
+    @Test
+    public void testIfServiceFindsLastChangedTransaction() throws TransactionException, UserException{
+        when(transactionRepository.findTransactionsBySenderEmail(any(String.class))).thenReturn(transactions);
+        assertEquals(false, transactionService.isLastTransactionChanged(""));
+    }
+
+
 }

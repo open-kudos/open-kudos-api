@@ -96,7 +96,6 @@ public class ChallengeService {
             setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
             return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
         }
-        System.out.println(checkWhoIsWinner(challenge));
 
         kudosService.takeSystemKudos(usersService.findByEmail(checkWhoIsWinner(challenge)).get(), 2 * challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
