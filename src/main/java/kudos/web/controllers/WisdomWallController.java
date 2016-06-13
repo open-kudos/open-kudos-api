@@ -25,7 +25,7 @@ import java.util.Map;
 @RequestMapping("/wisdomwall")
 public class WisdomWallController extends BaseController {
 
-    @Value("${kudos.maxAuthorNameLength}")
+    @Value("${kudos.maxNameLength}")
     private String maxAuthorNameLength;
     @Value("${kudos.maxIdeaLength}")
     private String maxIdeaLength;
@@ -34,8 +34,6 @@ public class WisdomWallController extends BaseController {
     public @ApiResponseObject
     @ResponseBody Idea addIdea(WisdomWallForm wisdomWallForm, Errors errors) throws UserException, FormValidationException {
         new WisdomWallForm.WisdomWallFormValidator(maxAuthorNameLength, maxIdeaLength).validate(wisdomWallForm, errors);
-        System.out.println(maxAuthorNameLength);
-        System.out.println(maxIdeaLength);
         if (errors.hasErrors())
             throw new FormValidationException(errors);
 
