@@ -27,6 +27,14 @@ public class WisdomWallForm {
 
     public static class WisdomWallFormValidator implements Validator {
 
+        private int maxAuthorNameLength;
+        private int maxIdeaLength;
+
+        public WisdomWallFormValidator(String maxAuthorNameLength, String maxIdeaLength) {
+            this.maxAuthorNameLength = Integer.parseInt(maxAuthorNameLength);
+            this.maxIdeaLength = Integer.parseInt(maxIdeaLength);
+        }
+
         @Override
         public boolean supports(Class<?> clazz) {
             return false;
@@ -40,6 +48,14 @@ public class WisdomWallForm {
 
             if (Strings.isNullOrEmpty(authorName)) {
                 errors.rejectValue("authorName", "author_name_not_specified");
+            }
+
+            if (authorName.length() > maxAuthorNameLength) {
+                errors.rejectValue("authorName", "author_name_too_long");
+            }
+
+            if (form.getIdea().length() > maxIdeaLength) {
+                errors.rejectValue("idea", "idea_too_long");
             }
 
             if (Strings.isNullOrEmpty(form.getIdea())) {
