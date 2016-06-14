@@ -156,6 +156,12 @@ public class MyProfileForm {
 
     public static class MyProfileValidator implements Validator{
 
+        private int maxNameLength;
+
+        public MyProfileValidator(String maxNameLength) {
+            this.maxNameLength = Integer.parseInt(maxNameLength);
+        }
+
         private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
                 "@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
        private static final String PHONE_PATTERN = "([+]\\d+)";
@@ -186,9 +192,15 @@ public class MyProfileForm {
                 } else if(!newPassword.equals(newPasswordConfirm)){
                     errors.rejectValue("newPasswordConfirm","no_new_password_match");
                 }
-
             }
 
+            if (form.getFirstName().length() > maxNameLength) {
+                errors.rejectValue("first_name", "first_name_too_long");
+            }
+
+            if (form.getLastName().length() > maxNameLength) {
+                errors.rejectValue("last_name", "last_name_too_long");
+            }
         }
 
         public boolean isEnteredDateValid(String text) {

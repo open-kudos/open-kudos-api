@@ -8,6 +8,7 @@ import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,18 +19,22 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Api(name = "Wisdom Wall Controller", description = "Controller for managing wisdom wall")
 @Controller
 @RequestMapping("/wisdomwall")
 public class WisdomWallController extends BaseController {
 
+    @Value("${kudos.maxNameLength}")
+    private String maxAuthorNameLength;
+    @Value("${kudos.maxIdeaLength}")
+    private String maxIdeaLength;
     @ApiMethod(description = "Service to add idea to wisdom wall")
     @RequestMapping(value = "/addidea", method = RequestMethod.POST)
     public @ApiResponseObject
     @ResponseBody Idea addIdea(WisdomWallForm wisdomWallForm, Errors errors) throws UserException, FormValidationException {
-        new WisdomWallForm.WisdomWallFormValidator().validate(wisdomWallForm, errors);
-
+        new WisdomWallForm.WisdomWallFormValidator(maxAuthorNameLength, maxIdeaLength).validate(wisdomWallForm, errors);
         if (errors.hasErrors())
             throw new FormValidationException(errors);
 
@@ -47,6 +52,16 @@ public class WisdomWallController extends BaseController {
             }
         }
         return allIdeas;
+    }
+
+    @ApiMethod(description = "Service to get random idea from the list")
+    @RequestMapping(value = "/randomIdea", method = RequestMethod.GET)
+    public @ApiResponseObject
+    @ResponseBody Idea getRandomIdea() {
+        List<Idea> ideas = getAllIdeas();
+        Random randomGenerator = new Random();
+        int index = randomGenerator.nextInt(ideas.size());
+        return ideas.get(index);
     }
 
 }

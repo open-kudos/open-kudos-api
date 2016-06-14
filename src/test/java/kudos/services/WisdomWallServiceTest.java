@@ -39,9 +39,8 @@ public class WisdomWallServiceTest {
     @Test
     public void testIfServiceAddsIdeaToWisdomWall() throws UserException {
         testIdea = new Idea("author", "test@test.com", "idea");
-        when(wisdomWallService.addIdeaToWisdomWall("author", "idea")).thenReturn(testIdea);
-        assertEquals(wisdomWallService.addIdeaToWisdomWall("author", "idea"), testIdea);
-
+        when(wisdomWallService.addIdeaToWisdomWall(any(String.class), any(String.class))).thenReturn(testIdea);
+        assertEquals(wisdomWallService.addIdeaToWisdomWall(any(String.class), any(String.class)), testIdea);
     }
 
     @Test
