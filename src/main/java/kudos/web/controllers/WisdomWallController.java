@@ -19,6 +19,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Api(name = "Wisdom Wall Controller", description = "Controller for managing wisdom wall")
 @Controller
@@ -51,6 +52,16 @@ public class WisdomWallController extends BaseController {
             }
         }
         return allIdeas;
+    }
+
+    @ApiMethod(description = "Service to get random idea from the list")
+    @RequestMapping(value = "/randomIdea", method = RequestMethod.GET)
+    public @ApiResponseObject
+    @ResponseBody Idea getRandomIdea() {
+        List<Idea> ideas = getAllIdeas();
+        Random randomGenerator = new Random();
+        int index = randomGenerator.nextInt(ideas.size());
+        return ideas.get(index);
     }
 
 }
