@@ -13,11 +13,13 @@ public class Idea {
     private String authorName;
     private String postedByEmail;
     private String idea;
+    private String creationDate;
 
-    public Idea(String authorName, String postedByEmail, String idea) {
+    public Idea(String authorName, String postedByEmail, String idea, String creationDate) {
         this.authorName = authorName;
         this.postedByEmail = postedByEmail;
         this.idea = idea;
+        this.creationDate = creationDate;
     }
 
     public String getAuthorName() {
@@ -32,4 +34,11 @@ public class Idea {
         return idea;
     }
 
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
 }
