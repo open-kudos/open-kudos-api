@@ -3,6 +3,7 @@ package kudos.services;
 import kudos.model.Idea;
 import kudos.repositories.WisdomWallRepository;
 import kudos.web.exceptions.UserException;
+import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.annotation.Id;
@@ -25,9 +26,9 @@ public class WisdomWallServiceTest {
     private WisdomWallRepository wisdomWallRepository;
     private static List<Idea> ideas = new ArrayList<>();
     static {
-        ideas.add(new Idea("author1", "postedBy1@test.lt", "idea1"));
-        ideas.add(new Idea("author2", "postedBy2@test.lt", "idea2"));
-        ideas.add(new Idea("author3", "postedBy3@test.lt", "idea3"));
+        ideas.add(new Idea("author1", "postedBy1@test.lt", "idea1", LocalDateTime.now().toString()));
+        ideas.add(new Idea("author2", "postedBy2@test.lt", "idea2", LocalDateTime.now().toString()));
+        ideas.add(new Idea("author3", "postedBy3@test.lt", "idea3", LocalDateTime.now().toString()));
     }
 
     @Before
@@ -38,10 +39,9 @@ public class WisdomWallServiceTest {
 
     @Test
     public void testIfServiceAddsIdeaToWisdomWall() throws UserException {
-        testIdea = new Idea("author", "test@test.com", "idea");
-        when(wisdomWallService.addIdeaToWisdomWall("author", "idea")).thenReturn(testIdea);
-        assertEquals(wisdomWallService.addIdeaToWisdomWall("author", "idea"), testIdea);
-
+        testIdea = new Idea("author", "test@test.com", "idea", LocalDateTime.now().toString());
+        when(wisdomWallService.addIdeaToWisdomWall(any(String.class), any(String.class))).thenReturn(testIdea);
+        assertEquals(wisdomWallService.addIdeaToWisdomWall(any(String.class), any(String.class)), testIdea);
     }
 
     @Test

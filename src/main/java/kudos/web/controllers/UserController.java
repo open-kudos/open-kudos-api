@@ -8,6 +8,7 @@ import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +45,8 @@ public class UserController extends BaseController {
         return usersService.getCompletedUser();
     }
 
+    @Value("${kudos.maxNameLength}")
+    private String maxNameLength;
     @ApiMethod(description = "Service to complete user profile")
     @ApiParams(queryparams = {
             @ApiQueryParam(name = "email", required = false, description = "New email, for testing use newEM@gmail.com"),
@@ -79,7 +82,7 @@ public class UserController extends BaseController {
     public @ResponseBody User updateUserProfile(MyProfileForm myProfileForm, Errors errors)
             throws FormValidationException, UserException, MessagingException, IOException, TemplateException {
 
-        new MyProfileForm.MyProfileValidator().validate(myProfileForm, errors);
+        new MyProfileForm.MyProfileValidator(maxNameLength).validate(myProfileForm, errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
         }

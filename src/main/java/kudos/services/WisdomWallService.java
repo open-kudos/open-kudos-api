@@ -5,7 +5,10 @@ import kudos.model.Idea;
 import kudos.model.User;
 import kudos.repositories.WisdomWallRepository;
 import kudos.web.exceptions.UserException;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,9 +22,14 @@ public class WisdomWallService {
     @Autowired
     private UsersService usersService;
 
+    @Autowired
+    @Qualifier(value = "DBTimeFormatter")
+    DateTimeFormatter dateTimeFormatter;
+
+
     public Idea addIdeaToWisdomWall(String author, String idea) throws UserException {
         User postedBy = usersService.getLoggedUser().get();
-        return repository.insert(new Idea(author, postedBy.getEmail(), idea));
+        return repository.insert(new Idea(author, postedBy.getEmail(), idea, LocalDateTime.now().toString(dateTimeFormatter)));
     }
 
     /**
@@ -30,6 +38,10 @@ public class WisdomWallService {
      */
     public List<Idea> getIdeasByPostedBy(String postedBy) {
         return repository.findIdeasByPostedByEmail(postedBy);
+    }
+
+    public Idea updateIdeaCreationTime(Idea idea) {
+        return repository.save(idea);
     }
 
 }

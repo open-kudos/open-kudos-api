@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -44,7 +46,13 @@ public class TransactionService {
 
     public List<Transaction> getNewTransactions(String timestamp) throws UserException{
         User currentUser = usersService.getLoggedUser().get();
-        return repository.findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(currentUser.getEmail(), Transaction.Status.COMPLETED, timestamp);
+        if(timestamp == null){
+            setLastSeenTransactionTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS")));
+        }
+        return repository.findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(
+                currentUser.getEmail(),
+                Transaction.Status.COMPLETED,
+                timestamp);
     }
 
     public boolean isLastTransactionChanged(String lastTransactionTimestamp){
