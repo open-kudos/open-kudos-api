@@ -84,5 +84,24 @@ public class KudosController extends BaseController {
         return kudosService.getKudos(usersService.getLoggedUser().get());
     }
 
+    @ApiMethod(description = "Service to get remaining kudos amount")
+    @RequestMapping(value = "/remaining-hack", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody UserKudos remainingKudos(Principal principal) throws UserException {
+        return new UserKudos(kudosService.getFreeKudos(usersService.getLoggedUser().get()),
+                kudosService.getKudos(usersService.getLoggedUser().get()));
+    }
+
+    // HACK FOR HACKATON
+
+    public class UserKudos{
+        int userRemainingKudos;
+        int userReceivedKudos;
+
+        public UserKudos(int userRemainingKudos, int userReceivedKudos) {
+            this.userRemainingKudos = userRemainingKudos;
+            this.userReceivedKudos = userReceivedKudos;
+        }
+    }
+
 
 }
