@@ -3,6 +3,7 @@ package kudos.web.controllers;
 import kudos.exceptions.BusinessException;
 import kudos.model.Transaction;
 import kudos.model.User;
+import kudos.model.UserKudos;
 import kudos.web.beans.form.KudosTransferForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
@@ -87,21 +88,8 @@ public class KudosController extends BaseController {
     @ApiMethod(description = "Service to get remaining kudos amount")
     @RequestMapping(value = "/remaining-hack", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody UserKudos remainingKudos(Principal principal) throws UserException {
-        return new UserKudos(kudosService.getFreeKudos(usersService.getLoggedUser().get()),
+        UserKudos userKudos = new UserKudos(kudosService.getFreeKudos(usersService.getLoggedUser().get()),
                 kudosService.getKudos(usersService.getLoggedUser().get()));
+        return userKudos;
     }
-
-    // HACK FOR HACKATON
-
-    public class UserKudos{
-        int userRemainingKudos;
-        int userReceivedKudos;
-
-        public UserKudos(int userRemainingKudos, int userReceivedKudos) {
-            this.userRemainingKudos = userRemainingKudos;
-            this.userReceivedKudos = userReceivedKudos;
-        }
-    }
-
-
 }
