@@ -1,13 +1,18 @@
 package kudos.web.controllers;
 
+import com.google.common.base.Strings;
 import kudos.model.Idea;
 import kudos.model.User;
 import kudos.web.beans.form.WisdomWallForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormatter;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiResponseObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -16,15 +21,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Api(name = "Wisdom Wall Controller", description = "Controller for managing wisdom wall")
 @Controller
 @RequestMapping("/wisdomwall")
 public class WisdomWallController extends BaseController {
+
+    @Autowired
+    @Qualifier(value = "DBTimeFormatter")
+    DateTimeFormatter dateTimeFormatter;
 
     @Value("${kudos.maxNameLength}")
     private String maxAuthorNameLength;
@@ -44,11 +52,18 @@ public class WisdomWallController extends BaseController {
     @ApiMethod(description = "Service to get all posted ideas")
     @RequestMapping(value = "/getideas", method = RequestMethod.GET)
     public @ApiResponseObject
-    @ResponseBody List<Idea> getAllIdeas() {
+    @ResponseBody List<Idea> getAllIdeas() throws ParseException {
         List<Idea> allIdeas = new ArrayList<>();
         for (User user : usersService.getAllConfirmedUsers()) {
             for (Idea idea : wisdomWallService.getIdeasByPostedBy(user.getEmail())){
-                allIdeas.add(idea);
+
+                if (Strings.isNullOrEmpty(idea.getCreationDate())) {
+                    idea.setCreationDate(LocalDateTime.now().toString(dateTimeFormatter));
+                    wisdomWallService.updateIdeaCreationTime(idea);
+                }
+
+                if (dateTimeFormatter.parseLocalDateTime(idea.getCreationDate()).plusDays(90).isAfter(LocalDateTime.now()))
+                    allIdeas.add(idea);
             }
         }
         return allIdeas;
@@ -57,11 +72,14 @@ public class WisdomWallController extends BaseController {
     @ApiMethod(description = "Service to get random idea from the list")
     @RequestMapping(value = "/randomIdea", method = RequestMethod.GET)
     public @ApiResponseObject
-    @ResponseBody Idea getRandomIdea() {
+    @ResponseBody Idea getRandomIdea() throws ParseException {
         List<Idea> ideas = getAllIdeas();
         Random randomGenerator = new Random();
-        int index = randomGenerator.nextInt(ideas.size());
-        return ideas.get(index);
+        if (ideas.size() > 0) {
+            int index = randomGenerator.nextInt(ideas.size());
+            return ideas.get(index);
+        }
+        return new Idea("", "", "", "");
     }
 
 }
