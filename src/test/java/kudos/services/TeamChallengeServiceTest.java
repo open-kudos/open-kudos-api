@@ -41,9 +41,6 @@ public class TeamChallengeServiceTest {
 
     @Test
     public void testIfServiceCreatesTeamChallenge() throws BusinessException, UserException {
-        //TeamChallenge teamChallenge = new TeamChallenge("name", team1, team2, "description", 1, TeamChallenge.Status.CREATED);
-        //when(teamChallengeRepository.insert(mockedChallenge)).thenReturn(mockedChallenge);
-        //when(teamChallengeService.createTeamChallenge(any(String.class), anyList(), anyList(), any(String.class), any(Integer.class))).thenReturn(teamChallenge);
-        //assertEquals(teamChallengeService.createTeamChallenge(any(String.class), anyList(), anyList(), any(String.class), any(Integer.class)), teamChallenge);
+
     }
 }

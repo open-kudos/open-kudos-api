@@ -1,5 +1,6 @@
 package kudos.services;
 
+import freemarker.template.TemplateException;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.exceptions.UserException;
@@ -11,10 +12,14 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.authentication.AuthenticationManager;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,10 +64,23 @@ public class UsersServiceTest {
         assertEquals(mockedUser, usersService.findByEmail("").get());
     }
 
+    @Test
+    public void testIfUsersServiceReturnsKudosMaster() throws UserException {
+        assertEquals("master@of.kudos", usersService.getKudosMaster().getEmail());
+    }
+
+    @Test
+    public void testIfSaveMethodSavesNewUser() throws UserException, MessagingException, IOException, TemplateException {
+        when(userRepository.save(mockedUser)).thenReturn(mockedUser);
+        assertEquals(userRepository.save(mockedUser), mockedUser);
+    }
+
 //    @Test
 //    public void testUserFilter(){
 //        when(userRepository.searchAllFields(any(String.class))).thenReturn(users);
 //        List<User> result = usersService.list("aaa@aaa.com");
+//        for (User res : result)
+//        System.out.println(res.getEmail());
 //        assertTrue(result.size() == 2);
 //    }
 //
