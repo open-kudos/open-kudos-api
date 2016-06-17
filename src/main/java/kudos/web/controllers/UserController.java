@@ -106,11 +106,11 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Gets top kudos receivers")
     @RequestMapping(value = "/topreceivers", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody Map<String, Integer> getTopReceivers() throws UserException {
-        Map<String, Integer> topReceivers = new HashMap<>();
+    public @ApiResponseObject @ResponseBody Map<User, Integer> getTopReceivers() throws UserException {
+        Map<User, Integer> topReceivers = new HashMap<>();
         for (User user : usersService.getAllConfirmedUsers()) {
             int incomingKudos = kudosService.getKudos(user);
-            topReceivers.put(user.getFirstName() + " " + user.getLastName(), incomingKudos);
+            topReceivers.put(user, incomingKudos);
         }
 
         return topReceivers.entrySet().stream()
@@ -121,15 +121,15 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Gets top kudos senders")
     @RequestMapping(value = "/topsenders", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody Map<String, Integer> getTopSenders() throws UserException {
-        Map<String, Integer> topSenders = new HashMap<>();
+    public @ApiResponseObject @ResponseBody Map<User, Integer> getTopSenders() throws UserException {
+        Map<User, Integer> topSenders = new HashMap<>();
         int outgoingKudos;
         for (User user : usersService.getAllConfirmedUsers()) {
             outgoingKudos = 0;
             for (Transaction transaction : transactionService.getTransactionsByEmailAndStatus(user.getEmail())) {
                 outgoingKudos += transaction.getAmount();
             }
-            topSenders.put(user.getFirstName() + " " + user.getLastName(), outgoingKudos);
+            topSenders.put(user, outgoingKudos);
         }
 
         return topSenders.entrySet().stream()

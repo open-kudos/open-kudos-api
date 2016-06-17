@@ -1,6 +1,7 @@
 package kudos.services;
 
 import freemarker.template.TemplateException;
+import junit.framework.Assert;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.exceptions.UserException;
@@ -75,12 +76,16 @@ public class UsersServiceTest {
         assertEquals(userRepository.save(mockedUser), mockedUser);
     }
 
+    @Test
+    public void testIfServiceReturnsAllConfirmedUsers() {
+        assertEquals(userRepository.findUsersByIsConfirmed(true), usersService.getAllConfirmedUsers());
+    }
+
 //    @Test
 //    public void testUserFilter(){
 //        when(userRepository.searchAllFields(any(String.class))).thenReturn(users);
 //        List<User> result = usersService.list("aaa@aaa.com");
 //        for (User res : result)
-//        System.out.println(res.getEmail());
 //        assertTrue(result.size() == 2);
 //    }
 //
