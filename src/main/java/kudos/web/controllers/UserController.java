@@ -118,7 +118,7 @@ public class UserController extends BaseController {
             );
         }
         Collections.sort(topReceivers, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
-        return topReceivers;
+        return topReceivers.subList(0, 5);
     }
 
     @ApiMethod(description = "Gets top kudos senders")
@@ -139,7 +139,7 @@ public class UserController extends BaseController {
             );
         }
         Collections.sort(topSenders, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
-        return topSenders;
+        return topSenders.subList(0, 5);
     }
     
 }
