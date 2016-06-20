@@ -3,6 +3,7 @@ package kudos.web.controllers;
 import kudos.exceptions.BusinessException;
 import kudos.model.Transaction;
 import kudos.model.User;
+import kudos.model.UserKudos;
 import kudos.web.beans.form.KudosTransferForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
@@ -84,5 +85,11 @@ public class KudosController extends BaseController {
         return kudosService.getKudos(usersService.getLoggedUser().get());
     }
 
-
+    @ApiMethod(description = "Service to get remaining kudos amount")
+    @RequestMapping(value = "/remaining-hack", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody UserKudos remainingKudos(Principal principal) throws UserException {
+        UserKudos userKudos = new UserKudos(kudosService.getFreeKudos(usersService.getLoggedUser().get()),
+                kudosService.getKudos(usersService.getLoggedUser().get()));
+        return userKudos;
+    }
 }
