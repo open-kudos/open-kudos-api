@@ -1,6 +1,7 @@
 package kudos.web.controllers;
 
 import freemarker.template.TemplateException;
+import kudos.model.LeaderboardUser;
 import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.web.beans.form.MyProfileForm;
@@ -106,36 +107,39 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Gets top kudos receivers")
     @RequestMapping(value = "/topreceivers", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody Map<User, Integer> getTopReceivers() throws UserException {
-        Map<User, Integer> topReceivers = new HashMap<>();
+    public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopReceivers() throws UserException {
+        List<LeaderboardUser> topReceivers = new ArrayList<>();
         for (User user : usersService.getAllConfirmedUsers()) {
-            int incomingKudos = kudosService.getKudos(user);
-            topReceivers.put(user, incomingKudos);
+            topReceivers.add(
+                    new LeaderboardUser(user.getFirstName(),
+                            user.getLastName(),
+                            user.getEmail(),
+                            kudosService.getKudos(user))
+            );
         }
-
-        return topReceivers.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (e1, e2) -> e2, LinkedHashMap::new));
+        Collections.sort(topReceivers, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
+        return topReceivers;
     }
 
     @ApiMethod(description = "Gets top kudos senders")
     @RequestMapping(value = "/topsenders", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody Map<User, Integer> getTopSenders() throws UserException {
-        Map<User, Integer> topSenders = new HashMap<>();
+    public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopSenders() throws UserException {
+        List<LeaderboardUser> topSenders = new ArrayList<>();
         int outgoingKudos;
         for (User user : usersService.getAllConfirmedUsers()) {
             outgoingKudos = 0;
             for (Transaction transaction : transactionService.getTransactionsByEmailAndStatus(user.getEmail())) {
                 outgoingKudos += transaction.getAmount();
             }
-            topSenders.put(user, outgoingKudos);
+            topSenders.add(
+                    new LeaderboardUser(user.getFirstName(),
+                            user.getLastName(),
+                            user.getEmail(),
+                            outgoingKudos)
+            );
         }
-
-        return topSenders.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (e1, e2) -> e2, LinkedHashMap::new));
+        Collections.sort(topSenders, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
+        return topSenders;
     }
     
 }
