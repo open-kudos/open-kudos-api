@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,6 +124,19 @@ public class ChallengeController extends BaseController {
     @RequestMapping(value = "/participatedByStatusPageable", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> participatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
         return challengeService.getAllUserParticipatedChallengesByStatusPageable(status, page, pageSize);
+    }
+
+    @ApiMethod(description = "Gets all challenges that logged user has completed")
+    @RequestMapping(value = "/completedChallenges", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> completedChallenges() throws UserException {
+        List<Challenge> completedChallenges = new ArrayList<>();
+
+        completedChallenges.addAll(challengeService.getAllLoggedUserAccomplishedChallenges());
+        completedChallenges.addAll(challengeService.getAllLoggedUserCanceledChallenges());
+        completedChallenges.addAll(challengeService.getAllLoggedUserDeclinedChallenges());
+        completedChallenges.addAll(challengeService.getAllLoggedUserFailedChallenges());
+
+        return completedChallenges;
     }
 /*
     @ApiMethod(description = "Gets all challenges that logged user has referred")

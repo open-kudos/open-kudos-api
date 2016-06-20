@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.jws.soap.SOAPBinding;
 import java.util.List;
 import java.util.Optional;
 
@@ -133,6 +134,22 @@ public class ChallengeService {
 
     public List<Challenge> getAllCreatedChallenges() {
         return challengeRepository.findAllChallengesByStatus(Challenge.Status.CREATED);
+    }
+
+    public List<Challenge> getAllLoggedUserDeclinedChallenges() throws UserException {
+        return challengeRepository.findAllChallengesByCreatorOrParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), usersService.getLoggedUser().get().getEmail(),  Challenge.Status.DECLINED);
+    }
+
+    public List<Challenge> getAllLoggedUserAccomplishedChallenges() throws UserException {
+        return challengeRepository.findAllChallengesByCreatorOrParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), usersService.getLoggedUser().get().getEmail(),  Challenge.Status.ACCOMPLISHED);
+    }
+
+    public List<Challenge> getAllLoggedUserFailedChallenges() throws UserException {
+        return challengeRepository.findAllChallengesByCreatorOrParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), usersService.getLoggedUser().get().getEmail(),  Challenge.Status.FAILED);
+    }
+
+    public List<Challenge> getAllLoggedUserCanceledChallenges() throws UserException {
+        return challengeRepository.findAllChallengesByCreatorOrParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), usersService.getLoggedUser().get().getEmail(),  Challenge.Status.CANCELED);
     }
 
     private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(Challenge challenge) throws InvalidChallengeStatusException {

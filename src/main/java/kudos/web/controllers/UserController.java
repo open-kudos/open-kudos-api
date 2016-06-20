@@ -115,8 +115,7 @@ public class UserController extends BaseController {
                             user.getLastName(),
                             user.getEmail(),
                             kudosService.getKudos(user))
-            );
-        }
+            ); }
         Collections.sort(topReceivers, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
         return topReceivers.subList(0, 5);
     }
