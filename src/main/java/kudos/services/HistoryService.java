@@ -43,12 +43,16 @@ public class HistoryService {
         return transactionRepository.findTransactionByStatusOrderByTimestampDesc(status, new PageRequest(page, pageSize));
     }
 
-    public List<History> getPageableUserHistoryByEmail(String userEmail){
+    public List<History> getPageableUserHistoryByEmail(String userEmail, int startingIndex, int endingIndex){
         List<History> historyList = transactionRepository.findTransactionsByReceiverEmailAndStatus(userEmail, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
         historyList.addAll(transactionRepository.findTransactionsBySenderEmailAndStatus(userEmail, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList()));
         historyList.addAll(challengeRepository.findAllChallengesByParticipantAndStatus(userEmail, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
         historyList.addAll(challengeRepository.findAllChallengesByCreatorAndStatus(userEmail, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
-        return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList());
+        try {
+            return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
+        } catch (IndexOutOfBoundsException e){
+            return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList());
+        }
     }
 
     public History transformChallengeModelToHistory(Challenge challenge){
@@ -63,7 +67,7 @@ public class HistoryService {
                 challenge.getAmount() * 2,
                 challenge.getDescription(),
                 challenge.getCreateDateDate(),
-                getStatus(challenge.getStatus()));
+                challengeStatus(challenge.getCreatorStatus(), challenge.getParticipantStatus()));
     }
 
     public History transformTransactionModelToHistory(Transaction transaction){
@@ -81,13 +85,23 @@ public class HistoryService {
                 transaction.getStatus());
     }
 
-
-
-    Transaction.Status getStatus(Challenge.Status status){
+    public Transaction.Status getStatus(Challenge.Status status){
         if (status == Challenge.Status.ACCOMPLISHED){
             return Transaction.Status.COMPLETED_CHALLENGE;
         }else{
             return null;
         }
+    }
+
+    public Transaction.Status challengeStatus(Boolean creatorStatus, Boolean participantStatus){
+        if (creatorStatus != null)
+            if (creatorStatus) return Transaction.Status.COMPLETED_CHALLENGE_CREATOR;
+            else return Transaction.Status.COMPLETED_CHALLENGE_PARTICIPANT;
+
+        if (participantStatus != null)
+            if (participantStatus) return Transaction.Status.COMPLETED_CHALLENGE_PARTICIPANT;
+            else return Transaction.Status.COMPLETED_CHALLENGE_CREATOR;
+
+        return Transaction.Status.COMPLETED_CHALLENGE;
     }
 }

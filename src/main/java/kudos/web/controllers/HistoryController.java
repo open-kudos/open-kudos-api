@@ -19,10 +19,8 @@ import java.util.List;
 public class HistoryController extends BaseController {
 
     @RequestMapping(value = "/email", method = RequestMethod.GET)
-    public @ResponseBody List<History> historyByUserEmail(String userEmail) throws UserException {
-        return historyService.getPageableUserHistoryByEmail(userEmail);
+    public @ResponseBody List<History> historyByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+        return historyService.getPageableUserHistoryByEmail(userEmail, startingIndex, endingIndex);
     }
-
-
 
 }

@@ -3,7 +3,6 @@ package kudos.repositories;
 import kudos.model.Challenge;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -29,6 +28,8 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
     List<Challenge> findAllChallengesByParticipantAndStatus(String participant, Challenge.Status status, Pageable pageable);
 
     List<Challenge> findAllChallengesByCreatorAndStatus(String creator, Challenge.Status status);
+
+    List<Challenge> findAllChallengesByCreatorAndStatus(String creator, Challenge.Status status, Pageable pageable);
 
     List<Challenge> findAllChallengesByCreatorOrParticipantAndStatus(String creator, String participant, Challenge.Status status);
 
