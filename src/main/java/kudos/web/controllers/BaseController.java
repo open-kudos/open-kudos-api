@@ -44,6 +44,9 @@ public abstract class BaseController {
     protected EmailService emailService;
 
     @Autowired
+    protected HistoryService historyService;
+
+    @Autowired
     @Qualifier(value = "DBTimeFormatter")
     protected DateTimeFormatter formatter;
 
