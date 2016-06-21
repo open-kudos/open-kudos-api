@@ -131,10 +131,15 @@ public class ChallengeController extends BaseController {
     public @ApiResponseObject @ResponseBody List<Challenge> completedChallenges() throws UserException {
         List<Challenge> completedChallenges = new ArrayList<>();
 
-        completedChallenges.addAll(challengeService.getAllLoggedUserAccomplishedChallenges());
-        completedChallenges.addAll(challengeService.getAllLoggedUserCanceledChallenges());
-        completedChallenges.addAll(challengeService.getAllLoggedUserDeclinedChallenges());
-        completedChallenges.addAll(challengeService.getAllLoggedUserFailedChallenges());
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CANCELED));
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.DECLINED));
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.FAILED));
+
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CANCELED));
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.DECLINED));
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.FAILED));
 
         return completedChallenges;
     }
