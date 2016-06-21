@@ -142,7 +142,10 @@ public class ChallengeController extends BaseController {
     @ApiMethod(description = "Gets all challenges that logged user is participating")
     @RequestMapping(value = "/ongoing", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> ongoingChallenges() throws UserException {
-        return challengeService.getAllLoggedUserOngoingChallenges();
+        List<Challenge> ongoingChallenges = new ArrayList<>();
+        ongoingChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCEPTED));
+        ongoingChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCEPTED));
+        return ongoingChallenges;
     }
 /*
     @ApiMethod(description = "Gets all challenges that logged user has referred")

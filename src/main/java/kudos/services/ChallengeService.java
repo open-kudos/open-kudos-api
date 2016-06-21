@@ -152,9 +152,6 @@ public class ChallengeService {
         return challengeRepository.findAllChallengesByCreatorOrParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), usersService.getLoggedUser().get().getEmail(),  Challenge.Status.CANCELED);
     }
 
-    public List<Challenge> getAllLoggedUserOngoingChallenges() throws UserException {
-        return challengeRepository.findAllChallengesByCreatorOrParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), usersService.getLoggedUser().get().getEmail(), Challenge.Status.ACCEPTED);
-    }
 
     private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
