@@ -117,6 +117,11 @@ public class UserController extends BaseController {
                             kudosService.getKudos(user))
             ); }
         Collections.sort(topReceivers, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
+
+        if (topReceivers.size() < 5) {
+            return topReceivers;
+        }
+
         return topReceivers.subList(0, 5);
     }
 
@@ -138,6 +143,11 @@ public class UserController extends BaseController {
             );
         }
         Collections.sort(topSenders, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
+
+        if (topSenders.size() < 5) {
+            return topSenders;
+        }
+
         return topSenders.subList(0, 5);
     }
     
