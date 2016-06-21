@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,6 +124,42 @@ public class ChallengeController extends BaseController {
     @RequestMapping(value = "/participatedByStatusPageable", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> participatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
         return challengeService.getAllUserParticipatedChallengesByStatusPageable(status, page, pageSize);
+    }
+
+    @ApiMethod(description = "Gets all challenges that logged user has completed")
+    @RequestMapping(value = "/completedChallenges", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> completedChallenges() throws UserException {
+        List<Challenge> completedChallenges = new ArrayList<>();
+
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CANCELED));
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.DECLINED));
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.FAILED));
+
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CANCELED));
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.DECLINED));
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.FAILED));
+
+        return completedChallenges;
+    }
+
+    @ApiMethod(description = "Gets all challenges that logged user is participating")
+    @RequestMapping(value = "/ongoing", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> ongoingChallenges() throws UserException {
+        List<Challenge> ongoingChallenges = new ArrayList<>();
+        ongoingChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCEPTED));
+        ongoingChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCEPTED));
+        return ongoingChallenges;
+    }
+
+    @ApiMethod(description = "Gets all new challenges (both created and received)")
+    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> newChallenges() throws UserException {
+        List<Challenge> newChallenges = new ArrayList<>();
+        newChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CREATED));
+        newChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CREATED));
+        return newChallenges;
     }
 /*
     @ApiMethod(description = "Gets all challenges that logged user has referred")
