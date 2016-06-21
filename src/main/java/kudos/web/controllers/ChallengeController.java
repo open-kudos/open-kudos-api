@@ -147,6 +147,15 @@ public class ChallengeController extends BaseController {
         ongoingChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCEPTED));
         return ongoingChallenges;
     }
+
+    @ApiMethod(description = "Gets all new challenges (both created and received)")
+    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    public @ApiResponseObject @ResponseBody List<Challenge> newChallenges() throws UserException {
+        List<Challenge> newChallenges = new ArrayList<>();
+        newChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CREATED));
+        newChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CREATED));
+        return newChallenges;
+    }
 /*
     @ApiMethod(description = "Gets all challenges that logged user has referred")
     @RequestMapping(value = "/referred", method = RequestMethod.GET)
