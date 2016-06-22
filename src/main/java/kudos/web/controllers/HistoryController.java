@@ -18,9 +18,24 @@ import java.util.List;
 @RequestMapping("/history")
 public class HistoryController extends BaseController {
 
-    @RequestMapping(value = "/email", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
     public @ResponseBody List<History> historyByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
         return historyService.getPageableUserHistoryByEmail(userEmail, startingIndex, endingIndex);
+    }
+
+    @RequestMapping(value = "/received", method = RequestMethod.GET)
+    public @ResponseBody List<History> receivedHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+        return historyService.getPageableUserReceivedHistoryByEmail(userEmail, startingIndex, endingIndex);
+    }
+
+    @RequestMapping(value = "/gave", method = RequestMethod.GET)
+    public @ResponseBody List<History> gaveHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+        return historyService.getPageableUserGivenHistoryByEmail(userEmail, startingIndex, endingIndex);
+    }
+
+    @RequestMapping(value = "/challenges", method = RequestMethod.GET)
+    public @ResponseBody List<History> challengesHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+        return historyService.getPageableUserAllChallengesHistoryByEmail(userEmail, startingIndex, endingIndex);
     }
 
 }
