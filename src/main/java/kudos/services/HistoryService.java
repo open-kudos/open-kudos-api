@@ -54,7 +54,7 @@ public class HistoryService {
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    private History transformChallengeModelToHistory(Challenge challenge){
+    public History transformChallengeModelToHistory(Challenge challenge){
         return new History(challenge.getParticipant(),
                 getUserFullNameByEmail(challenge.getParticipant()),
                 challenge.getCreator(),
@@ -65,7 +65,7 @@ public class HistoryService {
                 challengeStatus(challenge.getCreatorStatus(), challenge.getParticipantStatus()));
     }
 
-    private History transformTransactionModelToHistory(Transaction transaction){
+    public History transformTransactionModelToHistory(Transaction transaction){
         return new History(transaction.getReceiverEmail(),
                 getUserFullNameByEmail(transaction.getReceiverEmail()),
                 transaction.getSenderEmail(),

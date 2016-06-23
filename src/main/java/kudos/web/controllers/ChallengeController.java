@@ -141,7 +141,7 @@ public class ChallengeController extends BaseController {
         completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.DECLINED));
         completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.FAILED));
 
-        return completedChallenges;
+        return challengeService.sortListByTimestamp(completedChallenges);
     }
 
     @ApiMethod(description = "Gets all challenges that logged user is participating")
@@ -150,7 +150,7 @@ public class ChallengeController extends BaseController {
         List<Challenge> ongoingChallenges = new ArrayList<>();
         ongoingChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCEPTED));
         ongoingChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCEPTED));
-        return ongoingChallenges;
+        return challengeService.sortListByTimestamp(ongoingChallenges);
     }
 
     @ApiMethod(description = "Gets all new challenges (both created and received)")
@@ -159,7 +159,7 @@ public class ChallengeController extends BaseController {
         List<Challenge> newChallenges = new ArrayList<>();
         newChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CREATED));
         newChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CREATED));
-        return newChallenges;
+        return challengeService.sortListByTimestamp(newChallenges);
     }
 /*
     @ApiMethod(description = "Gets all challenges that logged user has referred")

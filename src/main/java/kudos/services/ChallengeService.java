@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.jws.soap.SOAPBinding;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by chc on 15.8.7.
@@ -180,6 +180,10 @@ public class ChallengeService {
         Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
         databaseChallenge.setParticipantStatus(status);
         return challengeRepository.save(databaseChallenge);
+    }
+
+    public List<Challenge> sortListByTimestamp(List<Challenge> historyList){
+        return historyList.stream().sorted((c1, c2) -> c2.getCreateDateDate().compareTo(c1.getCreateDateDate())).collect(Collectors.toList());
     }
 
 }
