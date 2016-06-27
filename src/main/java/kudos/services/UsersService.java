@@ -174,20 +174,20 @@ public class UsersService {
 
     private int calculateSendersTransactionsAmount(User user, String period){
         if (period.equals("week")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
-                .stream().mapToInt(Transaction::getAmount).sum();
+                .stream().filter(transaction -> transaction.getStatus() != Transaction.Status.FAILED_CHALENGE).mapToInt(Transaction::getAmount).sum();
         else if (period.equals("month")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
-                .stream().mapToInt(Transaction::getAmount).sum();
+                .stream().filter(transaction -> transaction.getStatus() != Transaction.Status.FAILED_CHALENGE).mapToInt(Transaction::getAmount).sum();
         else return transactionRepository.findTransactionsBySenderEmail(user.getEmail())
-                    .stream().mapToInt(Transaction::getAmount).sum();
+                    .stream().filter(transaction -> transaction.getStatus() != Transaction.Status.FAILED_CHALENGE).mapToInt(Transaction::getAmount).sum();
     }
 
     private int calculateReceiversTransactionsAmount(User user, String period){
         if (period.equals("week")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
-                .stream().mapToInt(Transaction::getAmount).sum();
+                .stream().filter(transaction -> transaction.getStatus() != Transaction.Status.FAILED_CHALENGE).mapToInt(Transaction::getAmount).sum();
         else if (period.equals("month")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
-                .stream().mapToInt(Transaction::getAmount).sum();
+                .stream().filter(transaction -> transaction.getStatus() != Transaction.Status.FAILED_CHALENGE).mapToInt(Transaction::getAmount).sum();
         else return transactionRepository.findTransactionsByReceiverEmail(user.getEmail())
-                    .stream().mapToInt(Transaction::getAmount).sum();
+                    .stream().filter(transaction -> transaction.getStatus() != Transaction.Status.FAILED_CHALENGE).mapToInt(Transaction::getAmount).sum();
     }
 
     private LeaderboardUser createLeaderboardUser(User user, int kudosAmount){
