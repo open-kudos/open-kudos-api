@@ -67,25 +67,25 @@ public class ChallengeService {
     }
 
     public Challenge accept(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
+        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(challenge);
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), challenge.getAmount(), "");
         return setStatusAndSave(challenge, Challenge.Status.ACCEPTED);
     }
 
     public Challenge decline(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
+        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(challenge);
         kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
+        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(challenge);
         kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
 
     public Challenge accomplish(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
+        checkNotAccomplishedDeclinedExpiredOrCanceled(challenge);
 
         if (challenge.getParticipantStatus() == null) {
             return setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
@@ -102,10 +102,10 @@ public class ChallengeService {
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
-    public Challenge fail(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
-        return setStatusAndSave(challenge, Challenge.Status.FAILED);
+    public Challenge expire(Challenge challenge) throws BusinessException, UserException {
+        checkNotAccomplishedDeclinedExpiredOrCanceled(challenge);
+        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
+        return setStatusAndSave(challenge, Challenge.Status.EXPIRED);
     }
 
     public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
@@ -136,22 +136,22 @@ public class ChallengeService {
         return challengeRepository.findAllChallengesByStatus(Challenge.Status.CREATED);
     }
 
-    private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(Challenge challenge) throws InvalidChallengeStatusException {
+    private void checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
             case ACCEPTED:
                 throw new InvalidChallengeStatusException("challenge_already_accepted");
         }
-        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
+        checkNotAccomplishedDeclinedExpiredOrCanceled(challenge);
     }
 
-    private void checkNotAccomplishedDeclinedFailedOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {
+    private void checkNotAccomplishedDeclinedExpiredOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
             case ACCOMPLISHED:
                 throw new InvalidChallengeStatusException("challenge_already_accomplished");
             case DECLINED:
                 throw new InvalidChallengeStatusException("challenge_already_declined");
-            case FAILED:
-                throw new InvalidChallengeStatusException("challenge_already_failed");
+            case EXPIRED:
+                throw new InvalidChallengeStatusException("challenge_already_expired");
             case CANCELED:
                 throw new InvalidChallengeStatusException("challenge_already_canceled");
         }
@@ -185,5 +185,6 @@ public class ChallengeService {
     public List<Challenge> sortListByTimestamp(List<Challenge> historyList){
         return historyList.stream().sorted((c1, c2) -> c2.getCreateDateDate().compareTo(c1.getCreateDateDate())).collect(Collectors.toList());
     }
+
 
 }

@@ -14,7 +14,7 @@ import java.util.Map;
 public class TeamChallenge {
 
     public enum Status {
-        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, FAILED, CANCELED
+        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, EXPIRED, CANCELED
     }
 
     @Id

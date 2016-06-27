@@ -6,6 +6,7 @@ import kudos.exceptions.ChallengeException;
 import kudos.exceptions.IdNotSpecifiedException;
 import kudos.exceptions.WrongChallengeEditorException;
 import kudos.model.Challenge;
+import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.web.exceptions.FormValidationException;
@@ -131,15 +132,17 @@ public class ChallengeController extends BaseController {
     public @ApiResponseObject @ResponseBody List<Challenge> completedChallenges() throws UserException {
         List<Challenge> completedChallenges = new ArrayList<>();
 
+
+
         completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
         completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CANCELED));
         completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.DECLINED));
-        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.FAILED));
+        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.EXPIRED));
 
         completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
         completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CANCELED));
         completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.DECLINED));
-        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.FAILED));
+        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.EXPIRED));
 
         return challengeService.sortListByTimestamp(completedChallenges);
     }
@@ -189,8 +192,8 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already accomplished"),
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_expired",
+                    description = "If challenge is already expired"),
             @ApiError(code = "challenge_already_canceled",
                     description = "If challenge is already canceled")
     })
@@ -228,8 +231,8 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already accomplished"),
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_expired",
+                    description = "If challenge is already expired"),
             @ApiError(code = "challenge_already_canceled",
                     description = "If challenge is already canceled")
     })
@@ -267,8 +270,8 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already accomplished"),
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_expired",
+                    description = "If challenge is already expired"),
             @ApiError(code = "challenge_already_canceled",
                     description = "If challenge is already canceled")
     })
@@ -305,8 +308,8 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already accomplished"),
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_expired",
+                    description = "If challenge is already expired"),
             @ApiError(code = "challenge_already_canceled",
                     description = "If challenge is already canceled")
     })
@@ -338,7 +341,7 @@ public class ChallengeController extends BaseController {
 //        }
     }
 
-    @ApiMethod(description = "Marks challenge as failed by its id")
+    @ApiMethod(description = "Marks challenge as expired by its id")
     @ApiParams(queryparams = {
             @ApiQueryParam(name = "id")
     })
@@ -351,13 +354,13 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already accomplished"),
             @ApiError(code = "challenge_already_declined",
                     description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
+            @ApiError(code = "challenge_already_expired",
+                    description = "If challenge is already expired"),
             @ApiError(code = "challenge_already_canceled",
                     description = "If challenge is already canceled")
     })
-    @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    @RequestMapping(value = "/expire", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody Challenge expire(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -371,7 +374,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
             throw new WrongChallengeEditorException("not_a_referee");
         }*/
-        return challengeService.fail(challenge);
+        return challengeService.expire(challenge);
     }
 
 }

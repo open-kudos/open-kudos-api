@@ -34,7 +34,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge accept(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
+        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(teamChallenge);
 
         for (TeamMember participant : teamChallenge.getFirstTeam()) {
             if (participant.getMemberEmail().equals(usersService.getLoggedUser().get().getEmail()) && !participant.getAccepted()) {
@@ -57,7 +57,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge decline(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
+        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(teamChallenge);
 
         for (TeamMember participant : teamChallenge.getFirstTeam()) {
             if (participant.getAccepted())
@@ -68,7 +68,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge cancel(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
+        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(teamChallenge);
 
         for (TeamMember participant : teamChallenge.getFirstTeam()) {
             if (participant.getAccepted())
@@ -79,7 +79,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge accomplish(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedOrCanceled(teamChallenge);
+        checkNotAccomplishedDeclinedExpiredOrCanceled(teamChallenge);
 
         if (teamChallenge.getFirstTeamStatus() == null) {
             return setSecondTeamStatusAndSave(teamChallenge, teamChallenge.getSecondTeamStatus());
@@ -98,24 +98,24 @@ public class TeamChallengeService {
         return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.ACCOMPLISHED);
     }
 
-    private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
+    private void checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
         switch (teamChallenge.getStatus()) {
             case ACCEPTED:
                 throw new InvalidChallengeStatusException("challenge_already_accepted");
         }
-        checkNotAccomplishedDeclinedFailedOrCanceled(teamChallenge);
+        checkNotAccomplishedDeclinedExpiredOrCanceled(teamChallenge);
     }
 
-    private void checkNotAccomplishedDeclinedFailedOrCanceled(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
+    private void checkNotAccomplishedDeclinedExpiredOrCanceled(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
         switch (teamChallenge.getStatus()) {
             case ACCOMPLISHED:
                 throw new InvalidChallengeStatusException("challenge_already_accomplished");
             case DECLINED:
                 throw new InvalidChallengeStatusException("challenge_already_declined");
-            case FAILED:
-                throw new InvalidChallengeStatusException("challenge_already_failed");
+            case EXPIRED:
+                throw new InvalidChallengeStatusException("challenge_already_expired");
             case CANCELED:
-                throw new InvalidChallengeStatusException("challenge_already_canceled");
+                throw new InvalidChallengeStatusException("challenge_already_cancelled");
         }
     }
 
