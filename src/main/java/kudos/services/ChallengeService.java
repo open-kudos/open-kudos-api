@@ -7,6 +7,8 @@ import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
 import kudos.web.exceptions.UserException;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,13 +76,17 @@ public class ChallengeService {
 
     public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
+        if (!checkIfNewWeekStarted(challenge)) {
+            kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
+        }
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
+        if (!checkIfNewWeekStarted(challenge)) {
+            kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
+        }
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
 
@@ -104,7 +110,9 @@ public class ChallengeService {
 
     public Challenge expire(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedExpiredOrCanceled(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
+        if (!checkIfNewWeekStarted(challenge)) {
+            kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
+        }
         return setStatusAndSave(challenge, Challenge.Status.EXPIRED);
     }
 
@@ -186,5 +194,11 @@ public class ChallengeService {
         return historyList.stream().sorted((c1, c2) -> c2.getCreateDateDate().compareTo(c1.getCreateDateDate())).collect(Collectors.toList());
     }
 
+    private boolean checkIfNewWeekStarted(Challenge challenge) {
+        LocalDateTime startOfWeek = new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
+        System.out.println(startOfWeek);
+        return dateTimeFormatter.parseLocalDateTime(challenge.getCreateDateDate()).isBefore(startOfWeek);
+
+    }
 
 }
