@@ -2,12 +2,16 @@ package kudos.services;
 
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
+import kudos.model.LeaderboardUser;
+import kudos.model.Transaction;
 import kudos.model.User;
+import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,12 +28,16 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UsersService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private EmailService emailService;
@@ -144,6 +152,46 @@ public class UsersService {
         User user = maybeUser.get();
         String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
         emailService.generateAndSendEmail(email, message);
+    }
+
+    public List<LeaderboardUser> getTopSenders(String period){
+        List<LeaderboardUser> topSenders = getAllConfirmedUsers().stream().map(user -> createLeaderboardUser(user, calculateSendersTransactionsAmount(user, period))).collect(Collectors.toList());
+        return sortListByAmountOfKudos(topSenders, 0, 5);
+    }
+
+    public List<LeaderboardUser> getTopReceivers(String period){
+        List<LeaderboardUser> topReceivers = getAllConfirmedUsers().stream().map(user -> createLeaderboardUser(user, calculateReceiversTransactionsAmount(user, period))).collect(Collectors.toList());
+        return sortListByAmountOfKudos(topReceivers, 0, 5);
+    }
+
+    private List<LeaderboardUser> sortListByAmountOfKudos(List<LeaderboardUser> leaderboardUserList, int startingIndex, int endingIndex){
+        try {
+            return leaderboardUserList.stream().sorted((l1, l2) -> l2.getAmountOfKudos().compareTo(l1.getAmountOfKudos())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
+        } catch (IndexOutOfBoundsException e){
+            return leaderboardUserList.stream().sorted((l1, l2) -> l2.getAmountOfKudos().compareTo(l1.getAmountOfKudos())).collect(Collectors.toList()).subList(0, leaderboardUserList.size());
+        }
+    }
+
+    private int calculateSendersTransactionsAmount(User user, String period){
+        if (period.equals("week")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
+                .stream().mapToInt(Transaction::getAmount).sum();
+        else if (period.equals("month")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
+                .stream().mapToInt(Transaction::getAmount).sum();
+        else return transactionRepository.findTransactionsBySenderEmail(user.getEmail())
+                    .stream().mapToInt(Transaction::getAmount).sum();
+    }
+
+    private int calculateReceiversTransactionsAmount(User user, String period){
+        if (period.equals("week")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
+                .stream().mapToInt(Transaction::getAmount).sum();
+        else if (period.equals("month")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
+                .stream().mapToInt(Transaction::getAmount).sum();
+        else return transactionRepository.findTransactionsByReceiverEmail(user.getEmail())
+                    .stream().mapToInt(Transaction::getAmount).sum();
+    }
+
+    private LeaderboardUser createLeaderboardUser(User user, int kudosAmount){
+        return new LeaderboardUser(user.getFirstName(), user.getLastName(), user.getEmail(), kudosAmount);
     }
 
     private String getRandomHash() {
