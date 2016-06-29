@@ -23,6 +23,7 @@ public class HomeController extends BaseController {
     @ApiMethod(description = "method to check whether user is logged in or not")
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody Response index(Principal principal) {
+
         return new IndexResponse(principal != null);
     }
 }

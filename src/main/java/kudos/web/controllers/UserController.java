@@ -2,7 +2,6 @@ package kudos.web.controllers;
 
 import freemarker.template.TemplateException;
 import kudos.model.LeaderboardUser;
-import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.web.beans.form.MyProfileForm;
 import kudos.web.exceptions.FormValidationException;
@@ -19,8 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 
 /**
@@ -107,39 +105,14 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Gets top kudos receivers")
     @RequestMapping(value = "/topreceivers", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopReceivers() throws UserException {
-        List<LeaderboardUser> topReceivers = new ArrayList<>();
-        for (User user : usersService.getAllConfirmedUsers()) {
-            topReceivers.add(
-                    new LeaderboardUser(user.getFirstName(),
-                            user.getLastName(),
-                            user.getEmail(),
-                            kudosService.getKudos(user))
-            );
-        }
-        Collections.sort(topReceivers, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
-        return topReceivers.subList(0, 5);
+    public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopReceivers(String period) throws UserException {
+        return usersService.getTopReceivers(period);
     }
 
     @ApiMethod(description = "Gets top kudos senders")
     @RequestMapping(value = "/topsenders", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopSenders() throws UserException {
-        List<LeaderboardUser> topSenders = new ArrayList<>();
-        int outgoingKudos;
-        for (User user : usersService.getAllConfirmedUsers()) {
-            outgoingKudos = 0;
-            for (Transaction transaction : transactionService.getTransactionsByEmailAndStatus(user.getEmail())) {
-                outgoingKudos += transaction.getAmount();
-            }
-            topSenders.add(
-                    new LeaderboardUser(user.getFirstName(),
-                            user.getLastName(),
-                            user.getEmail(),
-                            outgoingKudos)
-            );
-        }
-        Collections.sort(topSenders, (o1, o2) -> o2.getAmountOfKudos() - o1.getAmountOfKudos());
-        return topSenders.subList(0, 5);
+    public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopSenders(String period) throws UserException {
+        return usersService.getTopSenders(period);
     }
-    
+
 }
