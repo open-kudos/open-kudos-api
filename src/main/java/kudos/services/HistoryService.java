@@ -85,8 +85,12 @@ public class HistoryService {
     }
 
     private String getUserFullNameByEmail(String email){
-        User receiver = userRepository.findByEmail(email);
-        return receiver.getFirstName() + " " + receiver.getLastName();
+        try {
+            User receiver = userRepository.findByEmail(email);
+            return receiver.getFirstName() + " " + receiver.getLastName();
+        }catch (NullPointerException e){
+            return "Dead User";
+        }
     }
 
     private Transaction.Status challengeStatus(Boolean creatorStatus, Boolean participantStatus){
