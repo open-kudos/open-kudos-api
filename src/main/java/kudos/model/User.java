@@ -187,4 +187,8 @@ public class User {
     public void setCompleted(boolean completed) {
         isCompleted = completed;
     }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

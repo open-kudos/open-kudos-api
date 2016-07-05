@@ -6,7 +6,6 @@ import kudos.exceptions.ChallengeException;
 import kudos.exceptions.IdNotSpecifiedException;
 import kudos.exceptions.WrongChallengeEditorException;
 import kudos.model.Challenge;
-import kudos.model.User;
 import kudos.web.beans.form.ChallengeTransferForm;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
@@ -48,10 +47,6 @@ public class ChallengeController extends BaseController {
                     description = "If receiver email was not specified"),
             @ApiError(code = "receiver_email_incorrect",
                     description = "If receiver email was incorrect"),
-            @ApiError(code = "referee_email_not_specified",
-                    description = "If referee email was not specified"),
-            @ApiError(code = "referee_email_incorrect",
-                    description = "If referee email was incorrect"),
             @ApiError(code = "amount_not_specified",
                     description = "If amount was not specified"),
             @ApiError(code = "amount_negative_or_zero",
@@ -69,9 +64,7 @@ public class ChallengeController extends BaseController {
             @ApiError(code = "receiver_not_exist",
                     description = "If kudos receiver does not exist"),
             @ApiError(code = "participant_not_exist",
-                    description = "If participant user does not exist"),
-            @ApiError(code = "referee_not_exist",
-                    description = "If referee user does not exist")
+                    description = "If participant user does not exist")
     })
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge challenge(ChallengeTransferForm form, Errors errors)
@@ -83,12 +76,8 @@ public class ChallengeController extends BaseController {
         if (errors.hasErrors())
             throw new FormValidationException(errors);
 
-        User participant = usersService.findByEmail(form.getParticipant()).orElseThrow(() -> new UserException("participant.not.exist"));
-        //User referee = usersService.findByEmail(form.getReferee()).orElseThrow(() -> new UserException("referee.not.exist"));
-
         return challengeService.create(
-                participant,
-                //referee,
+                form.getParticipant(),
                 form.getName(),
                 form.getDescription(),
                 form.getFinishDate(),
@@ -161,18 +150,6 @@ public class ChallengeController extends BaseController {
         newChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CREATED));
         return challengeService.sortListByTimestamp(newChallenges);
     }
-/*
-    @ApiMethod(description = "Gets all challenges that logged user has referred")
-    @RequestMapping(value = "/referred", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> refferedChallenges() throws UserException {
-        return challengeService.getAllUserReferredChallenges();
-    }*/
-/*
-    @ApiMethod(description = "Gets all challenges that logged user has referred by status")
-    @RequestMapping(value = "/referredByStatus", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> refferedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeService.getAllUserReferredChallengesByStatus(status);
-    }*/
 
     @ApiMethod(description = "Accepts challenge by its id")
     @ApiParams(queryparams = {
@@ -207,7 +184,7 @@ public class ChallengeController extends BaseController {
         }
 
         Challenge challenge = maybeChallenge.get();
-        if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
+        if(!challenge.getParticipant().equals(usersService.getLoggedUser().get())) {
             throw new WrongChallengeEditorException("not_a_participant");
         }
         return challengeService.accept(challenge);
@@ -246,7 +223,7 @@ public class ChallengeController extends BaseController {
         }
 
         Challenge challenge = maybeChallenge.get();
-        if(!challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
+        if(!challenge.getParticipant().equals(usersService.getLoggedUser().get())) {
             throw new WrongChallengeEditorException("not_a_participant");
         }
         return challengeService.decline(challenge);
@@ -285,7 +262,7 @@ public class ChallengeController extends BaseController {
         }
 
         Challenge challenge = maybeChallenge.get();
-        if(!challenge.getCreator().equals(usersService.getLoggedUser().get().getEmail())) {
+        if(!challenge.getCreator().equals(usersService.getLoggedUser().get())) {
             throw new WrongChallengeEditorException("not_a_creator");
         }
         return challengeService.cancel(challenge);
@@ -322,20 +299,17 @@ public class ChallengeController extends BaseController {
         }
 
         Challenge challenge = maybeChallenge.get();
-        if(challenge.getCreator().equals(usersService.getLoggedUser().get().getEmail())) {
+        if(challenge.getCreator().equals(usersService.getLoggedUser().get())) {
             challenge.setCreatorStatus(status);
 
         }
 
-        if (challenge.getParticipant().equals(usersService.getLoggedUser().get().getEmail())) {
+        if (challenge.getParticipant().equals(usersService.getLoggedUser().get())) {
             challenge.setParticipantStatus(status);
         }
 
         challengeService.accomplish(challenge);
 
-//        if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
-//            throw new WrongChallengeEditorException("not_a_referee");
-//        }
     }
 
     @ApiMethod(description = "Marks challenge as failed by its id")
@@ -367,10 +341,7 @@ public class ChallengeController extends BaseController {
             throw new ChallengeException("challenge_not_found");
         }
 
-        Challenge challenge = maybeChallenge.get();/*
-        if(!challenge.getReferee().equals(usersService.getLoggedUser().get().getEmail())) {
-            throw new WrongChallengeEditorException("not_a_referee");
-        }*/
+        Challenge challenge = maybeChallenge.get();
         return challengeService.fail(challenge);
     }
 
