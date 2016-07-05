@@ -47,12 +47,12 @@ public class ChallengeService {
 
     public Challenge create(User participant, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
 
-        String userEmail = usersService.getLoggedUser().get().getEmail();
+        User creator = usersService.getLoggedUser().get();
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
         return challengeRepository.save(
                 new Challenge(
-                        userEmail,
-                        participant.getEmail(),
+                        creator,
+                        participant,
                         name,
                         description,
                         LocalDateTime.now().toString(dateTimeFormatter),
@@ -74,13 +74,15 @@ public class ChallengeService {
 
     public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
+        User creator = usersService.findById(challenge.getCreator().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
+        kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
+        User creator = usersService.findById(challenge.getCreator().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
+        kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
 
@@ -98,30 +100,30 @@ public class ChallengeService {
             return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
         }
 
-        kudosService.takeSystemKudos(usersService.findByEmail(checkWhoIsWinner(challenge)).get(), 2 * challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
+        kudosService.takeSystemKudos(checkWhoIsWinner(challenge), 2 * challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
     public Challenge fail(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.retrieveSystemKudos(usersService.findByEmail(challenge.getCreator()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
+        kudosService.retrieveSystemKudos(challenge.getCreator(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
         return setStatusAndSave(challenge, Challenge.Status.FAILED);
     }
 
     public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), status);
+        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get(), status);
     }
 
     public List<Challenge> getAllUserParticipatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
-        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get().getEmail(), status, new PageRequest(page, pageSize));
+        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get(), status, new PageRequest(page, pageSize));
     }
 
     public List<Challenge> getAllUserCreatedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeRepository.findAllChallengesByCreatorAndStatus(usersService.getLoggedUser().get().getEmail(), status);
+        return challengeRepository.findAllChallengesByCreatorAndStatus(usersService.getLoggedUser().get(), status);
     }
 
     public List<Challenge> getAllUserCreatedChallenges() throws UserException {
-        return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get().getEmail());
+        return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
@@ -157,7 +159,7 @@ public class ChallengeService {
         }
     }
 
-    private String checkWhoIsWinner(Challenge challenge) {
+    private User checkWhoIsWinner(Challenge challenge) {
         if (challenge.getCreatorStatus() && !challenge.getParticipantStatus()) {
             return challenge.getCreator();
         }

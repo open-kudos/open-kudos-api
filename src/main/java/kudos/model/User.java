@@ -96,6 +96,10 @@ public class User {
 
     }
 
+    public String getId() {
+        return id;
+    }
+
     private String getRandomHash() {
         return new BigInteger(130, new SecureRandom()).toString(32);
     }

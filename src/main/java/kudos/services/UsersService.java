@@ -63,6 +63,10 @@ public class UsersService {
         return Optional.ofNullable(userRepository.findByEmail(email));
     }
 
+    public Optional<User> findById(String id) throws UserException {
+        return Optional.ofNullable(userRepository.findById(id));
+    }
+
     public Optional<User> getLoggedUser() throws UserException {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         return findByEmail(name);

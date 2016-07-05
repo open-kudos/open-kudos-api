@@ -3,6 +3,7 @@ package kudos.model;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -18,13 +19,10 @@ public class Challenge {
 
     @Id
     private String id;
-    @ApiObjectField
-    private String creator;
-    @ApiObjectField
-    private String participant;
-    /*
-    @ApiObjectField
-    private String referee;*/
+    @DBRef
+    private User creator;
+    @DBRef
+    private User participant;
 
     @ApiObjectField
     private Boolean creatorStatus;
@@ -46,10 +44,9 @@ public class Challenge {
     private Status status;
 
 
-    public Challenge(String creator, String participant, String name, String description, String createDate, String finishDate, int amount, Status status) {
+    public Challenge(User creator, User participant, String name, String description, String createDate, String finishDate, int amount, Status status) {
         this.creator = creator;
         this.participant = participant;
-        //this.referee = referee;
 
         this.creatorStatus = null;
         this.participantStatus = null;
@@ -71,30 +68,22 @@ public class Challenge {
         this.id = id;
     }
 
-    public String getCreator() {
+    public User getCreator() {
         return creator;
     }
 
-    public void setCreator(String creator) {
+    public void setCreator(User creator) {
         this.creator = creator;
     }
 
-    public String getParticipant() {
+    public User getParticipant() {
         return participant;
     }
 
-    public void setParticipant(String participant) {
+    public void setParticipant(User participant) {
         this.participant = participant;
     }
-/*
-    public String getReferee() {
-        return referee;
-    }
 
-    public void setReferee(String referee) {
-        this.referee = referee;
-    }
-*/
     public String getName() {
         return name;
     }
