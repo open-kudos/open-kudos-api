@@ -60,7 +60,7 @@ public class UsersService {
     }
 
     public Optional<User> findByEmail(String email) throws UserException {
-        return Optional.ofNullable(userRepository.findOne(email));
+        return Optional.ofNullable(userRepository.findByEmail(email));
     }
 
     public Optional<User> getLoggedUser() throws UserException {
@@ -173,27 +173,29 @@ public class UsersService {
     }
 
     private int calculateSendersTransactionsAmount(User user, String period){
-        if (period.equals("week")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
+        if (period.equals("week")) return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(7).toString())
                 .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                 .mapToInt(Transaction::getAmount).sum();
-        else if (period.equals("month")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
+        else if (period.equals("month")) return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(30).toString())
                 .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                 .mapToInt(Transaction::getAmount).sum();
-        else return transactionRepository.findTransactionsBySenderEmail(user.getEmail())
+        else return transactionRepository.findTransactionsBySender(user)
                     .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                     .mapToInt(Transaction::getAmount).sum();
     }
 
     private int calculateReceiversTransactionsAmount(User user, String period){
-        if (period.equals("week")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
-        else if (period.equals("month")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
-        else return transactionRepository.findTransactionsByReceiverEmail(user.getEmail())
+        if (period.equals("week")) return calculateReceiverTransactionAmountByPeriod(user, 7);
+        else if (period.equals("month")) return calculateReceiverTransactionAmountByPeriod(user, 30);
+        else return transactionRepository.findTransactionsByReceiver(user)
                     .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                     .mapToInt(Transaction::getAmount).sum();
+    }
+
+    private int calculateReceiverTransactionAmountByPeriod(User user, int period){
+        return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(period).toString())
+                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
+                .mapToInt(Transaction::getAmount).sum();
     }
 
     private LeaderboardUser createLeaderboardUser(User user, int kudosAmount){
@@ -220,13 +222,13 @@ public class UsersService {
 
         kudosService.getAllLoggedUserIncomingTransactions().stream()
                 .forEach(transaction -> {
-                    transaction.setReceiverEmail(DELETED_USER_TAG);
+                    transaction.setReceiver(null);
                     kudosService.save(transaction);
                 });
 
         kudosService.getAllLoggedUserOutgoingTransactions().stream()
                 .forEach(transaction -> {
-                    transaction.setSenderEmail(DELETED_USER_TAG);
+                    transaction.setSender(null);
                     kudosService.save(transaction);
                 });
 

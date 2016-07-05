@@ -66,10 +66,10 @@ public class HistoryService {
     }
 
     public History transformTransactionModelToHistory(Transaction transaction){
-        return new History(transaction.getReceiverEmail(),
-                getUserFullNameByEmail(transaction.getReceiverEmail()),
-                transaction.getSenderEmail(),
-                getUserFullNameByEmail(transaction.getSenderEmail()),
+        return new History(transaction.getReceiver().getEmail(),
+                getUserFullNameByEmail(transaction.getReceiver().getEmail()),
+                transaction.getSender().getEmail(),
+                getUserFullNameByEmail(transaction.getSender().getEmail()),
                 transaction.getAmount(),
                 transaction.getMessage(),
                 transaction.getTimestamp(),
@@ -85,12 +85,8 @@ public class HistoryService {
     }
 
     private String getUserFullNameByEmail(String email){
-        try {
-            User receiver = userRepository.findByEmail(email);
-            return receiver.getFirstName() + " " + receiver.getLastName();
-        }catch (NullPointerException e){
-            return "Dead User";
-        }
+        User receiver = userRepository.findByEmail(email);
+        return receiver.getFirstName() + " " + receiver.getLastName();
     }
 
     private Transaction.Status challengeStatus(Boolean creatorStatus, Boolean participantStatus){

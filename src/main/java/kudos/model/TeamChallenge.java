@@ -1,20 +1,18 @@
 package kudos.model;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
-import java.util.Map;
 
 @ApiObject
 @Document
 public class TeamChallenge {
 
     public enum Status {
-        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, EXPIRED, CANCELED
+        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, FAILED, CANCELED
     }
 
     @Id

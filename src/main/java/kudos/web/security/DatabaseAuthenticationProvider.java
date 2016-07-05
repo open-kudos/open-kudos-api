@@ -37,7 +37,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        User user = userRepository.findOne(name);
+        User user = userRepository.findByEmail(name);
 
         if ((user != null && new StrongPasswordEncryptor().checkPassword(password, user.getPassword()))) {
             List<GrantedAuthority> grantedAuths = new LinkedList();

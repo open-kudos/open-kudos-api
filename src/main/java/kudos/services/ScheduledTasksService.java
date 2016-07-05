@@ -30,7 +30,7 @@ public class ScheduledTasksService {
     DateTimeFormatter dateTimeFormatter;
 
     @Scheduled(fixedRate = 1000 * 15)
-    public void markTasksAsExpired() {
+    public void markTasksAsFailed() {
         List<Challenge> challengesToCheck = new ArrayList<>();
         challengesToCheck.addAll(challengeService.getAllAcceptedChallenges());
         challengesToCheck.addAll(challengeService.getAllCreatedChallenges());
@@ -38,12 +38,12 @@ public class ScheduledTasksService {
         LOG.info("challengesToCheck challenges amount is: " + challengesToCheck.size());
 
         challengesToCheck.stream()
-                .filter(c -> !c.getStatus().equals(Challenge.Status.EXPIRED))
+                .filter(c -> !c.getStatus().equals(Challenge.Status.FAILED))
                 .filter(c -> !(c.getFinishDate() == null))
                 .filter(c -> dateTimeFormatter.parseLocalDateTime(c.getFinishDate()).isBefore(LocalDateTime.now()))
                 .forEach((challenge) -> {
                     try {
-                        challengeService.expire(challenge);
+                        challengeService.fail(challenge);
                     } catch (BusinessException e) {
                         e.printStackTrace();
                     } catch (UserException e) {

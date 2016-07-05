@@ -23,6 +23,7 @@ import java.security.SecureRandom;
 public class User {
     @Id
     @Indexed(unique = true)
+    protected String id;
     protected String email;
     protected String password;
     protected String firstName;

@@ -88,8 +88,7 @@ public class KudosController extends BaseController {
     @ApiMethod(description = "Service to get remaining kudos amount")
     @RequestMapping(value = "/remaining-hack", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody UserKudos remainingKudos(Principal principal) throws UserException {
-        UserKudos userKudos = new UserKudos(kudosService.getFreeKudos(usersService.getLoggedUser().get()),
+        return new UserKudos(kudosService.getFreeKudos(usersService.getLoggedUser().get()),
                 kudosService.getKudos(usersService.getLoggedUser().get()));
-        return userKudos;
     }
 }

@@ -49,8 +49,8 @@ public class TransactionService {
         if(timestamp == null){
             setLastSeenTransactionTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS")));
         }
-        return repository.findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(
-                currentUser.getEmail(),
+        return repository.findTransactionsByReceiverAndStatusAndTimestampGreaterThanOrderByTimestampDesc(
+                currentUser,
                 Transaction.Status.COMPLETED,
                 timestamp);
     }
@@ -67,6 +67,11 @@ public class TransactionService {
         User currentUser = usersService.getLoggedUser().get();
         currentUser.setLastSeenTransactionTimestamp(timestamp);
         userRepository.save(currentUser);
+    }
+
+    public List<Transaction> test(String id) throws UserException{
+        User user = usersService.findByEmail(id).get();
+        return repository.findTransactionsByReceiver(user);
     }
 
 }

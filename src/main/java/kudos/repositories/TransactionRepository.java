@@ -1,6 +1,7 @@
 package kudos.repositories;
 
 import kudos.model.Transaction;
+import kudos.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -15,7 +16,29 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     Transaction findFirstByOrderByTimestampDesc();
 
+
+
+
+    //RECEIVERS
     List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
+
+    List<Transaction> findTransactionsByReceiver(User receiver);
+
+    List<Transaction> findTransactionsByReceiverAndStatusAndTimestampGreaterThanOrderByTimestampDesc(User receiver, Transaction.Status status, String timestamp);
+
+    Transaction findTransactionByReceiverOrderByTimestampDesc(User receiver);
+
+    //SENDERS
+    List<Transaction> findTransactionsBySender(User sender);
+
+    List<Transaction> findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(User sender, String timestamp);
+
+    List<Transaction> findTransactionBySenderOrderByTimestampDesc(User sender);
+
+
+
+
+
 
     List<Transaction> findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, Transaction.Status status, String timestamp);
 

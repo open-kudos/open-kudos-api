@@ -65,4 +65,12 @@ public class TransactionController extends BaseController {
         return usersService.getLoggedUser().get().getLastSeenTransactionTimestamp();
     }
 
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public
+    @ApiResponseObject
+    @ResponseBody
+    List<Transaction> testCtrl(String id) throws UserException {
+        return transactionService.test(id);
+    }
+
 }
