@@ -1,16 +1,11 @@
 package kudos.web.beans.form;
 
 import com.google.common.base.Strings;
-import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 /**
  * Created by chc on 15.8.7.
@@ -19,9 +14,7 @@ import java.text.SimpleDateFormat;
 public class ChallengeTransferForm {
 
     @ApiObjectField
-    private String participant;/*
-    @ApiObjectField
-    private String referee;*/
+    private String participant;
     @ApiObjectField
     private String name;
     @ApiObjectField
@@ -38,15 +31,7 @@ public class ChallengeTransferForm {
     public void setParticipant(String participant) {
         this.participant = participant;
     }
-/*
-    public String getReferee() {
-        return referee;
-    }
 
-    public void setReferee(String judge) {
-        this.referee = judge;
-    }
-*/
     public String getName() {
         return name;
     }
@@ -94,7 +79,6 @@ public class ChallengeTransferForm {
             ChallengeTransferForm challengeTransferForm = (ChallengeTransferForm) target;
 
             String receiverEmail = challengeTransferForm.getParticipant();
-            //String judgeEmail = challengeTransferForm.getReferee();
             String amountInString = challengeTransferForm.getAmount();
             String challengeName = challengeTransferForm.getName();
             String estimatedDate = challengeTransferForm.getFinishDate();
@@ -104,12 +88,6 @@ public class ChallengeTransferForm {
             } else if (!receiverEmail.matches(EMAIL_PATTERN)) {
                 errors.rejectValue("participant", "receiver_email_incorrect");
             }
-/*
-            if (Strings.isNullOrEmpty(judgeEmail)) {
-                errors.rejectValue("referee", "referee_email_not_specified");
-            } else if (!judgeEmail.matches(EMAIL_PATTERN)) {
-                errors.rejectValue("referee", "referee_email_incorrect");
-            }*/
 
             if (Strings.isNullOrEmpty(amountInString)) {
                 errors.rejectValue("amount", "amount_not_specified");

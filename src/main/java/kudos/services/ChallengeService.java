@@ -45,8 +45,9 @@ public class ChallengeService {
         return challengeRepository.save(challenge);
     }
 
-    public Challenge create(User participant, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
+    public Challenge create(String participantEmail, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
 
+        User participant = usersService.findByEmail(participantEmail).get();
         User creator = usersService.getLoggedUser().get();
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
         return challengeRepository.save(
@@ -127,7 +128,7 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
-       return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
+       return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllAcceptedChallenges() {
