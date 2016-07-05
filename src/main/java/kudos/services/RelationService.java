@@ -23,11 +23,11 @@ public class RelationService {
     private RelationRepository relationRepository;
 
     public Relation addRelation(Relation relation) throws RelationException {
-        if(relationRepository.getRelationByFollowerEmailAndUserEmail(relation.getFollowerEmail(),relation.getUserEmail()) != null){
+        if(relationRepository.getRelationByFollowerAndCurrentUser(relation.getFollower(),relation.getCurrentUser()) != null){
             throw new RelationException("relation_already_exists");
         }
 
-        if(relation.getFollowerEmail().equals(relation.getUserEmail())){
+        if(relation.getFollower().equals(relation.getCurrentUser())){
             throw new RelationException("cant_follow_yourself");
         }
 
@@ -35,27 +35,20 @@ public class RelationService {
     }
 
     public List<Relation> getAllFollowedUsers() throws UserException {
-        String followerEmail = usersService.getLoggedUser().get().getEmail();
-        return relationRepository.getRelationsByFollowerEmail(followerEmail);
-
-        /* return relationList.stream().collect(() -> new ArrayList<>(),
-                (c, e) -> c.add(e.getUserEmail()),
-                (c1, c2) -> c1.addAll(c2)); */
+        User follower = usersService.getLoggedUser().get();
+        return relationRepository.getRelationsByFollower(follower);
     }
 
     public List<Relation> getAllFollowers() throws UserException {
-        String userEmail = usersService.getLoggedUser().get().getEmail();
-        return relationRepository.getRelationsByUserEmail(userEmail);
+        User currentUser = usersService.getLoggedUser().get();
+        return relationRepository.getRelationsByCurrentUser(currentUser);
 
-         /*relationList.stream().collect(() -> new ArrayList<>(),
-                (c, e) -> c.add(e.getFollowerEmail()),
-                (c1, c2) -> c1.addAll(c2)); */
     }
 
 
-    public void removeRelation(String followerUserEmail) throws RelationException, UserException {
-        User follower = usersService.getLoggedUser().get();
-        Relation relationToRemove = relationRepository.getRelationByFollowerEmailAndUserEmail(follower.getEmail(), followerUserEmail);
+    public void removeRelation(User follower) throws RelationException, UserException {
+        User loggedUser = usersService.getLoggedUser().get();
+        Relation relationToRemove = relationRepository.getRelationByFollowerAndCurrentUser(loggedUser, follower);
 
         if(relationToRemove == null){
             throw new RelationException("relation_not_exist");
