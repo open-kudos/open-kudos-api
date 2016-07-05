@@ -213,13 +213,13 @@ public class UsersService {
 
         challengeService.getAllUserCreatedChallenges().stream()
                 .forEach(challenge -> {
-                    challenge.getCreator().setEmail(DELETED_USER_TAG);
+                    challenge.setCreator(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
 
         challengeService.getAllUserParticipatedChallenges().stream()
                 .forEach(challenge -> {
-                    challenge.getParticipant().setEmail(DELETED_USER_TAG);
+                    challenge.setParticipant(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
 
