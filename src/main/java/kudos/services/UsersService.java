@@ -246,6 +246,10 @@ public class UsersService {
         userRepository.delete(getLoggedUser().get());
     }
 
+    public List<User> findAllAndCreateNewUsers(){
+        return userRepository.findAll();
+    }
+
     public List<User> list(String filter) {
         return userRepository.searchAllFields(filter);
     }
