@@ -46,21 +46,21 @@ public class ChallengeService {
     }
 
     public Challenge create(String participantEmail, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
-
         User participant = usersService.findByEmail(participantEmail).get();
         User creator = usersService.getLoggedUser().get();
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
-        return challengeRepository.save(
-                new Challenge(
-                        creator,
-                        participant,
-                        name,
-                        description,
-                        LocalDateTime.now().toString(dateTimeFormatter),
-                        finishDate,
-                        amount, Challenge.Status.CREATED
-                )
+
+        Challenge challenge = new Challenge(
+                creator,
+                participant,
+                name,
+                description,
+                LocalDateTime.now().toString(dateTimeFormatter),
+                finishDate,
+                amount, Challenge.Status.CREATED
         );
+
+        return save(challenge);
     }
 
     public Optional<Challenge> getChallenge(String id) {

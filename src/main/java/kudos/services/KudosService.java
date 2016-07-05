@@ -50,11 +50,11 @@ public class KudosService {
         return transferKudos(sender, receiver, amount, message, Transaction.Status.COMPLETED);
     }
 
-    public Transaction reduceFreeKudos(User user,  int amount, String message) throws BusinessException {
+    public Transaction reduceFreeKudos(User user,  int amount, String message) throws BusinessException, UserException {
         return transferKudos(usersService.getKudosMaster(), user, amount, message, Transaction.Status.PENDING_CHALLENGE);
     }
 
-    public Transaction takeSystemKudos(User receiver, int amount, String message, Transaction.Status status) throws BusinessException {
+    public Transaction takeSystemKudos(User receiver, int amount, String message, Transaction.Status status) throws BusinessException, UserException {
         return transferKudos(usersService.getKudosMaster(), receiver , amount, message, status);
     }
 

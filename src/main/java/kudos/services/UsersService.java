@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -55,8 +56,15 @@ public class UsersService {
 
     private static final User DELETED_USER_TAG = null;
 
-    public User getKudosMaster() {
-        return new User("pass", "master@of.kudos");
+    public User getKudosMaster() throws UserException {
+        User masterOfKudos;
+        try {
+            masterOfKudos = findByEmail("master@of.kudos").get();
+        } catch (NoSuchElementException e){
+            masterOfKudos = new User("pass", "master@of.kudos");
+            userRepository.save(masterOfKudos);
+        }
+        return masterOfKudos;
     }
 
     public Optional<User> findByEmail(String email) throws UserException {
@@ -236,7 +244,6 @@ public class UsersService {
                 });
 
         userRepository.delete(getLoggedUser().get());
-
     }
 
     public List<User> list(String filter) {

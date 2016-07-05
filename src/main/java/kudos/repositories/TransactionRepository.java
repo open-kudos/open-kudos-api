@@ -14,8 +14,6 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     Transaction findFirstByOrderByTimestampDesc();
 
-
-
     Transaction findTransactionByReceiverOrderByTimestampDesc(User receiver);
 
     List<Transaction> findTransactionsByReceiver(User receiver);
@@ -26,8 +24,6 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     List<Transaction> findTransactionsByReceiverAndStatusAndTimestampGreaterThanOrderByTimestampDesc(User receiver, Transaction.Status status, String timestamp);
 
-
-
     List<Transaction> findTransactionsBySender(User sender);
 
     List<Transaction> findTransactionsBySenderAndStatus(User sender, Transaction.Status status);
@@ -35,8 +31,6 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
     List<Transaction> findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(User sender, String timestamp);
 
     List<Transaction> findTransactionBySenderOrderByTimestampDesc(User sender);
-
-
 
     List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp);
 
