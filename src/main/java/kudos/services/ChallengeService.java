@@ -127,7 +127,7 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
-       return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get().getEmail());
+       return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllAcceptedChallenges() {

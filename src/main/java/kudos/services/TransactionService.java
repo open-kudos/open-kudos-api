@@ -59,10 +59,6 @@ public class TransactionService {
         return !lastTransactionTimestamp.equals(repository.findFirstByOrderByTimestampDesc().getTimestamp());
     }
 
-    public List<Transaction> getTransactionsByEmailAndStatus(String email) {
-        return repository.findTransactionsBySenderEmailAndStatus(email, Transaction.Status.COMPLETED);
-    }
-
     public void setLastSeenTransactionTimestamp(String timestamp) throws UserException{
         User currentUser = usersService.getLoggedUser().get();
         currentUser.setLastSeenTransactionTimestamp(timestamp);
@@ -70,7 +66,7 @@ public class TransactionService {
     }
 
     public List<Transaction> test(String id) throws UserException{
-        User user = usersService.findByEmail(id).get();
+        User user = usersService.findById(id).get();
         return repository.findTransactionsByReceiver(user);
     }
 

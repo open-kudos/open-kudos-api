@@ -12,51 +12,31 @@ import java.util.List;
  */
 public interface TransactionRepository extends MongoRepository<Transaction,String> {
 
-    Transaction findTransactionByReceiverEmailOrderByTimestampDesc(String receiverEmail);
-
     Transaction findFirstByOrderByTimestampDesc();
 
 
 
-
-    //RECEIVERS
-    List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
+    Transaction findTransactionByReceiverOrderByTimestampDesc(User receiver);
 
     List<Transaction> findTransactionsByReceiver(User receiver);
 
+    List<Transaction> findTransactionsByReceiverAndStatus(User receiver, Transaction.Status status);
+
+    List<Transaction> findTransactionsByReceiverAndTimestampGreaterThanOrderByTimestampDesc(User receiver, String timestamp);
+
     List<Transaction> findTransactionsByReceiverAndStatusAndTimestampGreaterThanOrderByTimestampDesc(User receiver, Transaction.Status status, String timestamp);
 
-    Transaction findTransactionByReceiverOrderByTimestampDesc(User receiver);
 
-    //SENDERS
+
     List<Transaction> findTransactionsBySender(User sender);
+
+    List<Transaction> findTransactionsBySenderAndStatus(User sender, Transaction.Status status);
 
     List<Transaction> findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(User sender, String timestamp);
 
     List<Transaction> findTransactionBySenderOrderByTimestampDesc(User sender);
 
 
-
-
-
-
-    List<Transaction> findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, Transaction.Status status, String timestamp);
-
-    List<Transaction> findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, String timestamp);
-
-    List<Transaction> findTransactionsByReceiverEmailAndStatus(String receiverEmail, Transaction.Status status);
-
-    List<Transaction> findTransactionsByReceiverEmailAndStatus(String receiverEmail, Transaction.Status status, Pageable pageable);
-
-    List<Transaction> findTransactionsBySenderEmail(String senderEmail);
-
-    List<Transaction> findTransactionsBySenderEmailAndStatus(String receiverEmail, Transaction.Status status);
-
-    List<Transaction> findTransactionsBySenderEmailAndStatus(String receiverEmail, Transaction.Status status, Pageable pageable);
-
-    List<Transaction> findTransactionBySenderEmailOrderByTimestampDesc (String senderEmail);
-
-    List<Transaction> findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, String timestamp);
 
     List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp);
 

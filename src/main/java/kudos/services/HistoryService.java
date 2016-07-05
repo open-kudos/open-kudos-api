@@ -11,6 +11,7 @@ import kudos.model.history.History;
 import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
+import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,35 +30,41 @@ public class HistoryService {
     private TransactionRepository transactionRepository;
     @Autowired
     private ChallengeRepository challengeRepository;
+    @Autowired
+    private UsersService usersService;
 
-    public List<History> getPageableUserHistoryByEmail(String userEmail, int startingIndex, int endingIndex){
-        List<History> historyList = transactionRepository.findTransactionsByReceiverEmailAndStatus(userEmail, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
-        historyList.addAll(transactionRepository.findTransactionsBySenderEmailAndStatus(userEmail, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByParticipantAndStatus(userEmail, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByCreatorAndStatus(userEmail, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+    public List<History> getPageableUserHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+        User user = usersService.findByEmail(userEmail).get();
+        List<History> historyList = transactionRepository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
+        historyList.addAll(transactionRepository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByParticipantAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByCreatorAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    public List<History> getPageableUserReceivedHistoryByEmail(String userEmail, int startingIndex, int endingIndex){
-        List<History> historyList = transactionRepository.findTransactionsByReceiverEmailAndStatus(userEmail, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
+    public List<History> getPageableUserReceivedHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+        User user = usersService.findByEmail(userEmail).get();
+        List<History> historyList = transactionRepository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    public List<History> getPageableUserGivenHistoryByEmail(String userEmail, int startingIndex, int endingIndex){
-        List<History> historyList = transactionRepository.findTransactionsBySenderEmailAndStatus(userEmail, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
+    public List<History> getPageableUserGivenHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+        User user = usersService.findByEmail(userEmail).get();
+        List<History> historyList = transactionRepository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    public List<History> getPageableUserAllChallengesHistoryByEmail(String userEmail, int startingIndex, int endingIndex){
-        List<History> historyList = (challengeRepository.findAllChallengesByParticipantAndStatus(userEmail, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByCreatorAndStatus(userEmail, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+    public List<History> getPageableUserAllChallengesHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+        User user = usersService.findByEmail(userEmail).get();
+        List<History> historyList = (challengeRepository.findAllChallengesByParticipantAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByCreatorAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
     public History transformChallengeModelToHistory(Challenge challenge){
-        return new History(challenge.getParticipant(),
+        return new History(challenge.getParticipant().getEmail(),
                 getUserFullNameByEmail(challenge.getParticipant()),
-                challenge.getCreator(),
+                challenge.getCreator().getEmail(),
                 getUserFullNameByEmail(challenge.getCreator()),
                 challenge.getAmount() * 2,
                 challenge.getDescription(),
@@ -67,9 +74,9 @@ public class HistoryService {
 
     public History transformTransactionModelToHistory(Transaction transaction){
         return new History(transaction.getReceiver().getEmail(),
-                getUserFullNameByEmail(transaction.getReceiver().getEmail()),
+                getUserFullNameByEmail(transaction.getReceiver()),
                 transaction.getSender().getEmail(),
-                getUserFullNameByEmail(transaction.getSender().getEmail()),
+                getUserFullNameByEmail(transaction.getSender()),
                 transaction.getAmount(),
                 transaction.getMessage(),
                 transaction.getTimestamp(),
@@ -84,8 +91,8 @@ public class HistoryService {
         }
     }
 
-    private String getUserFullNameByEmail(String email){
-        User receiver = userRepository.findByEmail(email);
+    private String getUserFullNameByEmail(User user){
+        User receiver = userRepository.findByEmail(user.getEmail());
         return receiver.getFirstName() + " " + receiver.getLastName();
     }
 

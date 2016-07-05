@@ -53,7 +53,7 @@ public class UsersService {
 
     private Logger LOG = Logger.getLogger(UsersService.class);
 
-    private static final String DELETED_USER_TAG = "undefined";
+    private static final User DELETED_USER_TAG = null;
 
     public User getKudosMaster() {
         return new User("pass", "master@of.kudos");
@@ -71,7 +71,6 @@ public class UsersService {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         return findByEmail(name);
     }
-
 
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
         if (userRepository.exists(user.getEmail().toLowerCase())) throw new UserException("user_already_exists");
@@ -197,7 +196,7 @@ public class UsersService {
     }
 
     private int calculateReceiverTransactionAmountByPeriod(User user, int period){
-        return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(period).toString())
+        return transactionRepository.findTransactionsByReceiverAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(period).toString())
                 .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                 .mapToInt(Transaction::getAmount).sum();
     }
@@ -226,13 +225,13 @@ public class UsersService {
 
         kudosService.getAllLoggedUserIncomingTransactions().stream()
                 .forEach(transaction -> {
-                    transaction.setReceiver(null);
+                    transaction.setReceiver(DELETED_USER_TAG);
                     kudosService.save(transaction);
                 });
 
         kudosService.getAllLoggedUserOutgoingTransactions().stream()
                 .forEach(transaction -> {
-                    transaction.setSender(null);
+                    transaction.setSender(DELETED_USER_TAG);
                     kudosService.save(transaction);
                 });
 
