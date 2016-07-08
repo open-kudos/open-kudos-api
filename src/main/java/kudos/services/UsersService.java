@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -266,7 +267,6 @@ public class UsersService {
             e.printStackTrace();
         }
 
-
         for (User user : allUsers) {
             User userToCreate;
             if (user.getEmail() == null) {
@@ -293,12 +293,14 @@ public class UsersService {
 
             userRepository.save(userToCreate);
 
-            List<Transaction> transactionsToChangeByReceiver;
+            List<Transaction> transactionsToChangeByReceiver = new ArrayList<>();
 
-            transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiver(user);
-
-            if (transactionsToChangeByReceiver.size() <= 0){
-                transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiverEmail(user.getEmail());
+            try {
+                transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiver(user);
+            } catch (Exception e) {
+                if (transactionRepository.findTransactionsByReceiverEmail(user.getEmail()) != null) {
+                    transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiverEmail(user.getEmail());
+                }
             }
 
             for (Transaction transaction : transactionsToChangeByReceiver) {
@@ -306,12 +308,14 @@ public class UsersService {
                 transactionRepository.save(transaction);
             }
 
-            List<Transaction> transactionsToChangeBySender;
+            List<Transaction> transactionsToChangeBySender = new ArrayList<>();
 
-            transactionsToChangeBySender = transactionRepository.findTransactionsBySender(user);
-
-            if (transactionsToChangeBySender.size() <= 0) {
-                transactionsToChangeBySender = transactionRepository.findTransactionsBySenderEmail(user.getEmail());
+            try {
+                transactionsToChangeBySender = transactionRepository.findTransactionsBySender(user);
+            } catch (Exception e) {
+                if (transactionRepository.findTransactionsBySenderEmail(user.getEmail()) != null) {
+                    transactionsToChangeBySender = transactionRepository.findTransactionsBySenderEmail(user.getEmail());
+                }
             }
 
             for (Transaction transaction : transactionsToChangeBySender) {
@@ -319,12 +323,15 @@ public class UsersService {
                 transactionRepository.save(transaction);
             }
 
-            List<Challenge> challengesToChangeByCreator;
 
-            challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user);
+            List<Challenge> challengesToChangeByCreator = new ArrayList<>();
 
-            if (challengesToChangeByCreator.size() <= 0){
-                challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user.getEmail());
+            try {
+                challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user);
+            }catch (Exception e){
+                if (challengeRepository.findChallengesByCreator(user.getEmail()) != null) {
+                    challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user.getEmail());
+                }
             }
 
             for (Challenge challenge : challengesToChangeByCreator) {
@@ -332,12 +339,14 @@ public class UsersService {
                 challengeRepository.save(challenge);
             }
 
-            List<Challenge> challengesToChangeByParticipant;
+            List<Challenge> challengesToChangeByParticipant = new ArrayList<>();
 
-            challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user);
-
-            if (challengesToChangeByParticipant.size() <= 0){
-                challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user.getEmail());
+            try{
+                challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user);
+            }catch (Exception e){
+                if (challengeRepository.findChallengesByParticipant(user.getEmail()) != null) {
+                    challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user.getEmail());
+                }
             }
 
             for (Challenge challenge : challengesToChangeByParticipant) {
@@ -347,7 +356,61 @@ public class UsersService {
 
             userRepository.delete(user);
         }
+        changeAllTransactionsAndChallenges();
         return userRepository.findAll();
+    }
+
+    public void changeAllTransactionsAndChallenges(){
+        List<User> allUsers = userRepository.findAll();
+
+        for (User user : allUsers){
+
+            List<Transaction> transactionsToChangeByReceiver;
+            List<Transaction> transactionsToChangeBySender;
+            List<Challenge> challengesToChangeByCreator;
+            List<Challenge> challengesToChangeByParticipant;
+
+            try {
+                transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiverEmail(user.getEmail());
+                for (Transaction transaction : transactionsToChangeByReceiver){
+                    transaction.setReceiver(user);
+                    transactionRepository.save(transaction);
+                }
+            } catch (Exception e){
+                System.out.println(e);
+            }
+
+            try {
+                transactionsToChangeBySender = transactionRepository.findTransactionsBySenderEmail(user.getEmail());
+                for (Transaction transaction : transactionsToChangeBySender){
+                    transaction.setSender(user);
+                    transactionRepository.save(transaction);
+                }
+            }catch (Exception e){
+                System.out.println(e);
+            }
+
+            try{
+                challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user.getEmail());
+                for (Challenge challenge : challengesToChangeByCreator){
+                    challenge.setCreator(user);
+                    challengeRepository.save(challenge);
+                }
+            }catch (Exception e){
+                System.out.println(e);
+            }
+
+            try {
+                challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user.getEmail());
+                for (Challenge challenge : challengesToChangeByParticipant){
+                    challenge.setParticipant(user);
+                    challengeRepository.save(challenge);
+                }
+            }catch (Exception e){
+                System.out.println(e);
+            }
+
+        }
     }
 
     public List<User> list(String filter) {
