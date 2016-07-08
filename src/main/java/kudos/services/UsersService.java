@@ -65,7 +65,7 @@ public class UsersService {
         User masterOfKudos;
         try {
             masterOfKudos = findByEmail("master@of.kudos").get();
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             masterOfKudos = new User("pass", "master@of.kudos");
             userRepository.save(masterOfKudos);
         }
@@ -170,37 +170,39 @@ public class UsersService {
         emailService.generateAndSendEmail(email, message);
     }
 
-    public List<LeaderboardUser> getTopSenders(String period){
+    public List<LeaderboardUser> getTopSenders(String period) {
         List<LeaderboardUser> topSenders = getAllConfirmedUsers().stream().map(user -> createLeaderboardUser(user, calculateSendersTransactionsAmount(user, period))).collect(Collectors.toList());
         return sortListByAmountOfKudos(topSenders, 0, 5);
     }
 
-    public List<LeaderboardUser> getTopReceivers(String period){
+    public List<LeaderboardUser> getTopReceivers(String period) {
         List<LeaderboardUser> topReceivers = getAllConfirmedUsers().stream().map(user -> createLeaderboardUser(user, calculateReceiversTransactionsAmount(user, period))).collect(Collectors.toList());
         return sortListByAmountOfKudos(topReceivers, 0, 5);
     }
 
-    private List<LeaderboardUser> sortListByAmountOfKudos(List<LeaderboardUser> leaderboardUserList, int startingIndex, int endingIndex){
+    private List<LeaderboardUser> sortListByAmountOfKudos(List<LeaderboardUser> leaderboardUserList, int startingIndex, int endingIndex) {
         try {
             return leaderboardUserList.stream().sorted((l1, l2) -> l2.getAmountOfKudos().compareTo(l1.getAmountOfKudos())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
-        } catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return leaderboardUserList.stream().sorted((l1, l2) -> l2.getAmountOfKudos().compareTo(l1.getAmountOfKudos())).collect(Collectors.toList()).subList(0, leaderboardUserList.size());
         }
     }
 
-    private int calculateSendersTransactionsAmount(User user, String period){
-        if (period.equals("week")) return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(7).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
-        else if (period.equals("month")) return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(30).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
+    private int calculateSendersTransactionsAmount(User user, String period) {
+        if (period.equals("week"))
+            return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(7).toString())
+                    .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
+                    .mapToInt(Transaction::getAmount).sum();
+        else if (period.equals("month"))
+            return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(30).toString())
+                    .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
+                    .mapToInt(Transaction::getAmount).sum();
         else return transactionRepository.findTransactionsBySender(user)
                     .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                     .mapToInt(Transaction::getAmount).sum();
     }
 
-    private int calculateReceiversTransactionsAmount(User user, String period){
+    private int calculateReceiversTransactionsAmount(User user, String period) {
         if (period.equals("week")) return calculateReceiverTransactionAmountByPeriod(user, 7);
         else if (period.equals("month")) return calculateReceiverTransactionAmountByPeriod(user, 30);
         else return transactionRepository.findTransactionsByReceiver(user)
@@ -208,13 +210,13 @@ public class UsersService {
                     .mapToInt(Transaction::getAmount).sum();
     }
 
-    private int calculateReceiverTransactionAmountByPeriod(User user, int period){
+    private int calculateReceiverTransactionAmountByPeriod(User user, int period) {
         return transactionRepository.findTransactionsByReceiverAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(period).toString())
                 .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                 .mapToInt(Transaction::getAmount).sum();
     }
 
-    private LeaderboardUser createLeaderboardUser(User user, int kudosAmount){
+    private LeaderboardUser createLeaderboardUser(User user, int kudosAmount) {
         return new LeaderboardUser(user.getFirstName(), user.getLastName(), user.getEmail(), kudosAmount);
     }
 
@@ -251,52 +253,77 @@ public class UsersService {
         userRepository.delete(getLoggedUser().get());
     }
 
-    public List<User> findAllAndCreateNewUsers(){
+    public List<User> findAllAndCreateNewUsers() {
         List<User> allUsers = userRepository.findAll();
 
-        for (User user : allUsers){
+        for (User user : allUsers) {
 
             User userToCreate = new User(user.getFirstName(), user.getLastName(), user.getPassword(), user.getEmail().toLowerCase());
             userToCreate.setEmailHash(user.getEmailHash());
 
-            if (user.isConfirmed()){
+            if (user.isConfirmed()) {
                 userToCreate.markUserAsConfirmed();
             }
 
-            if (user.isCompleted()){
+            if (user.isCompleted()) {
                 userToCreate.setCompleted(true);
             }
 
-            if (user.getLastSeenTransactionTimestamp() != null){
+            if (user.getLastSeenTransactionTimestamp() != null) {
                 userToCreate.setLastSeenTransactionTimestamp(user.getLastSeenTransactionTimestamp());
             }
 
             userRepository.save(userToCreate);
 
-            List<Transaction> transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiver(user);
+            List<Transaction> transactionsToChangeByReceiver;
 
-            for (Transaction transaction : transactionsToChangeByReceiver){
+            try {
+                transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiver(user);
+            } catch (Exception e) {
+                transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiverEmail(user.getEmail());
+            }
+
+            for (Transaction transaction : transactionsToChangeByReceiver) {
                 transaction.setReceiver(userToCreate);
                 transactionRepository.save(transaction);
             }
 
-            List<Transaction> transactionsToChangeBySender = transactionRepository.findTransactionsBySender(user);
+            List<Transaction> transactionsToChangeBySender;
 
-            for (Transaction transaction : transactionsToChangeBySender){
+            try {
+                transactionsToChangeBySender = transactionRepository.findTransactionsBySender(user);
+            } catch (Exception e) {
+                transactionsToChangeBySender = transactionRepository.findTransactionsBySenderEmail(user.getEmail());
+            }
+
+            for (Transaction transaction : transactionsToChangeBySender) {
                 transaction.setSender(userToCreate);
                 transactionRepository.save(transaction);
             }
 
-            List<Challenge> challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user);
 
-            for (Challenge challenge : challengesToChangeByCreator){
+            List<Challenge> challengesToChangeByCreator;
+
+            try {
+                challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user);
+            }catch (Exception e){
+                challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user.getEmail());
+            }
+
+            for (Challenge challenge : challengesToChangeByCreator) {
                 challenge.setCreator(userToCreate);
                 challengeRepository.save(challenge);
             }
 
-            List<Challenge> challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user);
+            List<Challenge> challengesToChangeByParticipant;
 
-            for (Challenge challenge : challengesToChangeByParticipant){
+            try{
+                challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user);
+            }catch (Exception e){
+                challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user.getEmail());
+            }
+
+            for (Challenge challenge : challengesToChangeByParticipant) {
                 challenge.setParticipant(userToCreate);
                 challengeRepository.save(challenge);
             }

@@ -12,6 +12,18 @@ import java.util.List;
  */
 public interface TransactionRepository extends MongoRepository<Transaction,String> {
 
+    /**
+     * TEMP METHODS
+     */
+
+    List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
+
+    List<Transaction> findTransactionsBySenderEmail(String senderEmail);
+
+    /**
+     * TEMP METHODS
+     */
+
     Transaction findFirstByOrderByTimestampDesc();
 
     Transaction findTransactionByReceiverOrderByTimestampDesc(User receiver);
