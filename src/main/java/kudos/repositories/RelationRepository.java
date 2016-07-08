@@ -12,7 +12,7 @@ import java.util.List;
 public interface RelationRepository extends MongoRepository<Relation,String>  {
 
     List<Relation> getRelationsByFollower(User follower);
-    List<Relation> getRelationsByCurrentUser(User currentUser);
-    Relation getRelationByFollowerAndCurrentUser(User follower, User currentUser);
+    List<Relation> getRelationsByUserToFollow(User userToFollow);
+    Relation getRelationByFollowerAndUserToFollow(User follower, User userToFollow);
 
 }

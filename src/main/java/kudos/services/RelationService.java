@@ -4,6 +4,7 @@ import kudos.exceptions.RelationException;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.repositories.RelationRepository;
+import kudos.repositories.UserRepository;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,15 @@ public class RelationService {
     @Autowired
     private RelationRepository relationRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public Relation addRelation(Relation relation) throws RelationException {
-        if(relationRepository.getRelationByFollowerAndCurrentUser(relation.getFollower(),relation.getCurrentUser()) != null){
+        if(relationRepository.getRelationByFollowerAndUserToFollow(relation.getFollower(),relation.getUserToFollow()) != null){
             throw new RelationException("relation_already_exists");
         }
 
-        if(relation.getFollower().equals(relation.getCurrentUser())){
+        if(relation.getFollower().equals(relation.getUserToFollow())){
             throw new RelationException("cant_follow_yourself");
         }
 
@@ -41,14 +45,15 @@ public class RelationService {
 
     public List<Relation> getAllFollowers() throws UserException {
         User currentUser = usersService.getLoggedUser().get();
-        return relationRepository.getRelationsByCurrentUser(currentUser);
+        return relationRepository.getRelationsByUserToFollow(currentUser);
 
     }
 
 
-    public void removeRelation(User follower) throws RelationException, UserException {
+    public void removeRelation(String email) throws RelationException, UserException {
         User loggedUser = usersService.getLoggedUser().get();
-        Relation relationToRemove = relationRepository.getRelationByFollowerAndCurrentUser(loggedUser, follower);
+        User userToRemoveRelation = userRepository.findByEmail(email);
+        Relation relationToRemove = relationRepository.getRelationByFollowerAndUserToFollow(loggedUser, userToRemoveRelation);
 
         if(relationToRemove == null){
             throw new RelationException("relation_not_exist");
