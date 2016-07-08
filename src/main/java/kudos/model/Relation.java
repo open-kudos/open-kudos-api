@@ -12,48 +12,32 @@ public class Relation {
     @Id
     private String id;
 
-    private String followerEmail;
-    private String followerName;
-    private String followerSurname;
+    private User follower;
 
-    private String userEmail;
-    private String userName;
-    private String userSurname;
+    private User currentUser;
 
-    public Relation(String followerEmail, String followerName, String followerSurname, String userEmail, String userName, String userSurname) {
-        this.followerEmail = followerEmail;
-        this.followerName = followerName;
-        this.followerSurname = followerSurname;
-        this.userEmail = userEmail;
-        this.userName = userName;
-        this.userSurname = userSurname;
+    public Relation(User follower, User currentUser) {
+        this.follower = follower;
+        this.currentUser = currentUser;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public User getFollower() {
+        return follower;
     }
 
-    public String getFollowerEmail() {
-        return followerEmail;
+    public User getCurrentUser() {
+        return currentUser;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getFollowerName() {
-        return followerName;
+    public void setFollower(User follower) {
+        this.follower = follower;
     }
 
-    public String getFollowerSurname() {
-        return followerSurname;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getUserSurname() {
-        return userSurname;
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
     }
 }
