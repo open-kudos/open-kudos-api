@@ -21,5 +21,6 @@ public class MigrationController extends BaseController  {
     List<User> transferUsers() throws UserException {
         return usersService.findAllAndCreateNewUsers();
     }
+    
 
 }

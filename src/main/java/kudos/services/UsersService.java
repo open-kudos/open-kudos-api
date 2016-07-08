@@ -2,9 +2,11 @@ package kudos.services;
 
 import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
+import kudos.model.Challenge;
 import kudos.model.LeaderboardUser;
 import kudos.model.Transaction;
 import kudos.model.User;
+import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
@@ -39,6 +41,9 @@ public class UsersService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private ChallengeRepository challengeRepository;
 
     @Autowired
     private EmailService emailService;
@@ -247,6 +252,57 @@ public class UsersService {
     }
 
     public List<User> findAllAndCreateNewUsers(){
+        List<User> allUsers = userRepository.findAll();
+
+        for (User user : allUsers){
+
+            User userToCreate = new User(user.getFirstName(), user.getLastName(), user.getPassword(), user.getEmail().toLowerCase());
+            userToCreate.setEmailHash(user.getEmailHash());
+
+            if (user.isConfirmed()){
+                userToCreate.markUserAsConfirmed();
+            }
+
+            if (user.isCompleted()){
+                userToCreate.setCompleted(true);
+            }
+
+            if (user.getLastSeenTransactionTimestamp() != null){
+                userToCreate.setLastSeenTransactionTimestamp(user.getLastSeenTransactionTimestamp());
+            }
+
+            userRepository.save(userToCreate);
+
+            List<Transaction> transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiver(user);
+
+            for (Transaction transaction : transactionsToChangeByReceiver){
+                transaction.setReceiver(userToCreate);
+                transactionRepository.save(transaction);
+            }
+
+            List<Transaction> transactionsToChangeBySender = transactionRepository.findTransactionsBySender(user);
+
+            for (Transaction transaction : transactionsToChangeBySender){
+                transaction.setSender(userToCreate);
+                transactionRepository.save(transaction);
+            }
+
+            List<Challenge> challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user);
+
+            for (Challenge challenge : challengesToChangeByCreator){
+                challenge.setCreator(userToCreate);
+                challengeRepository.save(challenge);
+            }
+
+            List<Challenge> challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user);
+
+            for (Challenge challenge : challengesToChangeByParticipant){
+                challenge.setParticipant(userToCreate);
+                challengeRepository.save(challenge);
+            }
+
+            userRepository.delete(user);
+        }
         return userRepository.findAll();
     }
 
