@@ -44,10 +44,9 @@ public class RelationController extends BaseController {
         if(!maybeUser.isPresent()){
             throw new UserException("user_not_exist");
         }
-        User user = maybeUser.get();
+        User userToFollow = maybeUser.get();
         User follower = usersService.getLoggedUser().get();
-        return relationService.addRelation(new Relation(follower.getEmail(),follower.getFirstName(),follower.getLastName(),
-                user.getEmail(),user.getFirstName(),user.getLastName()));
+        return relationService.addRelation(new Relation(follower, userToFollow));
     }
 
     @ApiMethod(description = "service to remove relation")
@@ -66,6 +65,7 @@ public class RelationController extends BaseController {
 
         Optional<User> maybeUser = usersService.findByEmail(email);
         if(!maybeUser.isPresent()) throw new UserException("user_not_exist");
+
 
         relationService.removeRelation(email);
     }

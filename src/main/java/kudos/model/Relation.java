@@ -14,19 +14,19 @@ public class Relation {
 
     private User follower;
 
-    private User currentUser;
+    private User userToFollow;
 
-    public Relation(User follower, User currentUser) {
+    public Relation(User follower, User userToFollow) {
         this.follower = follower;
-        this.currentUser = currentUser;
+        this.userToFollow = userToFollow;
     }
 
     public User getFollower() {
         return follower;
     }
 
-    public User getCurrentUser() {
-        return currentUser;
+    public User getUserToFollow() {
+        return userToFollow;
     }
 
     public String getId() {
@@ -37,7 +37,7 @@ public class Relation {
         this.follower = follower;
     }
 
-    public void setCurrentUser(User currentUser) {
-        this.currentUser = currentUser;
+    public void setUserToFollow(User userToFollow) {
+        this.userToFollow = userToFollow;
     }
 }
