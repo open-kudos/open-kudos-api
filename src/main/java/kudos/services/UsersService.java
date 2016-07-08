@@ -257,6 +257,17 @@ public class UsersService {
     public List<User> findAllAndCreateNewUsers() {
         List<User> allUsers = userRepository.findAll();
 
+        User masterOfKudos;
+        try {
+            masterOfKudos = findByEmail("master@of.kudos").get();
+        } catch (NoSuchElementException e) {
+            masterOfKudos = new User("pass", "master@of.kudos");
+            userRepository.save(masterOfKudos);
+        } catch (UserException e) {
+            e.printStackTrace();
+        }
+
+
         for (User user : allUsers) {
             User userToCreate;
             if (user.getEmail() == null) {
