@@ -356,34 +356,39 @@ public class UsersService {
 
             userRepository.delete(user);
         }
+
         changeAllTransactionsAndChallenges();
         return userRepository.findAll();
     }
 
-    public void changeAllTransactionsAndChallenges(){
+    public void changeAllTransactionsAndChallenges() {
         List<User> allUsers = userRepository.findAll();
 
         for (User user : allUsers){
 
-            List<Transaction> allTransactions;
+            List<Transaction> transactionsToChangeByReceiver;
             List<Transaction> transactionsToChangeBySender;
             List<Challenge> challengesToChangeByCreator;
             List<Challenge> challengesToChangeByParticipant;
 
             try {
-                allTransactions = transactionRepository.findAll();
-                for (Transaction transaction : allTransactions){
-                    if (transaction.getSenderEmail().equals(user.getEmail())){
-                        transaction.setSender(user);
-                        transactionRepository.save(transaction);
-                    }
-                    if (transaction.getReceiverEmail().equals(user.getEmail())){
-                        transaction.setReceiver(user);
-                        transactionRepository.save(transaction);
-                    }
+                transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiverEmail(user.getEmail());
+                for (Transaction transaction : transactionsToChangeByReceiver){
+                    transaction.setReceiver(user);
+                    transactionRepository.save(transaction);
                 }
             } catch (Exception e){
-                System.out.println("GG");
+                System.out.println("---GG: " + e);
+            }
+
+            try {
+                transactionsToChangeBySender = transactionRepository.findTransactionsBySenderEmail(user.getEmail());
+                for (Transaction transaction : transactionsToChangeBySender){
+                    transaction.setSender(user);
+                    transactionRepository.save(transaction);
+                }
+            } catch (Exception e){
+                System.out.println("---GG: " + e);
             }
 
             try{
@@ -393,7 +398,7 @@ public class UsersService {
                     challengeRepository.save(challenge);
                 }
             }catch (Exception e){
-                System.out.println("GG");
+                System.out.println("---GG: " + e);
             }
 
             try {
@@ -403,10 +408,22 @@ public class UsersService {
                     challengeRepository.save(challenge);
                 }
             }catch (Exception e){
-                System.out.println("GG");
+                System.out.println("---GG: " + e);
             }
 
         }
+    }
+
+    public List<Transaction> findAllTransactions() throws UserException {
+
+        List<Transaction> transactions = transactionRepository.findTransactionsByReceiverEmail("vytautas.sugintas@swedbank.lt");
+        User user = findByEmail("vytautas.sugintas@swedbank.lt").get();
+        for (Transaction transaction : transactions){
+            transaction.setReceiver(user);
+            transactionRepository.save(transaction);
+        }
+
+        return transactionRepository.findTransactionsByReceiverEmail("vytautas.sugintas@swedbank.lt");
     }
 
     public List<User> list(String filter) {
