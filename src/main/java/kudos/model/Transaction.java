@@ -23,6 +23,13 @@ public class Transaction {
     private String id;
     @DBRef
     private User sender;
+
+    //TODO remove after migration
+    private String senderEmail;
+
+    //TODO remove after migration
+    private String receiverEmail;
+
     @DBRef
     private User receiver;
     private String message;
@@ -94,5 +101,24 @@ public class Transaction {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+
+    //TODO remove later
+
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
+    }
+
+    public String getReceiverEmail() {
+        return receiverEmail;
+    }
+
+    public void setReceiverEmail(String receiverEmail) {
+        this.receiverEmail = receiverEmail;
     }
 }

@@ -365,29 +365,25 @@ public class UsersService {
 
         for (User user : allUsers){
 
-            List<Transaction> transactionsToChangeByReceiver;
+            List<Transaction> allTransactions;
             List<Transaction> transactionsToChangeBySender;
             List<Challenge> challengesToChangeByCreator;
             List<Challenge> challengesToChangeByParticipant;
 
             try {
-                transactionsToChangeByReceiver = transactionRepository.findTransactionsByReceiverEmail(user.getEmail());
-                for (Transaction transaction : transactionsToChangeByReceiver){
-                    transaction.setReceiver(user);
-                    transactionRepository.save(transaction);
+                allTransactions = transactionRepository.findAll();
+                for (Transaction transaction : allTransactions){
+                    if (transaction.getSenderEmail().equals(user.getEmail())){
+                        transaction.setSender(user);
+                        transactionRepository.save(transaction);
+                    }
+                    if (transaction.getReceiverEmail().equals(user.getEmail())){
+                        transaction.setReceiver(user);
+                        transactionRepository.save(transaction);
+                    }
                 }
             } catch (Exception e){
-                System.out.println(e);
-            }
-
-            try {
-                transactionsToChangeBySender = transactionRepository.findTransactionsBySenderEmail(user.getEmail());
-                for (Transaction transaction : transactionsToChangeBySender){
-                    transaction.setSender(user);
-                    transactionRepository.save(transaction);
-                }
-            }catch (Exception e){
-                System.out.println(e);
+                System.out.println("GG");
             }
 
             try{
@@ -397,7 +393,7 @@ public class UsersService {
                     challengeRepository.save(challenge);
                 }
             }catch (Exception e){
-                System.out.println(e);
+                System.out.println("GG");
             }
 
             try {
@@ -407,7 +403,7 @@ public class UsersService {
                     challengeRepository.save(challenge);
                 }
             }catch (Exception e){
-                System.out.println(e);
+                System.out.println("GG");
             }
 
         }
