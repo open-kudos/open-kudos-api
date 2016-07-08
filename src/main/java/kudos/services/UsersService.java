@@ -247,6 +247,22 @@ public class UsersService {
     }
 
     public List<User> findAllAndCreateNewUsers(){
+        List<User> allUsers = userRepository.findAll();
+        for (User user : allUsers){
+            User userToCreate = new User(user.getFirstName(), user.getLastName(), user.getPassword(), user.getEmail().toLowerCase());
+            userToCreate.setEmailHash(user.getEmailHash());
+
+            if (user.isConfirmed()){
+                userToCreate.markUserAsConfirmed();
+            }
+
+            if (user.isCompleted()){
+                userToCreate.setCompleted(true);
+            }
+
+            userRepository.delete(user);
+            userRepository.save(userToCreate);
+        }
         return userRepository.findAll();
     }
 
