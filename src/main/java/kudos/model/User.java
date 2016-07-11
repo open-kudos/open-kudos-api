@@ -38,6 +38,7 @@ public class User {
     protected String emailHash;
 
     protected boolean isCompleted = false;
+    protected boolean subscribing = true;
     protected boolean showBirthday = false;
     protected boolean isConfirmed = false;
 
@@ -89,7 +90,7 @@ public class User {
         this.location = myProfileForm.getLocation();
         this.team = myProfileForm.getTeam();
         this.showBirthday = myProfileForm.getShowBirthday();
-
+        this.subscribing = myProfileForm.isSubscribing();
         this.isCompleted = isUserCompleted();
 
         return this;
@@ -134,6 +135,14 @@ public class User {
 
     public boolean isCompleted() {
         return isCompleted;
+    }
+
+    public boolean isSubscribing() {
+        return subscribing;
+    }
+
+    public void setSubscribing(boolean subscribing) {
+        this.subscribing = subscribing;
     }
 
     public boolean isShowBirthday() {
