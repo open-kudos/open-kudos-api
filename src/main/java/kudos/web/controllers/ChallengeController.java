@@ -281,12 +281,11 @@ public class ChallengeController extends BaseController {
         }
 
         Challenge challenge = maybeChallenge.get();
-        if(challenge.getCreator().equals(usersService.getLoggedUser().get())) {
+        if(challenge.getCreatorUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             challenge.setCreatorStatus(status);
-
         }
 
-        if (challenge.getParticipant().equals(usersService.getLoggedUser().get())) {
+        if (challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             challenge.setParticipantStatus(status);
         }
 
