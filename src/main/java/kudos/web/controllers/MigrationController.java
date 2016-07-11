@@ -1,6 +1,5 @@
 package kudos.web.controllers;
 
-import kudos.model.Challenge;
 import kudos.model.User;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.ApiResponseObject;
@@ -15,20 +14,12 @@ import java.util.List;
 @RequestMapping("/migration")
 public class MigrationController extends BaseController  {
 
-    @RequestMapping(value = "/transferUsers", method = RequestMethod.GET)
+    @RequestMapping(value = "/migrate", method = RequestMethod.GET)
     public
     @ApiResponseObject
     @ResponseBody
     List<User> transferUsers() throws UserException {
-        return usersService.findAllAndCreateNewUsers();
-    }
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public
-    @ApiResponseObject
-    @ResponseBody
-    List<Challenge> test() {
-        return usersService.migrateChallengesToNewModel();
+        return migrationService.findAllAndCreateNewUsers();
     }
 
 }

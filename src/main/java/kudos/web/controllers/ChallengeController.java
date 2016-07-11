@@ -7,6 +7,7 @@ import kudos.exceptions.IdNotSpecifiedException;
 import kudos.exceptions.WrongChallengeEditorException;
 import kudos.model.Challenge;
 import kudos.web.beans.form.ChallengeTransferForm;
+import kudos.web.beans.response.ChallengeResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
@@ -114,6 +115,7 @@ public class ChallengeController extends BaseController {
         return challengeService.getAllUserParticipatedChallengesByStatusPageable(status, page, pageSize);
     }
 
+    //TODO CHANGE
     @ApiMethod(description = "Gets all challenges that logged user has completed")
     @RequestMapping(value = "/completedChallenges", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> completedChallenges() throws UserException {
@@ -132,6 +134,7 @@ public class ChallengeController extends BaseController {
         return challengeService.sortListByTimestamp(completedChallenges);
     }
 
+    //TODO CHANGE
     @ApiMethod(description = "Gets all challenges that logged user is participating")
     @RequestMapping(value = "/ongoing", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<Challenge> ongoingChallenges() throws UserException {
@@ -143,11 +146,8 @@ public class ChallengeController extends BaseController {
 
     @ApiMethod(description = "Gets all new challenges (both created and received)")
     @RequestMapping(value = "/new", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> newChallenges() throws UserException {
-        List<Challenge> newChallenges = new ArrayList<>();
-        newChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CREATED));
-        newChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CREATED));
-        return challengeService.sortListByTimestamp(newChallenges);
+    public @ApiResponseObject @ResponseBody List<ChallengeResponse> newChallenges() throws UserException {
+        return challengeService.getAllNewChallenges();
     }
 
     @ApiMethod(description = "Accepts challenge by its id")

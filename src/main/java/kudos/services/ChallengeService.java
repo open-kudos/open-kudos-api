@@ -6,6 +6,7 @@ import kudos.model.Challenge;
 import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
+import kudos.web.beans.response.ChallengeResponse;
 import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -109,15 +111,15 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get(), status);
+        return challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), status);
     }
 
     public List<Challenge> getAllUserParticipatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
-        return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get(), status, new PageRequest(page, pageSize));
+        return challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), status, new PageRequest(page, pageSize));
     }
 
     public List<Challenge> getAllUserCreatedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeRepository.findAllChallengesByCreatorAndStatus(usersService.getLoggedUser().get(), status);
+        return challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), status);
     }
 
     public List<Challenge> getAllUserCreatedChallenges() throws UserException {
@@ -142,6 +144,13 @@ public class ChallengeService {
                 throw new InvalidChallengeStatusException("challenge_already_accepted");
         }
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
+    }
+
+    public List<ChallengeResponse> getAllNewChallenges() throws UserException{
+        List<Challenge> newChallenges = new ArrayList<>();
+        newChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CREATED));
+        newChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CREATED));
+        return newChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
     }
 
     private void checkNotAccomplishedDeclinedFailedOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {

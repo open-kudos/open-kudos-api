@@ -37,8 +37,8 @@ public class HistoryService {
         User user = usersService.findByEmail(userEmail).get();
         List<History> historyList = transactionRepository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
         historyList.addAll(transactionRepository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByParticipantAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByCreatorAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
@@ -56,8 +56,8 @@ public class HistoryService {
 
     public List<History> getPageableUserAllChallengesHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
         User user = usersService.findByEmail(userEmail).get();
-        List<History> historyList = (challengeRepository.findAllChallengesByParticipantAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByCreatorAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        List<History> historyList = (challengeRepository.findAllChallengesByParticipantUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 

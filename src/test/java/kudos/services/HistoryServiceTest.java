@@ -66,7 +66,7 @@ public class HistoryServiceTest {
         when(transactionRepository.save(mockedTransaction)).thenReturn(mockedTransaction);
         when(userRepository.findByEmail(any(String.class))).thenReturn(new User("test", "test", "", "test@test.lt"));
         when(transactionRepository.findTransactionsBySenderAndStatus(any(User.class), any(Transaction.Status.class))).thenReturn(mockedTransactions);
-        when(challengeRepository.findAllChallengesByCreatorAndStatus(any(User.class), any(Challenge.Status.class))).thenReturn(mockedChallenges);
+        when(challengeRepository.findAllChallengesByCreatorUserAndStatus(any(User.class), any(Challenge.Status.class))).thenReturn(mockedChallenges);
     }
 
     @Test

@@ -100,8 +100,8 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Gets all confirmed users")
     @RequestMapping(value = "/confirmedUsers", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<User> confirmedUsers() throws UserException {
-        return usersService.getAllConfirmedUsers();
+    public @ApiResponseObject @ResponseBody List<UserResponse> confirmedUsers() throws UserException {
+        return usersService.getAllConfirmedUsersResponse();
     }
 
     @ApiMethod(description = "Gets top kudos receivers")
