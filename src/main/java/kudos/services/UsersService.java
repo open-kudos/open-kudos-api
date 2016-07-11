@@ -182,7 +182,7 @@ public class UsersService {
         Optional<User> maybeUser = findByEmail(email);
         User user = maybeUser.get();
         String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
-        emailService.generateAndSendEmail(email, message);
+        emailService.generateAndSendEmail(email, message, "Greetings from Acorns app");
     }
 
     public List<LeaderboardUser> getTopSenders(String period) {

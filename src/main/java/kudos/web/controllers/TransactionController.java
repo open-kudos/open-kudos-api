@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
-/**
- * Created by vytautassugintas on 25/04/16.
- */
 @Api(name = "Transactions Controller", description = "Controller for kudos transactions")
 @Controller
 @RequestMapping("/transaction")

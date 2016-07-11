@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,10 @@ public class ChallengeService {
     private KudosService kudosService;
     private UsersService usersService;
 
+
+    @Autowired
+    private EmailService emailService;
+
     @Autowired
     @Qualifier(value = "DBTimeFormatter")
     DateTimeFormatter dateTimeFormatter;
@@ -40,11 +45,11 @@ public class ChallengeService {
         this.usersService = usersService;
     }
 
-    public Challenge save(Challenge challenge){
+    public Challenge save(Challenge challenge) {
         return challengeRepository.save(challenge);
     }
 
-    public Challenge create(String participantEmail, String name, String description, String finishDate, int amount) throws BusinessException, UserException {
+    public Challenge create(String participantEmail, String name, String description, String finishDate, int amount) throws BusinessException, UserException, MessagingException {
         User participant = usersService.findByEmail(participantEmail).get();
         User creator = usersService.getLoggedUser().get();
         kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
@@ -58,6 +63,8 @@ public class ChallengeService {
                 finishDate,
                 amount, Challenge.Status.CREATED
         );
+
+        emailService.generateEmailForNewChallenge(creator, participant, challenge);
 
         return save(challenge);
     }
@@ -127,7 +134,7 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
-       return challengeRepository.findChallengesByParticipantUser(usersService.getLoggedUser().get());
+        return challengeRepository.findChallengesByParticipantUser(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllAcceptedChallenges() {
@@ -146,7 +153,7 @@ public class ChallengeService {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
     }
 
-    public List<ChallengeResponse> getAllNewChallenges() throws UserException{
+    public List<ChallengeResponse> getAllNewChallenges() throws UserException {
         List<Challenge> newChallenges = new ArrayList<>();
         newChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CREATED));
         newChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CREATED));
@@ -175,6 +182,7 @@ public class ChallengeService {
 
         return completedChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
     }
+
     private void checkNotAccomplishedDeclinedFailedOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
             case ACCOMPLISHED:
@@ -212,4 +220,5 @@ public class ChallengeService {
         databaseChallenge.setParticipantStatus(status);
         return challengeRepository.save(databaseChallenge);
     }
+
 }

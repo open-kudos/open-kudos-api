@@ -21,10 +21,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-
-/**
- * Created by chc on 15.7.23.
- */
 @Api(name = "User Controller", description = "Controller for managing user account")
 @Controller
 @RequestMapping("/user")

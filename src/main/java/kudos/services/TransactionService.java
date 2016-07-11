@@ -15,9 +15,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * Created by vytautassugintas on 25/04/16.
- */
 @Service
 public class TransactionService {
 

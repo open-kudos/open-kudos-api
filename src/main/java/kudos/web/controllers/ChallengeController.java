@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.mail.MessagingException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +69,7 @@ public class ChallengeController extends BaseController {
     })
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public @ApiResponseObject @ResponseBody Challenge challenge(ChallengeTransferForm form, Errors errors)
-            throws FormValidationException, ParseException, BusinessException, UserException {
+            throws FormValidationException, ParseException, BusinessException, UserException, MessagingException {
 
         new ChallengeTransferForm.ChallengeTransferFormValidator().validate(form, errors);
 
