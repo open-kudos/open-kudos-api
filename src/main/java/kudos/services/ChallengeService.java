@@ -153,6 +153,28 @@ public class ChallengeService {
         return newChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
     }
 
+    public List<ChallengeResponse> getAllOngoingChallenges() throws UserException {
+        List<Challenge> ongoingChallenges = new ArrayList<>();
+        ongoingChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCEPTED));
+        ongoingChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCEPTED));
+        return ongoingChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
+    }
+
+    public List<ChallengeResponse> getAllCompletedChallenges() throws UserException {
+        List<Challenge> completedChallenges = new ArrayList<>();
+
+        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCOMPLISHED));
+        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CANCELED));
+        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.DECLINED));
+        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.EXPIRED));
+
+        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCOMPLISHED));
+        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CANCELED));
+        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.DECLINED));
+        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.EXPIRED));
+
+        return completedChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
+    }
     private void checkNotAccomplishedDeclinedFailedOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
             case ACCOMPLISHED:
@@ -190,9 +212,4 @@ public class ChallengeService {
         databaseChallenge.setParticipantStatus(status);
         return challengeRepository.save(databaseChallenge);
     }
-
-    public List<Challenge> sortListByTimestamp(List<Challenge> historyList){
-        return historyList.stream().sorted((c1, c2) -> c2.getCreateDateDate().compareTo(c1.getCreateDateDate())).collect(Collectors.toList());
-    }
-
 }

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,30 +117,14 @@ public class ChallengeController extends BaseController {
     //TODO CHANGE
     @ApiMethod(description = "Gets all challenges that logged user has completed")
     @RequestMapping(value = "/completedChallenges", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> completedChallenges() throws UserException {
-        List<Challenge> completedChallenges = new ArrayList<>();
-
-        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
-        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.CANCELED));
-        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.DECLINED));
-        completedChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.EXPIRED));
-
-        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCOMPLISHED));
-        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.CANCELED));
-        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.DECLINED));
-        completedChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.EXPIRED));
-
-        return challengeService.sortListByTimestamp(completedChallenges);
+    public @ApiResponseObject @ResponseBody List<ChallengeResponse> completedChallenges() throws UserException {
+        return challengeService.getAllCompletedChallenges();
     }
 
-    //TODO CHANGE
     @ApiMethod(description = "Gets all challenges that logged user is participating")
     @RequestMapping(value = "/ongoing", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> ongoingChallenges() throws UserException {
-        List<Challenge> ongoingChallenges = new ArrayList<>();
-        ongoingChallenges.addAll(challengeService.getAllUserCreatedChallengesByStatus(Challenge.Status.ACCEPTED));
-        ongoingChallenges.addAll(challengeService.getAllUserParticipatedChallengesByStatus(Challenge.Status.ACCEPTED));
-        return challengeService.sortListByTimestamp(ongoingChallenges);
+    public @ApiResponseObject @ResponseBody List<ChallengeResponse> ongoingChallenges() throws UserException {
+        return challengeService.getAllOngoingChallenges();
     }
 
     @ApiMethod(description = "Gets all new challenges (both created and received)")
