@@ -330,8 +330,8 @@ public class ChallengeController extends BaseController {
             @ApiError(code = "challenge_already_canceled",
                     description = "If challenge is already canceled")
     })
-    @RequestMapping(value = "/expire", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge expire(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    @RequestMapping(value = "/fail", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");

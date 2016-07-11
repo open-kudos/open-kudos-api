@@ -102,10 +102,10 @@ public class ChallengeService {
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
-    public Challenge fail(Challenge challenge) throws BusinessException, UserException {
+    public Challenge expire(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.retrieveSystemKudos(challenge.getCreatorUser(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
-        return setStatusAndSave(challenge, Challenge.Status.FAILED);
+        kudosService.retrieveSystemKudos(challenge.getCreatorUser(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
+        return setStatusAndSave(challenge, Challenge.Status.EXPIRED);
     }
 
     public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
@@ -150,8 +150,8 @@ public class ChallengeService {
                 throw new InvalidChallengeStatusException("challenge_already_accomplished");
             case DECLINED:
                 throw new InvalidChallengeStatusException("challenge_already_declined");
-            case FAILED:
-                throw new InvalidChallengeStatusException("challenge_already_failed");
+            case EXPIRED:
+                throw new InvalidChallengeStatusException("challenge_already_expired");
             case CANCELED:
                 throw new InvalidChallengeStatusException("challenge_already_canceled");
         }
