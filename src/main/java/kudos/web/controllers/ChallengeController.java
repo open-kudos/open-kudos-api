@@ -70,7 +70,6 @@ public class ChallengeController extends BaseController {
     public @ApiResponseObject @ResponseBody Challenge challenge(ChallengeTransferForm form, Errors errors)
             throws FormValidationException, ParseException, BusinessException, UserException {
 
-        // TODO same question as in KudosController
         new ChallengeTransferForm.ChallengeTransferFormValidator().validate(form, errors);
 
         if (errors.hasErrors())

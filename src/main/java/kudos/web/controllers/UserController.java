@@ -4,6 +4,7 @@ import freemarker.template.TemplateException;
 import kudos.model.LeaderboardUser;
 import kudos.model.User;
 import kudos.web.beans.form.MyProfileForm;
+import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
@@ -93,8 +94,8 @@ public class UserController extends BaseController {
             @ApiQueryParam(name = "filter", required = false, description = "User list filter")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public List<User> listUsers(String filter) throws Exception{
-        return usersService.list(filter);
+    public List<UserResponse> listUsers() throws Exception{
+        return usersService.list();
     }
 
     @ApiMethod(description = "Gets all confirmed users")

@@ -44,7 +44,6 @@ public class Challenge {
     @ApiObjectField
     private Status status;
 
-
     public Challenge(User creatorUser, User participantUser, String name, String description, String createDate, String finishDate, int amount, Status status) {
         this.creatorUser = creatorUser;
         this.participantUser = participantUser;

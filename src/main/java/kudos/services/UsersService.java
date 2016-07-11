@@ -10,6 +10,7 @@ import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
+import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -423,8 +424,15 @@ public class UsersService {
         return challenges;
     }
 
-    public List<User> list(String filter) {
-        return userRepository.searchAllFields(filter);
+    public List<UserResponse> list() {
+        return userRepository.findAll().stream().map(user -> new UserResponse(user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getBirthday(),
+                user.getPhone(),
+                user.getLastSeenTransactionTimestamp()
+        )).collect(Collectors.toList());
     }
 
     public List<User> getAllConfirmedUsers() {
