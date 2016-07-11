@@ -1,6 +1,6 @@
 package kudos.web.controllers;
 
-import kudos.model.Transaction;
+import kudos.model.Challenge;
 import kudos.model.User;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.ApiResponseObject;
@@ -27,8 +27,8 @@ public class MigrationController extends BaseController  {
     public
     @ApiResponseObject
     @ResponseBody
-    List<Transaction> test() throws UserException {
-        return usersService.findAllTransactions();
+    List<Challenge> test() {
+        return usersService.migrateChallengesToNewModel();
     }
 
 }

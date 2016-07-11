@@ -12,14 +12,13 @@ import java.util.List;
  */
 public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
-
     List<Challenge> findChallengesByCreator(String creator);
 
     List<Challenge> findChallengesByParticipant(String participant);
 
-    List<Challenge> findChallengesByCreator(User creator);
+    List<Challenge> findChallengesByCreatorUser(User creator);
 
-    List<Challenge> findChallengesByParticipant(User participant);
+    List<Challenge> findChallengesByParticipantUser(User participant);
 
     Challenge findChallengeById(String id);
 

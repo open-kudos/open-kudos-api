@@ -7,7 +7,6 @@ import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
 import kudos.web.exceptions.UserException;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Created by chc on 15.8.7.
- */
 @Service
 @Scope("prototype")
 public class ChallengeService {
@@ -76,20 +72,20 @@ public class ChallengeService {
 
     public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        User creator = usersService.findById(challenge.getCreator().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
+        User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
         kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        User creator = usersService.findById(challenge.getCreator().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
+        User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
         kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
 
     public Challenge accomplish(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedExpiredOrCanceled(challenge);
+        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
 
         if (challenge.getParticipantStatus() == null) {
             return setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
@@ -106,13 +102,12 @@ public class ChallengeService {
         return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
     }
 
-    public Challenge expire(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedExpiredOrCanceled(challenge);
-        if (!checkIfNewWeekStarted(challenge)) {
-            kudosService.retrieveSystemKudos(usersService.findById(challenge.getCreator().getId()).get(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
-        }
-        return setStatusAndSave(challenge, Challenge.Status.EXPIRED);
+    public Challenge fail(Challenge challenge) throws BusinessException, UserException {
+        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
+        kudosService.retrieveSystemKudos(challenge.getCreatorUser(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
+        return setStatusAndSave(challenge, Challenge.Status.FAILED);
     }
+
     public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
         return challengeRepository.findAllChallengesByParticipantAndStatus(usersService.getLoggedUser().get(), status);
     }
@@ -126,11 +121,11 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllUserCreatedChallenges() throws UserException {
-        return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get());
+        return challengeRepository.findChallengesByCreatorUser(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
-       return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get());
+       return challengeRepository.findChallengesByParticipantUser(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllAcceptedChallenges() {
@@ -146,17 +141,17 @@ public class ChallengeService {
             case ACCEPTED:
                 throw new InvalidChallengeStatusException("challenge_already_accepted");
         }
-        checkNotAccomplishedDeclinedExpiredOrCanceled(challenge);
+        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
     }
 
-    private void checkNotAccomplishedDeclinedExpiredOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {
+    private void checkNotAccomplishedDeclinedFailedOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {
         switch (challenge.getStatus()) {
             case ACCOMPLISHED:
                 throw new InvalidChallengeStatusException("challenge_already_accomplished");
             case DECLINED:
                 throw new InvalidChallengeStatusException("challenge_already_declined");
-            case EXPIRED:
-                throw new InvalidChallengeStatusException("challenge_already_expired");
+            case FAILED:
+                throw new InvalidChallengeStatusException("challenge_already_failed");
             case CANCELED:
                 throw new InvalidChallengeStatusException("challenge_already_canceled");
         }
@@ -164,9 +159,9 @@ public class ChallengeService {
 
     private User checkWhoIsWinner(Challenge challenge) {
         if (challenge.getCreatorStatus() && !challenge.getParticipantStatus()) {
-            return challenge.getCreator();
+            return challenge.getCreatorUser();
         }
-        return challenge.getParticipant();
+        return challenge.getParticipantUser();
     }
 
     private Challenge setStatusAndSave(Challenge challenge, Challenge.Status status) {
@@ -191,9 +186,4 @@ public class ChallengeService {
         return historyList.stream().sorted((c1, c2) -> c2.getCreateDateDate().compareTo(c1.getCreateDateDate())).collect(Collectors.toList());
     }
 
-    private boolean checkIfNewWeekStarted(Challenge challenge) {
-        LocalDateTime startOfWeek = new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
-        return dateTimeFormatter.parseLocalDateTime(challenge.getCreateDateDate()).isBefore(startOfWeek);
-
-    }
 }
