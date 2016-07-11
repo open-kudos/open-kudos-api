@@ -119,18 +119,33 @@ public class UsersService {
         wipeAllUserData();
     }
 
-    public User getCompletedUser() throws UserException {
+    public UserResponse getCompletedUser() throws UserException {
         User user = getLoggedUser().get();
-        return user;
+        return new UserResponse(user);
     }
 
-    public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
+    public UserResponse login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
         loginValidation(email.toLowerCase(), password);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email.toLowerCase(), password)));
         request.getSession().setMaxInactiveInterval(0);
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-        return findByEmail(email.toLowerCase()).get();
+        return new UserResponse(findByEmail(email.toLowerCase()).get());
+    }
+
+    public boolean subscribe() throws UserException{
+        return setSubscribe(true);
+    }
+
+    public boolean unsubscribe() throws UserException{
+        return setSubscribe(false);
+    }
+
+    private boolean setSubscribe(boolean subscribing) throws UserException {
+        User user = getLoggedUser().get();
+        user.setSubscribing(subscribing);
+        userRepository.save(user);
+        return user.isSubscribing();
     }
 
     private User loginValidation(String email, String password) throws UserException {
@@ -253,16 +268,8 @@ public class UsersService {
         userRepository.delete(getLoggedUser().get());
     }
 
-
     public List<UserResponse> list() {
-        return userRepository.findAll().stream().map(user -> new UserResponse(user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getBirthday(),
-                user.getPhone(),
-                user.getLastSeenTransactionTimestamp()
-        )).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(UserResponse::new).collect(Collectors.toList());
     }
 
     public List<User> getAllConfirmedUsers(){
@@ -270,14 +277,7 @@ public class UsersService {
     }
 
     public List<UserResponse> getAllConfirmedUsersResponse() {
-        return userRepository.findUsersByIsConfirmed(true).stream().map(user -> new UserResponse(user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getBirthday(),
-                user.getPhone(),
-                user.getLastSeenTransactionTimestamp()
-        )).collect(Collectors.toList());
+        return userRepository.findUsersByIsConfirmed(true).stream().map(UserResponse::new).collect(Collectors.toList());
     }
 
 }

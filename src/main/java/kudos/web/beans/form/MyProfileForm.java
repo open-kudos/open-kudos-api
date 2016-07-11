@@ -22,6 +22,7 @@ public class MyProfileForm {
     private String department;
     private String location;
     private String team;
+    private boolean subscribing = true;
     private boolean isCompleted = false;
 
     public boolean getShowBirthday() {
@@ -153,6 +154,13 @@ public class MyProfileForm {
         this.newPasswordConfirm = newPasswordConfirm;
     }
 
+    public boolean isSubscribing() {
+        return subscribing;
+    }
+
+    public void setSubscribing(boolean subscribing) {
+        this.subscribing = subscribing;
+    }
 
     public static class MyProfileValidator implements Validator{
 

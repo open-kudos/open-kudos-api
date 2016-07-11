@@ -41,7 +41,7 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Service to show user account")
     @RequestMapping(value = "/home", method = RequestMethod.GET)
-    public User getUserAccount() throws UserException {
+    public UserResponse getUserAccount() throws UserException {
         return usersService.getCompletedUser();
     }
 
@@ -114,6 +114,18 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/topsenders", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopSenders(String period) throws UserException {
         return usersService.getTopSenders(period);
+    }
+
+    @ApiMethod(description = "Gets top kudos senders")
+    @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody boolean subscribe() throws UserException {
+        return usersService.subscribe();
+    }
+
+    @ApiMethod(description = "Gets top kudos senders")
+    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody boolean unsubscribe() throws UserException {
+        return usersService.unsubscribe();
     }
 
 }

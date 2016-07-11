@@ -1,7 +1,7 @@
 package kudos.web.controllers;
 
-import kudos.model.User;
 import kudos.web.beans.form.LoginForm;
+import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
@@ -33,7 +33,8 @@ public class AuthenticationController extends BaseController {
             @ApiError(code = "user_not_exist", description = "If user does not exist"),
             @ApiError(code = "user_already_logged", description = "If user is already logged")})
     @RequestMapping(value = "/login", method = RequestMethod.POST, headers = {"Content-type=application/json"})
-    public @ApiResponseObject @ResponseBody User login(@RequestBody LoginForm loginForm, Errors errors, HttpServletRequest request) throws FormValidationException, UserException {
+    public @ApiResponseObject @ResponseBody
+    UserResponse login(@RequestBody LoginForm loginForm, Errors errors, HttpServletRequest request) throws FormValidationException, UserException {
         new LoginForm.LoginFormValidator(domain).validate(loginForm,errors);
         if (errors.hasErrors()) {
             throw new FormValidationException(errors);
