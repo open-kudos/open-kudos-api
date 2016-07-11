@@ -5,6 +5,7 @@ import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.model.UserKudos;
 import kudos.web.beans.form.KudosTransferForm;
+import kudos.web.beans.response.TransactionResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
@@ -43,7 +44,7 @@ public class KudosController extends BaseController {
                     description = "If kudos receiver does not exist")
     })
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Transaction sendKudos(KudosTransferForm kudosTransferForm, Errors errors)
+    public @ApiResponseObject @ResponseBody TransactionResponse sendKudos(KudosTransferForm kudosTransferForm, Errors errors)
             throws FormValidationException, BusinessException, UserException {
 
         new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
@@ -58,7 +59,7 @@ public class KudosController extends BaseController {
         User user = usersService.findByEmail(kudosTransferForm.getReceiverEmail())
                 .orElseThrow(() -> new UserException("receiver.not.exist"));
 
-        return kudosService.giveKudos(user, Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage());
+        return new TransactionResponse(kudosService.giveKudos(user, Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage()));
     }
 
     @ApiMethod(description = "Service to get all incoming kudos transactions")
