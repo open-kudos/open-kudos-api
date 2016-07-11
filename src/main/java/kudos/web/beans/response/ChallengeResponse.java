@@ -19,6 +19,7 @@ public class ChallengeResponse extends Response {
     Boolean participantStatus;
     String description;
     String finishDate;
+    Challenge.Status status;
 
     public ChallengeResponse(Challenge challenge){
         this.id = challenge.getId();
@@ -33,6 +34,19 @@ public class ChallengeResponse extends Response {
         this.participantStatus = challenge.getParticipantStatus();
         this.description = challenge.getDescription();
         this.finishDate = challenge.getFinishDate();
+        this.status = challenge.getStatus();
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Challenge.Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Challenge.Status status) {
+        this.status = status;
     }
 
     public String getId() {
