@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Challenge {
 
     public enum Status {
-        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, FAILED, CANCELED
+        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, EXPIRED, CANCELED
     }
 
     @Id
