@@ -8,6 +8,7 @@ import kudos.model.Challenge;
 public class ChallengeResponse extends Response {
 
     int amount;
+    String id;
     String name;
     String createDate;
     String creatorName;
@@ -16,8 +17,11 @@ public class ChallengeResponse extends Response {
     String participantName;
     String participantEmail;
     Boolean participantStatus;
+    String description;
+    String finishDate;
 
     public ChallengeResponse(Challenge challenge){
+        this.id = challenge.getId();
         this.name = challenge.getName();
         this.amount = challenge.getAmount();
         this.createDate = challenge.getCreateDateDate();
@@ -27,6 +31,28 @@ public class ChallengeResponse extends Response {
         this.participantName = challenge.getParticipantUser().getFirstName() + " " + challenge.getParticipantUser().getLastName();
         this.participantEmail = challenge.getParticipantUser().getEmail();
         this.participantStatus = challenge.getParticipantStatus();
+        this.description = challenge.getDescription();
+        this.finishDate = challenge.getFinishDate();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getFinishDate() {
+        return finishDate;
+    }
+
+    public void setFinishDate(String finishDate) {
+        this.finishDate = finishDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getName() {
