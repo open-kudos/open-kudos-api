@@ -62,10 +62,10 @@ public class HistoryService {
     }
 
     public History transformChallengeModelToHistory(Challenge challenge){
-        return new History(challenge.getParticipant().getEmail(),
-                getUserFullNameByEmail(challenge.getParticipant()),
-                challenge.getCreator().getEmail(),
-                getUserFullNameByEmail(challenge.getCreator()),
+        return new History(challenge.getParticipantUser().getEmail(),
+                getUserFullNameByEmail(challenge.getParticipantUser()),
+                challenge.getCreatorUser().getEmail(),
+                getUserFullNameByEmail(challenge.getCreatorUser()),
                 challenge.getAmount() * 2,
                 challenge.getDescription(),
                 challenge.getCreateDateDate(),

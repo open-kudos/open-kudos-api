@@ -229,13 +229,13 @@ public class UsersService {
 
         challengeService.getAllUserCreatedChallenges().stream()
                 .forEach(challenge -> {
-                    challenge.setCreator(DELETED_USER_TAG);
+                    challenge.setCreatorUser(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
 
         challengeService.getAllUserParticipatedChallenges().stream()
                 .forEach(challenge -> {
-                    challenge.setParticipant(DELETED_USER_TAG);
+                    challenge.setParticipantUser(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
 
@@ -327,7 +327,7 @@ public class UsersService {
             List<Challenge> challengesToChangeByCreator = new ArrayList<>();
 
             try {
-                challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user);
+                challengesToChangeByCreator = challengeRepository.findChallengesByCreatorUser(user);
             }catch (Exception e){
                 if (challengeRepository.findChallengesByCreator(user.getEmail()) != null) {
                     challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user.getEmail());
@@ -335,14 +335,14 @@ public class UsersService {
             }
 
             for (Challenge challenge : challengesToChangeByCreator) {
-                challenge.setCreator(userToCreate);
+                challenge.setCreatorUser(userToCreate);
                 challengeRepository.save(challenge);
             }
 
             List<Challenge> challengesToChangeByParticipant = new ArrayList<>();
 
             try{
-                challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user);
+                challengesToChangeByParticipant = challengeRepository.findChallengesByParticipantUser(user);
             }catch (Exception e){
                 if (challengeRepository.findChallengesByParticipant(user.getEmail()) != null) {
                     challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user.getEmail());
@@ -350,7 +350,7 @@ public class UsersService {
             }
 
             for (Challenge challenge : challengesToChangeByParticipant) {
-                challenge.setParticipant(userToCreate);
+                challenge.setParticipantUser(userToCreate);
                 challengeRepository.save(challenge);
             }
 
@@ -394,7 +394,7 @@ public class UsersService {
             try{
                 challengesToChangeByCreator = challengeRepository.findChallengesByCreator(user.getEmail());
                 for (Challenge challenge : challengesToChangeByCreator){
-                    challenge.setCreator(user);
+                    challenge.setCreatorUser(user);
                     challengeRepository.save(challenge);
                 }
             }catch (Exception e){
@@ -404,7 +404,7 @@ public class UsersService {
             try {
                 challengesToChangeByParticipant = challengeRepository.findChallengesByParticipant(user.getEmail());
                 for (Challenge challenge : challengesToChangeByParticipant){
-                    challenge.setParticipant(user);
+                    challenge.setParticipantUser(user);
                     challengeRepository.save(challenge);
                 }
             }catch (Exception e){
@@ -414,16 +414,13 @@ public class UsersService {
         }
     }
 
-    public List<Transaction> findAllTransactions() throws UserException {
+    public List<Challenge> migrateChallengesToNewModel(){
 
-        List<Transaction> transactions = transactionRepository.findTransactionsByReceiverEmail("vytautas.sugintas@swedbank.lt");
-        User user = findByEmail("vytautas.sugintas@swedbank.lt").get();
-        for (Transaction transaction : transactions){
-            transaction.setReceiver(user);
-            transactionRepository.save(transaction);
-        }
+        List<Challenge> challenges;
 
-        return transactionRepository.findTransactionsByReceiverEmail("vytautas.sugintas@swedbank.lt");
+        challenges = challengeRepository.findAll();
+
+        return challenges;
     }
 
     public List<User> list(String filter) {

@@ -19,9 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Created by chc on 15.8.7.
- */
 @Service
 @Scope("prototype")
 public class ChallengeService {
@@ -75,14 +72,14 @@ public class ChallengeService {
 
     public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        User creator = usersService.findById(challenge.getCreator().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
+        User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
         kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        User creator = usersService.findById(challenge.getCreator().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
+        User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
         kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
@@ -107,7 +104,7 @@ public class ChallengeService {
 
     public Challenge fail(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.retrieveSystemKudos(challenge.getCreator(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
+        kudosService.retrieveSystemKudos(challenge.getCreatorUser(), challenge.getAmount(), challenge.getName(), Transaction.Status.FAILED_CHALENGE);
         return setStatusAndSave(challenge, Challenge.Status.FAILED);
     }
 
@@ -124,11 +121,11 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllUserCreatedChallenges() throws UserException {
-        return challengeRepository.findChallengesByCreator(usersService.getLoggedUser().get());
+        return challengeRepository.findChallengesByCreatorUser(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
-       return challengeRepository.findChallengesByParticipant(usersService.getLoggedUser().get());
+       return challengeRepository.findChallengesByParticipantUser(usersService.getLoggedUser().get());
     }
 
     public List<Challenge> getAllAcceptedChallenges() {
@@ -162,9 +159,9 @@ public class ChallengeService {
 
     private User checkWhoIsWinner(Challenge challenge) {
         if (challenge.getCreatorStatus() && !challenge.getParticipantStatus()) {
-            return challenge.getCreator();
+            return challenge.getCreatorUser();
         }
-        return challenge.getParticipant();
+        return challenge.getParticipantUser();
     }
 
     private Challenge setStatusAndSave(Challenge challenge, Challenge.Status status) {

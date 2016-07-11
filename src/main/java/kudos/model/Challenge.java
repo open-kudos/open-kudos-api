@@ -6,9 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * Created by chc on 15.8.7.
- */
 @ApiObject
 @Document
 public class Challenge {
@@ -19,10 +16,14 @@ public class Challenge {
 
     @Id
     private String id;
+
+    private String creator;
+    private String participant;
+
     @DBRef
-    private User creator;
+    private User creatorUser;
     @DBRef
-    private User participant;
+    private User participantUser;
 
     @ApiObjectField
     private Boolean creatorStatus;
@@ -44,9 +45,9 @@ public class Challenge {
     private Status status;
 
 
-    public Challenge(User creator, User participant, String name, String description, String createDate, String finishDate, int amount, Status status) {
-        this.creator = creator;
-        this.participant = participant;
+    public Challenge(User creatorUser, User participantUser, String name, String description, String createDate, String finishDate, int amount, Status status) {
+        this.creatorUser = creatorUser;
+        this.participantUser = participantUser;
 
         this.creatorStatus = null;
         this.participantStatus = null;
@@ -68,20 +69,36 @@ public class Challenge {
         this.id = id;
     }
 
-    public User getCreator() {
+    public String getCreator() {
         return creator;
     }
 
-    public void setCreator(User creator) {
+    public void setCreator(String creator) {
         this.creator = creator;
     }
 
-    public User getParticipant() {
+    public String getParticipant() {
         return participant;
     }
 
-    public void setParticipant(User participant) {
+    public void setParticipant(String participant) {
         this.participant = participant;
+    }
+
+    public User getCreatorUser() {
+        return creatorUser;
+    }
+
+    public void setCreatorUser(User creatorUser) {
+        this.creatorUser = creatorUser;
+    }
+
+    public User getParticipantUser() {
+        return participantUser;
+    }
+
+    public void setParticipantUser(User participantUser) {
+        this.participantUser = participantUser;
     }
 
     public String getName() {
