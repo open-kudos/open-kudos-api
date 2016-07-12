@@ -207,7 +207,7 @@ public class ChallengeController extends BaseController {
 
         Challenge challenge = maybeChallenge.get();
         if(!challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
-            throw new WrongChallengeEditorException("not_a_participant");
+            throw new WrongChallengeEditorException("not_a_particitipant");
         }
         return challengeService.decline(challenge);
     }
