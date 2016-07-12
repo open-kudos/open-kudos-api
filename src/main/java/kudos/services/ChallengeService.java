@@ -8,6 +8,7 @@ import kudos.model.User;
 import kudos.repositories.ChallengeRepository;
 import kudos.web.beans.response.ChallengeResponse;
 import kudos.web.exceptions.UserException;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,14 +83,18 @@ public class ChallengeService {
     public Challenge decline(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
         User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
-        kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
+        if (!checkIfNewWeekStarted(challenge)) {
+            kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
+        }
         return setStatusAndSave(challenge, Challenge.Status.DECLINED);
     }
 
     public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
         User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
-        kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
+        if (!checkIfNewWeekStarted(challenge)) {
+            kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
+        }
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
 
@@ -113,7 +118,9 @@ public class ChallengeService {
 
     public Challenge expire(Challenge challenge) throws BusinessException, UserException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        kudosService.retrieveSystemKudos(challenge.getCreatorUser(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
+        if (!checkIfNewWeekStarted(challenge)) {
+            kudosService.retrieveSystemKudos(challenge.getCreatorUser(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
+        }
         return setStatusAndSave(challenge, Challenge.Status.EXPIRED);
     }
 
@@ -221,4 +228,9 @@ public class ChallengeService {
         return challengeRepository.save(databaseChallenge);
     }
 
+    private boolean checkIfNewWeekStarted(Challenge challenge) {
+        LocalDateTime startOfWeek = new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
+        return dateTimeFormatter.parseLocalDateTime(challenge.getCreateDateDate()).isBefore(startOfWeek);
+
+    }
 }
