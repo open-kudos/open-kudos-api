@@ -68,7 +68,7 @@ public class ChallengeController extends BaseController {
                     description = "If participant user does not exist")
     })
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge challenge(ChallengeTransferForm form, Errors errors)
+    public @ApiResponseObject @ResponseBody ChallengeResponse challenge(ChallengeTransferForm form, Errors errors)
             throws FormValidationException, ParseException, BusinessException, UserException, MessagingException {
 
         new ChallengeTransferForm.ChallengeTransferFormValidator().validate(form, errors);
@@ -76,13 +76,13 @@ public class ChallengeController extends BaseController {
         if (errors.hasErrors())
             throw new FormValidationException(errors);
 
-        return challengeService.create(
+        return new ChallengeResponse(challengeService.create(
                 form.getParticipant(),
                 form.getName(),
                 form.getDescription(),
                 form.getFinishDate(),
                 Integer.parseInt(form.getAmount())
-        );
+        ));
     }
 
     @ApiMethod(description = "Gets all challenges that logged user has created")

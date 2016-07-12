@@ -5,11 +5,13 @@ import kudos.model.Relation;
 import kudos.model.User;
 import kudos.repositories.RelationRepository;
 import kudos.repositories.UserRepository;
+import kudos.web.beans.response.RelationResponse;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by chc on 15.8.20.
@@ -26,7 +28,7 @@ public class RelationService {
     @Autowired
     private UserRepository userRepository;
 
-    public Relation addRelation(Relation relation) throws RelationException {
+    public RelationResponse addRelation(Relation relation) throws RelationException {
         if(relationRepository.getRelationByFollowerAndUserToFollow(relation.getFollower(),relation.getUserToFollow()) != null){
             throw new RelationException("relation_already_exists");
         }
@@ -35,17 +37,17 @@ public class RelationService {
             throw new RelationException("cant_follow_yourself");
         }
 
-        return relationRepository.save(relation);
+        return new RelationResponse(relationRepository.save(relation));
     }
 
-    public List<Relation> getAllFollowedUsers() throws UserException {
+    public List<RelationResponse> getAllFollowedUsers() throws UserException {
         User follower = usersService.getLoggedUser().get();
-        return relationRepository.getRelationsByFollower(follower);
+        return relationRepository.getRelationsByFollower(follower).stream().map(RelationResponse::new).collect(Collectors.toList());
     }
 
-    public List<Relation> getAllFollowers() throws UserException {
+    public List<RelationResponse> getAllFollowers() throws UserException {
         User currentUser = usersService.getLoggedUser().get();
-        return relationRepository.getRelationsByUserToFollow(currentUser);
+        return relationRepository.getRelationsByUserToFollow(currentUser).stream().map(RelationResponse::new).collect(Collectors.toList());
 
     }
 
