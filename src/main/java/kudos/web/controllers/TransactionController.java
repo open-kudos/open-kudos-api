@@ -1,6 +1,7 @@
 package kudos.web.controllers;
 
 import kudos.model.Transaction;
+import kudos.web.beans.response.TransactionResponse;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -12,9 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
-/**
- * Created by vytautassugintas on 25/04/16.
- */
 @Api(name = "Transactions Controller", description = "Controller for kudos transactions")
 @Controller
 @RequestMapping("/transaction")
@@ -34,7 +32,7 @@ public class TransactionController extends BaseController {
     public
     @ApiResponseObject
     @ResponseBody
-    List<Transaction> listOfTransactionsByStatus(Transaction.Status status, int page, int pageSize) throws UserException {
+    List<TransactionResponse> listOfTransactionsByStatus(Transaction.Status status, int page, int pageSize) throws UserException {
         return transactionService.getPageableTransactionsByStatus(status, page, pageSize);
     }
 
@@ -43,7 +41,7 @@ public class TransactionController extends BaseController {
     public
     @ApiResponseObject
     @ResponseBody
-    List<Transaction> listOfNewTransactions() throws UserException {
+    List<TransactionResponse> listOfNewTransactions() throws UserException {
         return transactionService.getNewTransactions(usersService.getLoggedUser().get().getLastSeenTransactionTimestamp());
     }
 
@@ -64,5 +62,4 @@ public class TransactionController extends BaseController {
     String getLastSeenTransaction() throws UserException {
         return usersService.getLoggedUser().get().getLastSeenTransactionTimestamp();
     }
-
 }

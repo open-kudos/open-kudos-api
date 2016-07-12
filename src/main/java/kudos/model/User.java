@@ -23,6 +23,7 @@ import java.security.SecureRandom;
 public class User {
     @Id
     @Indexed(unique = true)
+    protected String id;
     protected String email;
     protected String password;
     protected String firstName;
@@ -37,6 +38,7 @@ public class User {
     protected String emailHash;
 
     protected boolean isCompleted = false;
+    protected boolean subscribing = true;
     protected boolean showBirthday = false;
     protected boolean isConfirmed = false;
 
@@ -88,11 +90,15 @@ public class User {
         this.location = myProfileForm.getLocation();
         this.team = myProfileForm.getTeam();
         this.showBirthday = myProfileForm.getShowBirthday();
-
+        this.subscribing = myProfileForm.isSubscribing();
         this.isCompleted = isUserCompleted();
 
         return this;
 
+    }
+
+    public String getId() {
+        return id;
     }
 
     private String getRandomHash() {
@@ -129,6 +135,14 @@ public class User {
 
     public boolean isCompleted() {
         return isCompleted;
+    }
+
+    public boolean isSubscribing() {
+        return subscribing;
+    }
+
+    public void setSubscribing(boolean subscribing) {
+        this.subscribing = subscribing;
     }
 
     public boolean isShowBirthday() {
@@ -181,5 +195,9 @@ public class User {
 
     public void setCompleted(boolean completed) {
         isCompleted = completed;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -1,6 +1,7 @@
 package kudos.repositories;
 
 import kudos.model.Transaction;
+import kudos.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -11,29 +12,37 @@ import java.util.List;
  */
 public interface TransactionRepository extends MongoRepository<Transaction,String> {
 
-    Transaction findTransactionByReceiverEmailOrderByTimestampDesc(String receiverEmail);
-
-    Transaction findFirstByOrderByTimestampDesc();
+    /**
+     * TEMP METHODS
+     */
 
     List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
 
-    List<Transaction> findTransactionsByReceiverEmailAndStatusAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, Transaction.Status status, String timestamp);
-
-    List<Transaction> findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, String timestamp);
-
-    List<Transaction> findTransactionsByReceiverEmailAndStatus(String receiverEmail, Transaction.Status status);
-
-    List<Transaction> findTransactionsByReceiverEmailAndStatus(String receiverEmail, Transaction.Status status, Pageable pageable);
-
     List<Transaction> findTransactionsBySenderEmail(String senderEmail);
 
-    List<Transaction> findTransactionsBySenderEmailAndStatus(String receiverEmail, Transaction.Status status);
+    /**
+     * TEMP METHODS
+     */
 
-    List<Transaction> findTransactionsBySenderEmailAndStatus(String receiverEmail, Transaction.Status status, Pageable pageable);
+    Transaction findFirstByOrderByTimestampDesc();
 
-    List<Transaction> findTransactionBySenderEmailOrderByTimestampDesc (String senderEmail);
+    Transaction findTransactionByReceiverOrderByTimestampDesc(User receiver);
 
-    List<Transaction> findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(String receiverEmail, String timestamp);
+    List<Transaction> findTransactionsByReceiver(User receiver);
+
+    List<Transaction> findTransactionsByReceiverAndStatus(User receiver, Transaction.Status status);
+
+    List<Transaction> findTransactionsByReceiverAndTimestampGreaterThanOrderByTimestampDesc(User receiver, String timestamp);
+
+    List<Transaction> findTransactionsByReceiverAndStatusAndTimestampGreaterThanOrderByTimestampDesc(User receiver, Transaction.Status status, String timestamp);
+
+    List<Transaction> findTransactionsBySender(User sender);
+
+    List<Transaction> findTransactionsBySenderAndStatus(User sender, Transaction.Status status);
+
+    List<Transaction> findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(User sender, String timestamp);
+
+    List<Transaction> findTransactionBySenderOrderByTimestampDesc(User sender);
 
     List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp);
 

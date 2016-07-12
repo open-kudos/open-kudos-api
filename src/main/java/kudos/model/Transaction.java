@@ -2,6 +2,7 @@ package kudos.model;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.text.SimpleDateFormat;
@@ -20,25 +21,29 @@ public class Transaction {
 
     @Id
     private String id;
+    @DBRef
+    private User sender;
+
+    //TODO remove after migration
     private String senderEmail;
-    private String senderName;
+
+    //TODO remove after migration
     private String receiverEmail;
-    private String receiverName;
+
+    @DBRef
+    private User receiver;
     private String message;
     private int amount;
     private String timestamp;
     private Status status;
-
     private int receiverBalance;
 
-    public Transaction(String receiverEmail, String receiverName, String senderEmail, String senderName, int amount, String message, Transaction.Status status) {
-        this.senderEmail = senderEmail;
-        this.senderName = senderName;
-        this.receiverEmail = receiverEmail;
-        this.receiverName = receiverName;
+    public Transaction(User sender, User receiver, int amount, String message, Status status) {
+        this.sender = sender;
+        this.receiver = receiver;
         this.amount = amount;
         this.message = message;
-        this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date());
+        this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date());;
         this.status = status;
     }
 
@@ -48,14 +53,6 @@ public class Transaction {
 
     public String getTimestamp() {
         return timestamp;
-    }
-
-    public String getSenderEmail() {
-        return senderEmail;
-    }
-
-    public String getReceiver() {
-        return receiverEmail;
     }
 
     public int getReceiverBalance() {
@@ -74,14 +71,6 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public void setSenderEmail(String senderEmail) {
-        this.senderEmail = senderEmail;
-    }
-
-    public void setReceiverEmail(String receiverEmail) {
-        this.receiverEmail = receiverEmail;
-    }
-
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
@@ -94,24 +83,42 @@ public class Transaction {
         this.status = status;
     }
 
-    public String getSenderName() {
-        return senderName;
+    public User getSender() {
+        return sender;
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
-    public String getReceiverName() {
-        return receiverName;
+    public User getReceiver() {
+        return receiver;
     }
 
-    public void setReceiverName(String receiverName) {
-        this.receiverName = receiverName;
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+
+    //TODO remove later
+
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
     }
 
     public String getReceiverEmail() {
         return receiverEmail;
     }
 
+    public void setReceiverEmail(String receiverEmail) {
+        this.receiverEmail = receiverEmail;
+    }
 }

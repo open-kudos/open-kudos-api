@@ -5,6 +5,7 @@ import kudos.exceptions.IdNotSpecifiedException;
 import kudos.exceptions.RelationException;
 import kudos.model.Relation;
 import kudos.model.User;
+import kudos.web.beans.response.RelationResponse;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
@@ -36,7 +37,8 @@ public class RelationController extends BaseController {
             @ApiError(code = "relation_already_exists", description = "If relation that logged user wants to create already exists")
     })
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public @ResponseBody Relation addRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
+    public @ResponseBody
+    RelationResponse addRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
         if(Strings.isNullOrEmpty(email)){
             throw new IdNotSpecifiedException("email_not_specified");
         }
@@ -44,10 +46,9 @@ public class RelationController extends BaseController {
         if(!maybeUser.isPresent()){
             throw new UserException("user_not_exist");
         }
-        User user = maybeUser.get();
+        User userToFollow = maybeUser.get();
         User follower = usersService.getLoggedUser().get();
-        return relationService.addRelation(new Relation(follower.getEmail(),follower.getFirstName(),follower.getLastName(),
-                user.getEmail(),user.getFirstName(),user.getLastName()));
+        return relationService.addRelation(new Relation(follower, userToFollow));
     }
 
     @ApiMethod(description = "service to remove relation")
@@ -67,18 +68,19 @@ public class RelationController extends BaseController {
         Optional<User> maybeUser = usersService.findByEmail(email);
         if(!maybeUser.isPresent()) throw new UserException("user_not_exist");
 
+
         relationService.removeRelation(email);
     }
 
     @ApiMethod(description = "service to get all emails of users that follows logged user")
     @RequestMapping(value = "/followers", method = RequestMethod.GET)
-    public @ResponseBody List<Relation> getFollowers() throws UserException {
+    public @ResponseBody List<RelationResponse> getFollowers() throws UserException {
         return relationService.getAllFollowers();
     }
 
     @ApiMethod(description = "service to get all email of users that are followed by logged user")
     @RequestMapping(value = "/followed", method = RequestMethod.GET)
-    public @ResponseBody List<Relation> getFollowed() throws UserException {
+    public @ResponseBody List<RelationResponse> getFollowed() throws UserException {
         return relationService.getAllFollowedUsers();
     }
 

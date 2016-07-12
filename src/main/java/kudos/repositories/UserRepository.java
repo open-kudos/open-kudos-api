@@ -16,6 +16,8 @@ public interface UserRepository extends MongoRepository<User, String>, CustomUse
 
     List<User> findByLastName(String lastName);
 
+    User findById(String id);
+
     User findByEmail(String email);
 
     Optional<User> findUserByEmailHash(String emailHash);

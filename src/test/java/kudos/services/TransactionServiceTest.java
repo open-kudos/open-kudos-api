@@ -2,6 +2,7 @@ package kudos.services;
 
 import kudos.exceptions.TransactionException;
 import kudos.model.Transaction;
+import kudos.model.User;
 import kudos.repositories.TransactionRepository;
 import kudos.web.exceptions.UserException;
 import org.junit.Before;
@@ -25,10 +26,12 @@ public class TransactionServiceTest {
     private List<Transaction> mockedTransactions;
     private TransactionRepository transactionRepository;
     private static List<Transaction> transactions = new ArrayList<>();
+    private static final User mockedUser =  new User("test@test.lt", "test", "test", "");
+
     static {
-        transactions.add(new Transaction("test@test.lt", "", "test@test.lt", "", 1, "", Transaction.Status.COMPLETED));
-        transactions.add(new Transaction("test1@test1.lt", "", "test@test.lt", "", 1, "", Transaction.Status.CANCELED_CHALLENGE));
-        transactions.add(new Transaction("test2@test2.lt", "", "test1@test1.lt", "", 1, "", Transaction.Status.COMPLETED_CHALLENGE));
+        transactions.add(new Transaction(mockedUser, mockedUser, 1, "", Transaction.Status.COMPLETED));
+        transactions.add(new Transaction(mockedUser, mockedUser, 1, "", Transaction.Status.COMPLETED));
+        transactions.add(new Transaction(mockedUser, mockedUser, 1, "", Transaction.Status.COMPLETED));
     }
 
     @Before
@@ -47,19 +50,19 @@ public class TransactionServiceTest {
 
     @Test
     public void testIfServiceFindsTransactionsByReceiverEmail() throws TransactionException{
-        when(transactionRepository.findTransactionsByReceiverEmail(any(String.class))).thenReturn(transactions);
-        assertEquals("test@test.lt", transactionRepository.findTransactionsByReceiverEmail("").get(0).getReceiverEmail());
+        when(transactionRepository.findTransactionsByReceiver(any(User.class))).thenReturn(transactions);
+        assertEquals("test@test.lt", transactionRepository.findTransactionsByReceiver(mockedUser).get(0));
     }
 
     @Test
     public void testIfServiceFindsTransactionsBySenderEmail() throws TransactionException{
-        when(transactionRepository.findTransactionsBySenderEmail(any(String.class))).thenReturn(transactions);
-        assertEquals("test@test.lt", transactionRepository.findTransactionsBySenderEmail("").get(0).getSenderEmail());
+        when(transactionRepository.findTransactionsBySender(any(User.class))).thenReturn(transactions);
+        assertEquals("test@test.lt", transactionRepository.findTransactionsBySender(mockedUser).get(0).getSender().getEmail());
     }
 
     @Test
     public void testIfServiceFindsLastChangedTransaction() throws TransactionException, UserException{
-        when(transactionRepository.findTransactionsBySenderEmail(any(String.class))).thenReturn(transactions);
+        when(transactionRepository.findTransactionsBySender(any(User.class))).thenReturn(transactions);
         assertEquals(false, transactionService.isLastTransactionChanged(""));
     }
 

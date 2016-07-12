@@ -4,6 +4,7 @@ import freemarker.template.TemplateException;
 import kudos.model.LeaderboardUser;
 import kudos.model.User;
 import kudos.web.beans.form.MyProfileForm;
+import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.FormValidationException;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
@@ -20,10 +21,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-
-/**
- * Created by chc on 15.7.23.
- */
 @Api(name = "User Controller", description = "Controller for managing user account")
 @Controller
 @RequestMapping("/user")
@@ -40,7 +37,7 @@ public class UserController extends BaseController {
 
     @ApiMethod(description = "Service to show user account")
     @RequestMapping(value = "/home", method = RequestMethod.GET)
-    public User getUserAccount() throws UserException {
+    public UserResponse getUserAccount() throws UserException {
         return usersService.getCompletedUser();
     }
 
@@ -93,14 +90,14 @@ public class UserController extends BaseController {
             @ApiQueryParam(name = "filter", required = false, description = "User list filter")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public List<User> listUsers(String filter) throws Exception{
-        return usersService.list(filter);
+    public List<UserResponse> listUsers() throws Exception{
+        return usersService.list();
     }
 
     @ApiMethod(description = "Gets all confirmed users")
     @RequestMapping(value = "/confirmedUsers", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<User> confirmedUsers() throws UserException {
-        return usersService.getAllConfirmedUsers();
+    public @ApiResponseObject @ResponseBody List<UserResponse> confirmedUsers() throws UserException {
+        return usersService.getAllConfirmedUsersResponse();
     }
 
     @ApiMethod(description = "Gets top kudos receivers")
@@ -113,6 +110,18 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/topsenders", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody List<LeaderboardUser> getTopSenders(String period) throws UserException {
         return usersService.getTopSenders(period);
+    }
+
+    @ApiMethod(description = "Gets top kudos senders")
+    @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody boolean subscribe() throws UserException {
+        return usersService.subscribe();
+    }
+
+    @ApiMethod(description = "Gets top kudos senders")
+    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
+    public @ApiResponseObject @ResponseBody boolean unsubscribe() throws UserException {
+        return usersService.unsubscribe();
     }
 
 }

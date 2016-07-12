@@ -3,7 +3,7 @@ package kudos.web.controllers;
 /**
  * Created by vytautassugintas on 21/06/16.
  */
-import kudos.model.history.History;
+import kudos.web.beans.response.HistoryResponse;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.Api;
 import org.springframework.stereotype.Controller;
@@ -19,22 +19,22 @@ import java.util.List;
 public class HistoryController extends BaseController {
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
-    public @ResponseBody List<History> historyByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+    public @ResponseBody List<HistoryResponse> historyByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
         return historyService.getPageableUserHistoryByEmail(userEmail, startingIndex, endingIndex);
     }
 
     @RequestMapping(value = "/received", method = RequestMethod.GET)
-    public @ResponseBody List<History> receivedHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+    public @ResponseBody List<HistoryResponse> receivedHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
         return historyService.getPageableUserReceivedHistoryByEmail(userEmail, startingIndex, endingIndex);
     }
 
     @RequestMapping(value = "/gave", method = RequestMethod.GET)
-    public @ResponseBody List<History> gaveHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+    public @ResponseBody List<HistoryResponse> gaveHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
         return historyService.getPageableUserGivenHistoryByEmail(userEmail, startingIndex, endingIndex);
     }
 
     @RequestMapping(value = "/challenges", method = RequestMethod.GET)
-    public @ResponseBody List<History> challengesHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
+    public @ResponseBody List<HistoryResponse> challengesHistoryByUserEmail(String userEmail, int startingIndex, int endingIndex) throws UserException {
         return historyService.getPageableUserAllChallengesHistoryByEmail(userEmail, startingIndex, endingIndex);
     }
 

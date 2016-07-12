@@ -45,44 +45,44 @@ public class KudosService {
         this.dateTimeFormatter = dateTimeFormatter;
     }
 
-    public Transaction giveKudos(User to, int amount, String message) throws BusinessException, MongoException, UserException {
-        User user = usersService.getLoggedUser().get();
-        return transferKudos(to, user, amount, message, Transaction.Status.COMPLETED);
+    public Transaction giveKudos(User receiver, int amount, String message) throws BusinessException, MongoException, UserException {
+        User sender = usersService.getLoggedUser().get();
+        return transferKudos(sender, receiver, amount, message, Transaction.Status.COMPLETED);
     }
 
-    public Transaction reduceFreeKudos(User user,  int amount, String message) throws BusinessException {
-        return transferKudos(usersService.getKudosMaster(), user, amount, message, Transaction.Status.PENDING_CHALLENGE);
+    public Transaction reduceFreeKudos(User user,  int amount, String message) throws BusinessException, UserException {
+        return transferKudos(user, usersService.getKudosMaster(), amount, message, Transaction.Status.PENDING_CHALLENGE);
     }
 
-    public Transaction takeSystemKudos(User to, int amount, String message, Transaction.Status status) throws BusinessException {
-        return transferKudos(to, usersService.getKudosMaster(), amount, message, status);
+    public Transaction takeSystemKudos(User receiver, int amount, String message, Transaction.Status status) throws BusinessException, UserException {
+        return transferKudos(usersService.getKudosMaster(), receiver , amount, message, status);
     }
 
     public Transaction retrieveSystemKudos(User to, int amount, String message, Transaction.Status status) throws BusinessException {
-        Transaction newTransaction = new Transaction(to.getEmail(), to.getFirstName(), to.getEmail(), to.getFirstName(), -amount, message, status);
+        Transaction newTransaction = new Transaction(to, to, -amount, message, status);
         newTransaction.setReceiverBalance(getKudos(to));
         return repository.insert(newTransaction);
     }
 
-    private Transaction transferKudos(User to, User from, int amount, String message, Transaction.Status status) throws BusinessException {
-        Transaction newTransaction = new Transaction(to.getEmail(), to.getFirstName(), from.getEmail(), from.getFirstName(), amount, message, status);
+    private Transaction transferKudos(User sender, User receiver, int amount, String message, Transaction.Status status) throws BusinessException {
+        Transaction newTransaction = new Transaction(sender, receiver, amount, message, status);
         newTransaction.setStatus(status);
 
         if (amount < strategy.getMinDeposit()) {
             throw new InvalidKudosAmountException("invalid_kudos_amount");
         }
 
-        if (getFreeKudos(from) < amount && status != Transaction.Status.COMPLETED_CHALLENGE){
+        if (getFreeKudos(sender) < amount){
             throw new KudosExceededException("exceeded_kudos");
         }
 
-        newTransaction.setReceiverBalance(amount + getKudos(to));
+        newTransaction.setReceiverBalance(amount + getKudos(receiver));
 
         return repository.insert(newTransaction);
     }
 
     public int getKudos(User user) {
-        Transaction lastTransaction = repository.findTransactionByReceiverEmailOrderByTimestampDesc(user.getEmail());
+        Transaction lastTransaction = repository.findTransactionByReceiverOrderByTimestampDesc(user);
         return lastTransaction == null ? 0 : lastTransaction.getReceiverBalance();
     }
 
@@ -91,7 +91,7 @@ public class KudosService {
     }
 
     public int calculateSpentKudos(User user, LocalDateTime startTime){
-        return repository.findTransactionBySenderEmailOrderByTimestampDesc(user.getEmail()).stream()
+        return repository.findTransactionBySenderOrderByTimestampDesc(user).stream()
                 .filter(t -> dateTimeFormatter.parseLocalDateTime(t.getTimestamp()).isAfter(startTime))
                 .mapToInt(Transaction::getAmount)
                 .sum();
@@ -102,7 +102,7 @@ public class KudosService {
 
         List<Transaction> formattedDateTransactions = new ArrayList<>();
 
-        for (Transaction transaction : repository.findTransactionsBySenderEmailAndStatus(user.getEmail(), Transaction.Status.COMPLETED)){
+        for (Transaction transaction : repository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED)){
             try {
                 transaction.setTimestamp(responseFormat.format(transactionDateFormat.parse(transaction.getTimestamp())));
             } catch (ParseException e) {
@@ -119,13 +119,13 @@ public class KudosService {
         User user = usersService.getLoggedUser().get();
         List<Transaction> formattedDateTransactions = new ArrayList<>();
 
-        for (Transaction transaction : repository.findTransactionsByReceiverEmailAndStatus(user.getEmail(), Transaction.Status.COMPLETED)){
+        for (Transaction transaction : repository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED)){
             try {
                 transaction.setTimestamp(responseFormat.format(transactionDateFormat.parse(transaction.getTimestamp())));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            if (!transaction.getSenderEmail().equals(user.getEmail()))
+            if (!transaction.getSender().getEmail().equals(user.getEmail()))
                 formattedDateTransactions.add(transaction);
         }
         return formattedDateTransactions;

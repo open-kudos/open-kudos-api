@@ -10,8 +10,8 @@ import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.jws.soap.SOAPBinding;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeamChallengeService {
@@ -34,7 +34,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge accept(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(teamChallenge);
+        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
 
         for (TeamMember participant : teamChallenge.getFirstTeam()) {
             if (participant.getMemberEmail().equals(usersService.getLoggedUser().get().getEmail()) && !participant.getAccepted()) {
@@ -57,7 +57,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge decline(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(teamChallenge);
+        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
 
         for (TeamMember participant : teamChallenge.getFirstTeam()) {
             if (participant.getAccepted())
@@ -68,7 +68,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge cancel(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(teamChallenge);
+        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(teamChallenge);
 
         for (TeamMember participant : teamChallenge.getFirstTeam()) {
             if (participant.getAccepted())
@@ -79,7 +79,7 @@ public class TeamChallengeService {
     }
 
     public TeamChallenge accomplish(TeamChallenge teamChallenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedExpiredOrCanceled(teamChallenge);
+        checkNotAccomplishedDeclinedFailedOrCanceled(teamChallenge);
 
         if (teamChallenge.getFirstTeamStatus() == null) {
             return setSecondTeamStatusAndSave(teamChallenge, teamChallenge.getSecondTeamStatus());
@@ -98,24 +98,24 @@ public class TeamChallengeService {
         return setStatusAndTeamsAndSave(teamChallenge, TeamChallenge.Status.ACCOMPLISHED);
     }
 
-    private void checkNotAccomplishedDeclinedExpiredCanceledOrAccepted(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
+    private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
         switch (teamChallenge.getStatus()) {
             case ACCEPTED:
                 throw new InvalidChallengeStatusException("challenge_already_accepted");
         }
-        checkNotAccomplishedDeclinedExpiredOrCanceled(teamChallenge);
+        checkNotAccomplishedDeclinedFailedOrCanceled(teamChallenge);
     }
 
-    private void checkNotAccomplishedDeclinedExpiredOrCanceled(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
+    private void checkNotAccomplishedDeclinedFailedOrCanceled(TeamChallenge teamChallenge) throws InvalidChallengeStatusException {
         switch (teamChallenge.getStatus()) {
             case ACCOMPLISHED:
                 throw new InvalidChallengeStatusException("challenge_already_accomplished");
             case DECLINED:
                 throw new InvalidChallengeStatusException("challenge_already_declined");
-            case EXPIRED:
-                throw new InvalidChallengeStatusException("challenge_already_expired");
+            case FAILED:
+                throw new InvalidChallengeStatusException("challenge_already_failed");
             case CANCELED:
-                throw new InvalidChallengeStatusException("challenge_already_cancelled");
+                throw new InvalidChallengeStatusException("challenge_already_canceled");
         }
     }
 

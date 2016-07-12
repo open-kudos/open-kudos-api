@@ -32,22 +32,23 @@ public class HistoryServiceTest {
     private History mockedHistory;
     private Transaction mockedTransaction;
     private Challenge mockedChallenge;
-    private User mockedUser;
 
     private List<History> mockedHistories;
     private static List<Transaction> mockedTransactions = new ArrayList<>();
     private static List<Challenge> mockedChallenges = new ArrayList<>();
 
+    private static final User testUser = new User("test@test.lt", "", "", "");;
+
     static {
-        mockedTransactions.add(new Transaction("test@test.lt", "", "test@test.lt", "", 1, "", Transaction.Status.COMPLETED));
-        mockedTransactions.add(new Transaction("test1@test1.lt", "", "test@test.lt", "", 1, "", Transaction.Status.CANCELED_CHALLENGE));
-        mockedTransactions.add(new Transaction("test2@test2.lt", "", "test1@test1.lt", "", 1, "", Transaction.Status.COMPLETED_CHALLENGE));
+        mockedTransactions.add(new Transaction(testUser, testUser, 1, "", Transaction.Status.COMPLETED));
+        mockedTransactions.add(new Transaction(testUser, testUser, 1, "", Transaction.Status.COMPLETED));
+        mockedTransactions.add(new Transaction(testUser, testUser, 1, "", Transaction.Status.COMPLETED));
     }
 
     static {
-        mockedChallenges.add(new Challenge("test@test.lt", "", "test@test.lt", "", "", "", 1, Challenge.Status.ACCOMPLISHED));
-        mockedChallenges.add(new Challenge("test1@test1.lt", "", "test@test.lt", "", "", "", 1, Challenge.Status.CANCELED));
-        mockedChallenges.add(new Challenge("test2@test2.lt", "", "test1@test1.lt", "", "", "", 1, Challenge.Status.CREATED));
+        mockedChallenges.add(new Challenge(testUser, testUser, "", "", "", "", 1, Challenge.Status.ACCOMPLISHED));
+        mockedChallenges.add(new Challenge(testUser, testUser, "", "", "", "", 1, Challenge.Status.ACCOMPLISHED));
+        mockedChallenges.add(new Challenge(testUser, testUser, "", "", "", "", 1, Challenge.Status.ACCOMPLISHED));
     }
 
     @Before
@@ -58,17 +59,14 @@ public class HistoryServiceTest {
 
         historyService = mock(HistoryService.class);
 
-        mockedUser = mock(User.class);
         mockedHistory = mock(History.class);
         mockedTransaction = mock(Transaction.class);
         mockedChallenge = mock(Challenge.class);
 
         when(transactionRepository.save(mockedTransaction)).thenReturn(mockedTransaction);
         when(userRepository.findByEmail(any(String.class))).thenReturn(new User("test", "test", "", "test@test.lt"));
-        when(transactionRepository.findTransactionsByReceiverEmailAndStatus(any(String.class), any(Transaction.Status.class))).thenReturn(mockedTransactions);
-        when(transactionRepository.findTransactionsBySenderEmailAndStatus(any(String.class), any(Transaction.Status.class))).thenReturn(mockedTransactions);
-        when(challengeRepository.findAllChallengesByCreatorAndStatus(any(String.class), any(Challenge.Status.class))).thenReturn(mockedChallenges);
-        when(challengeRepository.findAllChallengesByParticipantAndStatus(any(String.class), any(Challenge.Status.class))).thenReturn(mockedChallenges);
+        when(transactionRepository.findTransactionsBySenderAndStatus(any(User.class), any(Transaction.Status.class))).thenReturn(mockedTransactions);
+        when(challengeRepository.findAllChallengesByCreatorUserAndStatus(any(User.class), any(Challenge.Status.class))).thenReturn(mockedChallenges);
     }
 
     @Test

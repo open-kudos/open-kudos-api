@@ -5,9 +5,11 @@ import freemarker.template.TemplateException;
 import kudos.model.LeaderboardUser;
 import kudos.model.Transaction;
 import kudos.model.User;
+import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import kudos.web.beans.form.MyProfileForm;
+import kudos.web.beans.response.UserResponse;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,6 +41,9 @@ public class UsersService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private ChallengeRepository challengeRepository;
 
     @Autowired
     private EmailService emailService;
@@ -53,21 +59,31 @@ public class UsersService {
 
     private Logger LOG = Logger.getLogger(UsersService.class);
 
-    private static final String DELETED_USER_TAG = "undefined";
+    private static final User DELETED_USER_TAG = null;
 
-    public User getKudosMaster() {
-        return new User("pass", "master@of.kudos");
+    public User getKudosMaster() throws UserException {
+        User masterOfKudos;
+        try {
+            masterOfKudos = findByEmail("master@of.kudos").get();
+        } catch (NoSuchElementException e) {
+            masterOfKudos = new User("pass", "master@of.kudos");
+            userRepository.save(masterOfKudos);
+        }
+        return masterOfKudos;
     }
 
     public Optional<User> findByEmail(String email) throws UserException {
-        return Optional.ofNullable(userRepository.findOne(email));
+        return Optional.ofNullable(userRepository.findByEmail(email));
+    }
+
+    public Optional<User> findById(String id) throws UserException {
+        return Optional.ofNullable(userRepository.findById(id));
     }
 
     public Optional<User> getLoggedUser() throws UserException {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         return findByEmail(name);
     }
-
 
     public User registerUser(User user) throws UserException, MessagingException, IOException, TemplateException {
         if (userRepository.exists(user.getEmail().toLowerCase())) throw new UserException("user_already_exists");
@@ -103,18 +119,33 @@ public class UsersService {
         wipeAllUserData();
     }
 
-    public User getCompletedUser() throws UserException {
+    public UserResponse getCompletedUser() throws UserException {
         User user = getLoggedUser().get();
-        return user;
+        return new UserResponse(user);
     }
 
-    public User login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
+    public UserResponse login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
         loginValidation(email.toLowerCase(), password);
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email.toLowerCase(), password)));
         request.getSession().setMaxInactiveInterval(0);
         request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-        return findByEmail(email.toLowerCase()).get();
+        return new UserResponse(findByEmail(email.toLowerCase()).get());
+    }
+
+    public boolean subscribe() throws UserException{
+        return setSubscribe(true);
+    }
+
+    public boolean unsubscribe() throws UserException{
+        return setSubscribe(false);
+    }
+
+    private boolean setSubscribe(boolean subscribing) throws UserException {
+        User user = getLoggedUser().get();
+        user.setSubscribing(subscribing);
+        userRepository.save(user);
+        return user.isSubscribing();
     }
 
     private User loginValidation(String email, String password) throws UserException {
@@ -151,52 +182,56 @@ public class UsersService {
         Optional<User> maybeUser = findByEmail(email);
         User user = maybeUser.get();
         String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
-        emailService.generateAndSendEmail(email, message);
+        emailService.generateAndSendEmail(email, message, "Greetings from Acorns app");
     }
 
-    public List<LeaderboardUser> getTopSenders(String period){
+    public List<LeaderboardUser> getTopSenders(String period) {
         List<LeaderboardUser> topSenders = getAllConfirmedUsers().stream().map(user -> createLeaderboardUser(user, calculateSendersTransactionsAmount(user, period))).collect(Collectors.toList());
         return sortListByAmountOfKudos(topSenders, 0, 5);
     }
 
-    public List<LeaderboardUser> getTopReceivers(String period){
+    public List<LeaderboardUser> getTopReceivers(String period) {
         List<LeaderboardUser> topReceivers = getAllConfirmedUsers().stream().map(user -> createLeaderboardUser(user, calculateReceiversTransactionsAmount(user, period))).collect(Collectors.toList());
         return sortListByAmountOfKudos(topReceivers, 0, 5);
     }
 
-    private List<LeaderboardUser> sortListByAmountOfKudos(List<LeaderboardUser> leaderboardUserList, int startingIndex, int endingIndex){
+    private List<LeaderboardUser> sortListByAmountOfKudos(List<LeaderboardUser> leaderboardUserList, int startingIndex, int endingIndex) {
         try {
             return leaderboardUserList.stream().sorted((l1, l2) -> l2.getAmountOfKudos().compareTo(l1.getAmountOfKudos())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
-        } catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             return leaderboardUserList.stream().sorted((l1, l2) -> l2.getAmountOfKudos().compareTo(l1.getAmountOfKudos())).collect(Collectors.toList()).subList(0, leaderboardUserList.size());
         }
     }
 
-    private int calculateSendersTransactionsAmount(User user, String period){
-        if (period.equals("week")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
-        else if (period.equals("month")) return transactionRepository.findTransactionsBySenderEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
-        else return transactionRepository.findTransactionsBySenderEmail(user.getEmail())
+    private int calculateSendersTransactionsAmount(User user, String period) {
+        if (period.equals("week"))
+            return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(7).toString())
+                    .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
+                    .mapToInt(Transaction::getAmount).sum();
+        else if (period.equals("month"))
+            return transactionRepository.findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(30).toString())
+                    .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
+                    .mapToInt(Transaction::getAmount).sum();
+        else return transactionRepository.findTransactionsBySender(user)
                     .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                     .mapToInt(Transaction::getAmount).sum();
     }
 
-    private int calculateReceiversTransactionsAmount(User user, String period){
-        if (period.equals("week")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(7).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
-        else if (period.equals("month")) return transactionRepository.findTransactionsByReceiverEmailAndTimestampGreaterThanOrderByTimestampDesc(user.getEmail(), LocalDateTime.now().minusDays(30).toString())
-                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
-                .mapToInt(Transaction::getAmount).sum();
-        else return transactionRepository.findTransactionsByReceiverEmail(user.getEmail())
+    private int calculateReceiversTransactionsAmount(User user, String period) {
+        if (period.equals("week")) return calculateReceiverTransactionAmountByPeriod(user, 7);
+        else if (period.equals("month")) return calculateReceiverTransactionAmountByPeriod(user, 30);
+        else return transactionRepository.findTransactionsByReceiver(user)
                     .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
                     .mapToInt(Transaction::getAmount).sum();
     }
 
-    private LeaderboardUser createLeaderboardUser(User user, int kudosAmount){
+    private int calculateReceiverTransactionAmountByPeriod(User user, int period) {
+        return transactionRepository.findTransactionsByReceiverAndTimestampGreaterThanOrderByTimestampDesc(user, LocalDateTime.now().minusDays(period).toString())
+                .stream().filter(transaction -> transaction.getStatus() == Transaction.Status.COMPLETED || transaction.getStatus() == Transaction.Status.COMPLETED_CHALLENGE)
+                .mapToInt(Transaction::getAmount).sum();
+    }
+
+    private LeaderboardUser createLeaderboardUser(User user, int kudosAmount) {
         return new LeaderboardUser(user.getFirstName(), user.getLastName(), user.getEmail(), kudosAmount);
     }
 
@@ -208,38 +243,41 @@ public class UsersService {
 
         challengeService.getAllUserCreatedChallenges().stream()
                 .forEach(challenge -> {
-                    challenge.setCreator(DELETED_USER_TAG);
+                    challenge.setCreatorUser(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
 
         challengeService.getAllUserParticipatedChallenges().stream()
                 .forEach(challenge -> {
-                    challenge.setParticipant(DELETED_USER_TAG);
+                    challenge.setParticipantUser(DELETED_USER_TAG);
                     challengeService.save(challenge);
                 });
 
         kudosService.getAllLoggedUserIncomingTransactions().stream()
                 .forEach(transaction -> {
-                    transaction.setReceiverEmail(DELETED_USER_TAG);
+                    transaction.setReceiver(DELETED_USER_TAG);
                     kudosService.save(transaction);
                 });
 
         kudosService.getAllLoggedUserOutgoingTransactions().stream()
                 .forEach(transaction -> {
-                    transaction.setSenderEmail(DELETED_USER_TAG);
+                    transaction.setSender(DELETED_USER_TAG);
                     kudosService.save(transaction);
                 });
 
         userRepository.delete(getLoggedUser().get());
-
     }
 
-    public List<User> list(String filter) {
-        return userRepository.searchAllFields(filter);
+    public List<UserResponse> list() {
+        return userRepository.findAll().stream().map(UserResponse::new).collect(Collectors.toList());
     }
 
-    public List<User> getAllConfirmedUsers() {
+    public List<User> getAllConfirmedUsers(){
         return userRepository.findUsersByIsConfirmed(true);
+    }
+
+    public List<UserResponse> getAllConfirmedUsersResponse() {
+        return userRepository.findUsersByIsConfirmed(true).stream().map(UserResponse::new).collect(Collectors.toList());
     }
 
 }
