@@ -98,12 +98,14 @@ public class ChallengeService {
         return setStatusAndSave(challenge, Challenge.Status.CANCELED);
     }
 
-    public Challenge accomplish(Challenge challenge) throws BusinessException, UserException {
+    public Challenge accomplish(Challenge challenge) throws BusinessException, UserException, MessagingException {
         checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
 
         if (challenge.getParticipantStatus() == null) {
+            emailService.generateEmailForOngoingChallengeSelection(challenge);
             return setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
         } else if (challenge.getCreatorStatus() == null) {
+            emailService.generateEmailForOngoingChallengeSelection(challenge);
             return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
         } else if (challenge.getCreatorStatus() == challenge.getParticipantStatus()) {
             challenge.setCreatorStatus(null);
