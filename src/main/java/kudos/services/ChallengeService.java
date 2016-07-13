@@ -231,6 +231,5 @@ public class ChallengeService {
     private boolean checkIfNewWeekStarted(Challenge challenge) {
         LocalDateTime startOfWeek = new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
         return dateTimeFormatter.parseLocalDateTime(challenge.getCreateDateDate()).isBefore(startOfWeek);
-
     }
 }
