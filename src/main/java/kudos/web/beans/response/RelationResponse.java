@@ -5,7 +5,7 @@ import kudos.model.Relation;
 /**
  * Created by vytautassugintas on 12/07/16.
  */
-public class RelationResponse {
+public class RelationResponse extends Response{
 
     private String id;
 

@@ -1,6 +1,7 @@
 package kudos.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -12,8 +13,10 @@ public class Relation {
     @Id
     private String id;
 
+    @DBRef
     private User follower;
 
+    @DBRef
     private User userToFollow;
 
     public Relation(User follower, User userToFollow) {
@@ -31,6 +34,10 @@ public class Relation {
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setFollower(User follower) {
