@@ -8,9 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by chc on 15.8.5.
- */
 @ApiObject
 @Document
 public class Transaction {

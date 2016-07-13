@@ -2,9 +2,6 @@ package kudos.model.history;
 
 import kudos.model.Transaction;
 
-/**
- * Created by vytautassugintas on 21/06/16.
- */
 public class History {
 
     private String receiverEmail;

@@ -21,10 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * UsersService tests suite
- * Created by chc on 15.8.27.
- */
 @RunWith(MockitoJUnitRunner.class)
 public class UsersServiceTest {
 

@@ -1,8 +1,5 @@
 package kudos.exceptions;
 
-/**
- * Created by chc on 15.8.20.
- */
 public class RelationException extends Exception {
 
     private String errorCause;

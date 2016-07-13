@@ -13,9 +13,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
-/**
- * Created by chc on 15.8.4.
- */
 @Component
 public class EmailService {
 

@@ -22,9 +22,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by chc on 15.8.11.
- */
 @Api(name = "Challenge Controller", description = "Controller for managing challenges")
 @RequestMapping("/challenges")
 @Controller

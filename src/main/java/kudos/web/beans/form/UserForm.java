@@ -2,16 +2,9 @@ package kudos.web.beans.form;
 
 import com.google.common.base.Strings;
 import kudos.model.User;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/**
- * Created by chc on 15.7.23.
- */
 public class UserForm {
 
     private String firstName;

@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-/**
- * Created by chc on 15.7.23.
- */
 @ApiObject
 @Document
 public class User {

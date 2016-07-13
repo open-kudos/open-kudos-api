@@ -17,9 +17,6 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by p998dls on 2015.07.28.
- */
 @Component
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 

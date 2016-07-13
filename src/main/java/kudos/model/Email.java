@@ -1,8 +1,5 @@
 package kudos.model;
 
-/**
- * Created by chc on 15.8.4.
- */
 public class Email {
 
     private final String recipientAddress;

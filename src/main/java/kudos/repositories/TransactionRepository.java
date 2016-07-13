@@ -7,9 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-/**
- * Created by chc on 15.8.6.
- */
 public interface TransactionRepository extends MongoRepository<Transaction,String> {
 
     /**

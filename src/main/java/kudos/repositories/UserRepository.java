@@ -7,9 +7,6 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by chc on 15.8.3.
- */
 public interface UserRepository extends MongoRepository<User, String>, CustomUserRepository {
 
     User findByFirstName(String firstName);

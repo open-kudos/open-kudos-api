@@ -2,9 +2,6 @@ package kudos.web.beans.response;
 
 import kudos.model.User;
 
-/**
- * Created by vytautassugintas on 11/07/16.
- */
 public class UserResponse extends Response {
 
     protected String id;
