@@ -1,9 +1,5 @@
 package kudos.services;
 
-/**
- * Created by vytautassugintas on 21/06/16.
- */
-
 import kudos.model.Challenge;
 import kudos.model.Transaction;
 import kudos.model.User;
@@ -11,6 +7,7 @@ import kudos.model.history.History;
 import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
+import kudos.web.beans.response.HistoryResponse;
 import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by vytautassugintas on 25/04/16.
- */
 @Service
 public class HistoryService {
 
@@ -33,31 +27,31 @@ public class HistoryService {
     @Autowired
     private UsersService usersService;
 
-    public List<History> getPageableUserHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+    public List<HistoryResponse> getPageableUserHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
         User user = usersService.findByEmail(userEmail).get();
-        List<History> historyList = transactionRepository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
-        historyList.addAll(transactionRepository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        List<HistoryResponse> historyList = transactionRepository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED).stream().map(HistoryResponse::new).collect(Collectors.toList());
+        historyList.addAll(transactionRepository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED).stream().map(HistoryResponse::new).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(HistoryResponse::new).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(HistoryResponse::new).collect(Collectors.toList()));
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    public List<History> getPageableUserReceivedHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+    public List<HistoryResponse> getPageableUserReceivedHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
         User user = usersService.findByEmail(userEmail).get();
-        List<History> historyList = transactionRepository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
+        List<HistoryResponse> historyList = transactionRepository.findTransactionsByReceiverAndStatus(user, Transaction.Status.COMPLETED).stream().map(HistoryResponse::new).collect(Collectors.toList());
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    public List<History> getPageableUserGivenHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+    public List<HistoryResponse> getPageableUserGivenHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
         User user = usersService.findByEmail(userEmail).get();
-        List<History> historyList = transactionRepository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED).stream().map(this::transformTransactionModelToHistory).collect(Collectors.toList());
+        List<HistoryResponse> historyList = transactionRepository.findTransactionsBySenderAndStatus(user, Transaction.Status.COMPLETED).stream().map(HistoryResponse::new).collect(Collectors.toList());
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    public List<History> getPageableUserAllChallengesHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
+    public List<HistoryResponse> getPageableUserAllChallengesHistoryByEmail(String userEmail, int startingIndex, int endingIndex) throws UserException{
         User user = usersService.findByEmail(userEmail).get();
-        List<History> historyList = (challengeRepository.findAllChallengesByParticipantUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
-        historyList.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(this::transformChallengeModelToHistory).collect(Collectors.toList()));
+        List<HistoryResponse> historyList = (challengeRepository.findAllChallengesByParticipantUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(HistoryResponse::new).collect(Collectors.toList()));
+        historyList.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(user, Challenge.Status.ACCOMPLISHED).stream().map(HistoryResponse::new).collect(Collectors.toList()));
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
@@ -83,7 +77,7 @@ public class HistoryService {
                 transaction.getStatus());
     }
 
-    private List<History> sortListByTimestamp(List<History> historyList, int startingIndex, int endingIndex){
+    private List<HistoryResponse> sortListByTimestamp(List<HistoryResponse> historyList, int startingIndex, int endingIndex){
         try {
             return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
         } catch (IndexOutOfBoundsException e){

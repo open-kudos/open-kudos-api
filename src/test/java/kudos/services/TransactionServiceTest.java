@@ -49,18 +49,6 @@ public class TransactionServiceTest {
     }
 
     @Test
-    public void testIfServiceFindsTransactionsByReceiverEmail() throws TransactionException{
-        when(transactionRepository.findTransactionsByReceiver(any(User.class))).thenReturn(transactions);
-        assertEquals("test@test.lt", transactionRepository.findTransactionsByReceiver(mockedUser).get(0));
-    }
-
-    @Test
-    public void testIfServiceFindsTransactionsBySenderEmail() throws TransactionException{
-        when(transactionRepository.findTransactionsBySender(any(User.class))).thenReturn(transactions);
-        assertEquals("test@test.lt", transactionRepository.findTransactionsBySender(mockedUser).get(0).getSender().getEmail());
-    }
-
-    @Test
     public void testIfServiceFindsLastChangedTransaction() throws TransactionException, UserException{
         when(transactionRepository.findTransactionsBySender(any(User.class))).thenReturn(transactions);
         assertEquals(false, transactionService.isLastTransactionChanged(""));

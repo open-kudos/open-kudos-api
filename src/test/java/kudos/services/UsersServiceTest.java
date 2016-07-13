@@ -1,7 +1,6 @@
 package kudos.services;
 
 import freemarker.template.TemplateException;
-import junit.framework.Assert;
 import kudos.model.User;
 import kudos.repositories.UserRepository;
 import kudos.web.exceptions.UserException;
@@ -18,9 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,12 +54,6 @@ public class UsersServiceTest {
     @Before
     public void before() throws UserException {
         mockedUser = mock(User.class);
-    }
-
-    @Test
-    public void testIfUsersServiceFindsUserByEmail() throws UserException {
-        when(userRepository.findOne("")).thenReturn(mockedUser);
-        assertEquals(mockedUser, usersService.findByEmail("").get());
     }
 
     @Test
