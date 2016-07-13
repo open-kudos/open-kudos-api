@@ -268,7 +268,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody void accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody void accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException, MessagingException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
