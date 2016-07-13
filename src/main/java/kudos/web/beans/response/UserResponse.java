@@ -13,7 +13,7 @@ public class UserResponse extends Response {
     protected String email;
 
     protected String birthday;
-    protected String phone;
+    protected String startedToWorkDate;
 
     protected boolean subscribing;
     protected String lastSeenTransactionTimestamp;
@@ -24,7 +24,7 @@ public class UserResponse extends Response {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.birthday = user.getBirthday();
-        this.phone = user.getPhone();
+        this.startedToWorkDate = user.getStartedToWorkDate();
         this.subscribing = user.isSubscribing();
         this.lastSeenTransactionTimestamp = user.getLastSeenTransactionTimestamp();
     }
@@ -69,12 +69,12 @@ public class UserResponse extends Response {
         this.birthday = birthday;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getStartedToWorkDate() {
+        return startedToWorkDate;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setStartedToWorkDate(String startedToWorkDate) {
+        this.startedToWorkDate = startedToWorkDate;
     }
 
     public boolean isSubscribing() {
