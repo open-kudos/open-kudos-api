@@ -155,7 +155,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge accept(String id)
+    public @ApiResponseObject @ResponseBody ChallengeResponse accept(String id)
             throws BusinessException, IdNotSpecifiedException, ChallengeException, UserException {
 
         if(Strings.isNullOrEmpty(id))
@@ -170,7 +170,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             throw new WrongChallengeEditorException("not_a_participant");
         }
-        return challengeService.accept(challenge);
+        return new ChallengeResponse(challengeService.accept(challenge));
     }
 
     @ApiMethod(description = "Declines challenge by its id")
@@ -194,7 +194,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -209,7 +209,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             throw new WrongChallengeEditorException("not_a_particitipant");
         }
-        return challengeService.decline(challenge);
+        return new ChallengeResponse(challengeService.decline(challenge));
     }
 
     @ApiMethod(description = "Cancels challenge by its id")
@@ -233,7 +233,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge cancel(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse cancel(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -248,7 +248,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getCreatorUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             throw new WrongChallengeEditorException("not_a_creator");
         }
-        return challengeService.cancel(challenge);
+        return new ChallengeResponse(challengeService.cancel(challenge));
     }
 
 
@@ -313,7 +313,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -325,7 +325,7 @@ public class ChallengeController extends BaseController {
 
         Challenge challenge = maybeChallenge.get();
 
-        return challengeService.expire(challenge);
+        return new ChallengeResponse(challengeService.expire(challenge));
     }
 
 }
