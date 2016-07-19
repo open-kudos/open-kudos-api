@@ -3,7 +3,6 @@ package kudos.services;
 import kudos.model.Challenge;
 import kudos.model.Transaction;
 import kudos.model.User;
-import kudos.model.History;
 import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
@@ -55,28 +54,6 @@ public class HistoryService {
         return sortListByTimestamp(historyList, startingIndex, endingIndex);
     }
 
-    public History transformChallengeModelToHistory(Challenge challenge){
-        return new History(challenge.getParticipantUser().getEmail(),
-                getUserFullNameByEmail(challenge.getParticipantUser()),
-                challenge.getCreatorUser().getEmail(),
-                getUserFullNameByEmail(challenge.getCreatorUser()),
-                challenge.getAmount() * 2,
-                challenge.getDescription(),
-                challenge.getCreateDateDate(),
-                challengeStatus(challenge.getCreatorStatus(), challenge.getParticipantStatus()));
-    }
-
-    public History transformTransactionModelToHistory(Transaction transaction){
-        return new History(transaction.getReceiver().getEmail(),
-                getUserFullNameByEmail(transaction.getReceiver()),
-                transaction.getSender().getEmail(),
-                getUserFullNameByEmail(transaction.getSender()),
-                transaction.getAmount(),
-                transaction.getMessage(),
-                transaction.getTimestamp(),
-                transaction.getStatus());
-    }
-
     private List<HistoryResponse> sortListByTimestamp(List<HistoryResponse> historyList, int startingIndex, int endingIndex){
         try {
             return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
@@ -84,22 +61,4 @@ public class HistoryService {
             return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList());
         }
     }
-
-    private String getUserFullNameByEmail(User user){
-        User receiver = userRepository.findByEmail(user.getEmail());
-        return receiver.getFirstName() + " " + receiver.getLastName();
-    }
-
-    private Transaction.Status challengeStatus(Boolean creatorStatus, Boolean participantStatus){
-        if (creatorStatus != null)
-            if (creatorStatus) return Transaction.Status.COMPLETED_CHALLENGE_CREATOR;
-            else return Transaction.Status.COMPLETED_CHALLENGE_PARTICIPANT;
-
-        if (participantStatus != null)
-            if (participantStatus) return Transaction.Status.COMPLETED_CHALLENGE_PARTICIPANT;
-            else return Transaction.Status.COMPLETED_CHALLENGE_CREATOR;
-
-        return Transaction.Status.COMPLETED_CHALLENGE;
-    }
-
 }

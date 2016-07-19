@@ -1,11 +1,9 @@
 package kudos.model;
 
-import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@ApiObject
 @Document
 public class Challenge {
 

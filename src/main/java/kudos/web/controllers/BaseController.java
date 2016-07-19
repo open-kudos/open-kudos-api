@@ -40,9 +40,6 @@ public abstract class BaseController {
     protected HistoryService historyService;
 
     @Autowired
-    protected MigrationService migrationService;
-
-    @Autowired
     @Qualifier(value = "DBTimeFormatter")
     protected DateTimeFormatter formatter;
 

@@ -1,6 +1,7 @@
 package kudos.model;
 
 public class LeaderboardUser {
+
     private String firstName;
     private String lastName;
     private String email;
