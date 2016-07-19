@@ -9,6 +9,12 @@ the default mongo URL requires no further configuration. If that's in place, jus
 <pre>
 ./gradlew bootRun
 </pre>
+
+<p>To run it with test profile</p>
+<pre>
+./gradlew -Dspring.profiles.active=test bootRun
+</pre>
+<p>You can add as many profiles as you need for different environments
 </p>
 <h2>API Documentation</h2>
 <p>
