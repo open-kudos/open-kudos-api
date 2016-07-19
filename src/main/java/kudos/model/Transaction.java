@@ -1,5 +1,6 @@
 package kudos.model;
 
+import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,25 +8,35 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Created by chc on 15.8.5.
+ */
+@ApiObject
 @Document
 public class Transaction {
+
+    public enum Status {
+        COMPLETED, PENDING_CHALLENGE, COMPLETED_CHALLENGE, DECLINED_CHALLENGE, CANCELED_CHALLENGE, EXPIRED_CHALLENGE, COMPLETED_CHALLENGE_PARTICIPANT, COMPLETED_CHALLENGE_CREATOR, SHOP
+    }
 
     @Id
     private String id;
     @DBRef
     private User sender;
+
+    //TODO remove after migration
+    private String senderEmail;
+
+    //TODO remove after migration
+    private String receiverEmail;
+
     @DBRef
     private User receiver;
-
     private String message;
     private int amount;
     private String timestamp;
     private Status status;
     private int receiverBalance;
-
-    public enum Status {
-        COMPLETED, PENDING_CHALLENGE, COMPLETED_CHALLENGE, DECLINED_CHALLENGE, CANCELED_CHALLENGE, EXPIRED_CHALLENGE, COMPLETED_CHALLENGE_PARTICIPANT, COMPLETED_CHALLENGE_CREATOR
-    }
 
     public Transaction(User sender, User receiver, int amount, String message, Status status) {
         this.sender = sender;
@@ -90,5 +101,24 @@ public class Transaction {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+
+    //TODO remove later
+
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
+    }
+
+    public String getReceiverEmail() {
+        return receiverEmail;
+    }
+
+    public void setReceiverEmail(String receiverEmail) {
+        this.receiverEmail = receiverEmail;
     }
 }
