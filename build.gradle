@@ -11,6 +11,10 @@ apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'spring-boot'
 
+bootRun{
+    systemProperties System.properties
+}
+
 war {
    baseName = 'open-kudos'
    version =  '0.1.0'
