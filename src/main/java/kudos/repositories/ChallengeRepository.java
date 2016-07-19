@@ -12,6 +12,8 @@ import java.util.List;
  */
 public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
+    Challenge findChallengeById(String id);
+
     List<Challenge> findChallengesByCreator(String creator);
 
     List<Challenge> findChallengesByParticipant(String participant);
@@ -19,8 +21,6 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
     List<Challenge> findChallengesByCreatorUser(User creator);
 
     List<Challenge> findChallengesByParticipantUser(User participant);
-
-    Challenge findChallengeById(String id);
 
     List<Challenge> findAllChallengesByStatus(Challenge.Status status);
 

@@ -5,7 +5,6 @@ import com.google.common.base.Strings;
 import freemarker.template.TemplateException;
 import kudos.web.beans.form.MyProfileForm;
 import org.jasypt.util.password.StrongPasswordEncryptor;
-import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,10 +14,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-/**
- * Created by chc on 15.7.23.
- */
-@ApiObject
 @Document
 public class User {
     @Id

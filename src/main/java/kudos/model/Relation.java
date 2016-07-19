@@ -12,10 +12,8 @@ public class Relation {
 
     @Id
     private String id;
-
     @DBRef
     private User follower;
-
     @DBRef
     private User userToFollow;
 

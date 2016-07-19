@@ -3,7 +3,7 @@ package kudos.services;
 import kudos.model.Challenge;
 import kudos.model.Transaction;
 import kudos.model.User;
-import kudos.model.history.History;
+import kudos.model.History;
 import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;

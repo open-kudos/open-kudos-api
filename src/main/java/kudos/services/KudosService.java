@@ -21,9 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by chc on 15.8.7.
- */
 @Service
 public class KudosService {
 
