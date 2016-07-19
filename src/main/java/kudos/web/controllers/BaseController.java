@@ -53,4 +53,7 @@ public abstract class BaseController {
     @Qualifier(value = "DBTimeFormatter")
     protected DateTimeFormatter formatter;
 
+    @Autowired
+    protected ShopService shopService;
+
 }
