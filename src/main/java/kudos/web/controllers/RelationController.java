@@ -17,9 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by chc on 15.8.20.
- */
 @Api(description = "service to manage user relations", name = "Relation Controller")
 @Controller
 @RequestMapping("/relations")

@@ -1,6 +1,5 @@
 package kudos.web.beans.form;
 
-
 import com.google.common.base.Strings;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

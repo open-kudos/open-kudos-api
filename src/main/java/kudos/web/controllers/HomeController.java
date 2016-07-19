@@ -12,10 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 
-
-/**
- * Created by chc on 15.7.29.
- */
 @Api(name = "Home Controller",description = "Service to test connection / check whether someone is logged in or not.")
 @Controller
 public class HomeController extends BaseController {

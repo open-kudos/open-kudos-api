@@ -2,14 +2,11 @@ package kudos.services;
 
 import kudos.web.beans.form.UserForm;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
+
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by Robertas on 6/7/2016.
- */
 public class UserFormTest {
 
     private UserForm form = new UserForm("FirstName", "LastName", "pass", "pass", "first.last@swedbank.lt");

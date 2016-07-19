@@ -3,7 +3,6 @@ package kudos.web.controllers;
 import kudos.exceptions.BusinessException;
 import kudos.model.Transaction;
 import kudos.model.User;
-import kudos.model.UserKudos;
 import kudos.web.beans.form.KudosTransferForm;
 import kudos.web.beans.response.TransactionResponse;
 import kudos.web.exceptions.FormValidationException;
@@ -18,9 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.security.Principal;
 import java.util.List;
 
-/**
- * Created by chc on 15.8.11.
- */
 @Api(name = "Kudos Controller", description = "Controller for giving/pending/receiving kudos")
 @Controller
 @RequestMapping("/kudos")
@@ -84,12 +80,5 @@ public class KudosController extends BaseController {
     @RequestMapping(value = "/received", method = RequestMethod.GET)
     public @ApiResponseObject @ResponseBody int receivedKudos(Principal principal) throws UserException {
         return kudosService.getKudos(usersService.getLoggedUser().get());
-    }
-
-    @ApiMethod(description = "Service to get remaining kudos amount")
-    @RequestMapping(value = "/remaining-hack", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody UserKudos remainingKudos(Principal principal) throws UserException {
-        return new UserKudos(kudosService.getFreeKudos(usersService.getLoggedUser().get()),
-                kudosService.getKudos(usersService.getLoggedUser().get()));
     }
 }

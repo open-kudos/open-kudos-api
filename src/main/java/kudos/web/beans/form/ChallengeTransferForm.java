@@ -7,9 +7,6 @@ import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-/**
- * Created by chc on 15.8.7.
- */
 @ApiObject
 public class ChallengeTransferForm {
 

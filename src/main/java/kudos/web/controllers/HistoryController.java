@@ -1,8 +1,5 @@
 package kudos.web.controllers;
 
-/**
- * Created by vytautassugintas on 21/06/16.
- */
 import kudos.web.beans.response.HistoryResponse;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.Api;

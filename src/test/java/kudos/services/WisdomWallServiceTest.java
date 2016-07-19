@@ -6,19 +6,15 @@ import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by Robertas on 6/9/2016.
- */
 public class WisdomWallServiceTest {
 
     private WisdomWallService wisdomWallService;

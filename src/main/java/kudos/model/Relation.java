@@ -4,9 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * Created by chc on 15.8.20.
- */
 @Document
 public class Relation {
 
