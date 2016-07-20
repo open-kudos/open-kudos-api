@@ -3,9 +3,6 @@ package kudos;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDateTime;
 
-/**
- * Created by chc on 15.8.11.
- */
 public abstract class KudosBusinessStrategy {
 
     private final int deposit;

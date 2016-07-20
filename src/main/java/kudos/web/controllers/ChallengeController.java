@@ -22,9 +22,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by chc on 15.8.11.
- */
 @Api(name = "Challenge Controller", description = "Controller for managing challenges")
 @RequestMapping("/challenges")
 @Controller
@@ -155,7 +152,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accept", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge accept(String id)
+    public @ApiResponseObject @ResponseBody ChallengeResponse accept(String id)
             throws BusinessException, IdNotSpecifiedException, ChallengeException, UserException {
 
         if(Strings.isNullOrEmpty(id))
@@ -170,7 +167,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             throw new WrongChallengeEditorException("not_a_participant");
         }
-        return challengeService.accept(challenge);
+        return new ChallengeResponse(challengeService.accept(challenge));
     }
 
     @ApiMethod(description = "Declines challenge by its id")
@@ -194,7 +191,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/decline", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -209,7 +206,7 @@ public class ChallengeController extends BaseController {
         if(!challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             throw new WrongChallengeEditorException("not_a_particitipant");
         }
-        return challengeService.decline(challenge);
+        return new ChallengeResponse(challengeService.decline(challenge));
     }
 
     @ApiMethod(description = "Cancels challenge by its id")
@@ -233,7 +230,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge cancel(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse cancel(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -248,14 +245,11 @@ public class ChallengeController extends BaseController {
         if(!challenge.getCreatorUser().getId().equals(usersService.getLoggedUser().get().getId())) {
             throw new WrongChallengeEditorException("not_a_creator");
         }
-        return challengeService.cancel(challenge);
+        return new ChallengeResponse(challengeService.cancel(challenge));
     }
 
-
     @ApiMethod(description = "Accomplishes challenge by its id")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "id")
-    })
+    @ApiParams(queryparams = {@ApiQueryParam(name = "id")})
     @ApiErrors(apierrors = {
             @ApiError(code = "challenge_id_not_specified",
                     description = "If challenge id was not specified"),
@@ -271,7 +265,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody void accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException, MessagingException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -290,8 +284,7 @@ public class ChallengeController extends BaseController {
             challenge.setParticipantStatus(status);
         }
 
-        challengeService.accomplish(challenge);
-
+        return new ChallengeResponse(challengeService.accomplish(challenge));
     }
 
     @ApiMethod(description = "Marks challenge as failed by its id")
@@ -313,7 +306,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody Challenge fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -325,7 +318,7 @@ public class ChallengeController extends BaseController {
 
         Challenge challenge = maybeChallenge.get();
 
-        return challengeService.expire(challenge);
+        return new ChallengeResponse(challengeService.expire(challenge));
     }
 
 }

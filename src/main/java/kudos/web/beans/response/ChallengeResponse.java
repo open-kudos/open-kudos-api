@@ -2,9 +2,6 @@ package kudos.web.beans.response;
 
 import kudos.model.Challenge;
 
-/**
- * Created by vytautassugintas on 11/07/16.
- */
 public class ChallengeResponse extends Response {
 
     int amount;

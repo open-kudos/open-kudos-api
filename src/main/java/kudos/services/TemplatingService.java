@@ -12,9 +12,6 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by chc on 15.8.13.
- */
 @Component
 public class TemplatingService {
 

@@ -2,9 +2,6 @@ package kudos.web.beans.response;
 
 import kudos.model.User;
 
-/**
- * Created by vytautassugintas on 11/07/16.
- */
 public class UserResponse extends Response {
 
     protected String id;
@@ -16,6 +13,7 @@ public class UserResponse extends Response {
     protected String startedToWorkDate;
 
     protected boolean subscribing;
+    protected boolean isCompleted;
     protected String lastSeenTransactionTimestamp;
 
     public UserResponse(User user){
@@ -26,6 +24,7 @@ public class UserResponse extends Response {
         this.birthday = user.getBirthday();
         this.startedToWorkDate = user.getStartedToWorkDate();
         this.subscribing = user.isSubscribing();
+        this.isCompleted = user.isCompleted();
         this.lastSeenTransactionTimestamp = user.getLastSeenTransactionTimestamp();
     }
 
@@ -83,6 +82,14 @@ public class UserResponse extends Response {
 
     public void setSubscribing(boolean subscribing) {
         this.subscribing = subscribing;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
     }
 
     public String getLastSeenTransactionTimestamp() {

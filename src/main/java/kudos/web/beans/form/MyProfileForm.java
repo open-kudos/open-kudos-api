@@ -7,9 +7,6 @@ import org.springframework.validation.Validator;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-/**
- * Created by chc on 15.8.4.
- */
 public class MyProfileForm {
 
     private String email;

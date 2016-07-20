@@ -14,9 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by chc on 15.8.12.
- */
 @Component
 public class ScheduledTasksService {
 

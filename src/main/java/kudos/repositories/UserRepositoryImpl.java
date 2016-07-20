@@ -10,9 +10,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Modestas on 2015-09-16.
- */
 public class UserRepositoryImpl implements CustomUserRepository {
 
     private static final int MAX_LIST_SIZE = 100;

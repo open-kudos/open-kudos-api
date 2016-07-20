@@ -1,8 +1,5 @@
 package kudos.web.beans.response;
 
-/**
- * Created by chc on 15.8.3.
- */
 public class InputFieldError {
     private final String field;
     private final String cause;

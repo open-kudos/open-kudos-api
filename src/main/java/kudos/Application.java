@@ -10,9 +10,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-/**
- * Created by chc on 15.8.3.
- */
 @SpringBootApplication
 @EnableScheduling
 @EnableWebMvc

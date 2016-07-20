@@ -13,9 +13,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
-/**
- * Created by chc on 15.8.4.
- */
 @Component
 public class EmailService {
 
@@ -61,6 +58,58 @@ public class EmailService {
 
             Thread thread = new Thread(runnable);
             thread.start();
+        }
+    }
+
+    public void generateEmailForOngoingChallengeSelection(Challenge challenge) throws MessagingException{
+        String text;
+
+        if (challenge.getParticipantStatus() == null) {
+            if (challenge.getParticipantUser().isSubscribing()) {
+                if (challenge.getCreatorStatus()) text = "WON";
+                else text = "LOST";
+
+                String message = "<h2>Challenge updated!</h2>"
+                        + "<p>" + challenge.getCreatorUser().getFirstName() + " " + challenge.getCreatorUser().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
+                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
+                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
+                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
+
+
+                Runnable runnable = () -> {
+                    try {
+                        generateAndSendEmail(challenge.getParticipantUser().getEmail(), message, "Challenge updated!");
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                };
+
+                Thread thread = new Thread(runnable);
+                thread.start();
+            }
+        } else if (challenge.getCreatorStatus() == null) {
+            if (challenge.getCreatorUser().isSubscribing()){
+                if (challenge.getParticipantStatus()) text = "WON";
+                else text = "LOST";
+
+                String message = "<h2>Challenge updated!</h2>"
+                        + "<p>" + challenge.getParticipantUser().getFirstName() + " " + challenge.getParticipantUser().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
+                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
+                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
+                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
+
+
+                Runnable runnable = () -> {
+                    try {
+                        generateAndSendEmail(challenge.getCreatorUser().getEmail(), message, "Challenge updated!");
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                };
+
+                Thread thread = new Thread(runnable);
+                thread.start();
+            }
         }
     }
 

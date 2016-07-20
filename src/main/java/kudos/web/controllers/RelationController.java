@@ -5,6 +5,7 @@ import kudos.exceptions.IdNotSpecifiedException;
 import kudos.exceptions.RelationException;
 import kudos.model.Relation;
 import kudos.model.User;
+import kudos.web.beans.response.HistoryResponse;
 import kudos.web.beans.response.RelationResponse;
 import kudos.web.exceptions.UserException;
 import org.apache.log4j.Logger;
@@ -17,9 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by chc on 15.8.20.
- */
 @Api(description = "service to manage user relations", name = "Relation Controller")
 @Controller
 @RequestMapping("/relations")
@@ -82,6 +80,12 @@ public class RelationController extends BaseController {
     @RequestMapping(value = "/followed", method = RequestMethod.GET)
     public @ResponseBody List<RelationResponse> getFollowed() throws UserException {
         return relationService.getAllFollowedUsers();
+    }
+
+    @ApiMethod(description = "service to get all followed users transactions history ")
+    @RequestMapping(value = "/feed", method = RequestMethod.GET)
+    public @ResponseBody List<HistoryResponse> getFollowedUsersHistory(int startIndex, int endIndex) throws UserException {
+        return relationService.getFollowedUsersNewsFeed(startIndex, endIndex);
     }
 
 

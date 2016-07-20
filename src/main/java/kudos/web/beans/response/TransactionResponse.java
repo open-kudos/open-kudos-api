@@ -2,9 +2,6 @@ package kudos.web.beans.response;
 
 import kudos.model.Transaction;
 
-/**
- * Created by vytautassugintas on 11/07/16.
- */
 public class TransactionResponse extends Response {
     int amount;
     String message;

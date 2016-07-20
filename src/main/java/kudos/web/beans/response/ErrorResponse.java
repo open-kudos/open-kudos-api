@@ -7,9 +7,6 @@ import org.springframework.validation.FieldError;
 import javax.annotation.Nullable;
 import java.util.List;
 
-/**
- * Created by chc on 15.7.30.
- */
 public class ErrorResponse extends Response {
 
     private final List<InputFieldError> fieldErrors;
