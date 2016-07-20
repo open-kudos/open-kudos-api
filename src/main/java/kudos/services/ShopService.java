@@ -43,7 +43,7 @@ public class ShopService {
         shopRepository.delete(itemId);
     }
 
-    public ShopItem editItemOnShop(String itemId, String name, int price, String description, int amount) {
+    public ShopItem editItemOnShop(String itemId, String name, Integer price, String description, Integer amount, String pictureUrl) {
         ShopItem oldItem = shopRepository.findOne(itemId);
 
         if(!Strings.isNullOrEmpty(name))
@@ -52,11 +52,14 @@ public class ShopService {
         if(!Strings.isNullOrEmpty(description))
             oldItem.setDescription(description);
 
-        if(price > 0)
+        if(price != null && price > 0)
             oldItem.setPrice(price);
 
-        if(amount > 0)
+        if(amount != null && amount > 0)
             oldItem.setAmount(amount);
+
+        if(!Strings.isNullOrEmpty(pictureUrl))
+            oldItem.setPictureUrl(pictureUrl);
 
         return shopRepository.save(oldItem);
     }

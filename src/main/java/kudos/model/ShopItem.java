@@ -12,12 +12,14 @@ public class ShopItem {
     private int price;
     private String description;
     private int amount;
+    private String pictureUrl;
 
-    public ShopItem(String name, int price, String description, int amount) {
+    public ShopItem(String name, int price, String description, int amount, String pictureUrl) {
         this.name = name;
         this.price = price;
         this.description = description;
         this.amount = amount;
+        this.pictureUrl = pictureUrl;
     }
 
     public String getId() {
@@ -59,4 +61,13 @@ public class ShopItem {
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
+
 }

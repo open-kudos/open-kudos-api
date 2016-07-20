@@ -27,8 +27,9 @@ public class ShopController extends BaseController {
     public void add(@RequestParam(value="name") String name,
                               @RequestParam(value="price") int price,
                               @RequestParam(value="description") String description,
-                              @RequestParam(value="amount") int amount) throws UserException {
-        shopService.addItemToShop(new ShopItem(name, price, description, amount));
+                              @RequestParam(value="amount") int amount,
+                              @RequestParam(value="pictureUrl") String pictureUrl) throws UserException {
+        shopService.addItemToShop(new ShopItem(name, price, description, amount, pictureUrl));
     }
 
     @RequestMapping(value = "/delete/{itemId}", method = RequestMethod.POST)
@@ -39,10 +40,11 @@ public class ShopController extends BaseController {
     @RequestMapping(value = "/edit/{itemId}", method = RequestMethod.POST)
     public ShopItem edit(@PathVariable String itemId,
                                    @RequestParam(value="name", required = false) String name,
-                                   @RequestParam(value="price", required = false) int price,
+                                   @RequestParam(value="price", required = false) Integer price,
                                    @RequestParam(value="description", required = false) String description,
-                                   @RequestParam(value="amount", required = false) int amount) throws UserException {
-        return shopService.editItemOnShop(itemId, name, price, description, amount);
+                                   @RequestParam(value="amount", required = false) Integer amount,
+                                   @RequestParam(value="pictureUrl", required = false) String pictureUrl) throws UserException {
+        return shopService.editItemOnShop(itemId, name, price, description, amount, pictureUrl);
     }
 
 }
