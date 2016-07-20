@@ -9,7 +9,6 @@ import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.TransactionRepository;
 import kudos.web.exceptions.UserException;
-import org.apache.log4j.Logger;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import java.util.List;
 @Service
 public class KudosService {
 
-    private final Logger LOG = Logger.getLogger(KudosService.class.getName());
     SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
     SimpleDateFormat responseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -69,7 +67,7 @@ public class KudosService {
             throw new InvalidKudosAmountException("invalid_kudos_amount");
         }
 
-        if (getFreeKudos(sender) < amount){
+        if (status != Transaction.Status.COMPLETED_CHALLENGE && getFreeKudos(sender) < amount){
             throw new KudosExceededException("exceeded_kudos");
         }
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
-@Api(name = "Transactions Controller", description = "Controller for kudos transactions")
+@Api(name = "History Controller", description = "Controller for user history")
 @Controller
 @RequestMapping("/history")
 public class HistoryController extends BaseController {
