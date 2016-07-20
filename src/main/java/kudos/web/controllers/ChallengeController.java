@@ -248,11 +248,8 @@ public class ChallengeController extends BaseController {
         return new ChallengeResponse(challengeService.cancel(challenge));
     }
 
-
     @ApiMethod(description = "Accomplishes challenge by its id")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "id")
-    })
+    @ApiParams(queryparams = {@ApiQueryParam(name = "id")})
     @ApiErrors(apierrors = {
             @ApiError(code = "challenge_id_not_specified",
                     description = "If challenge id was not specified"),
@@ -268,7 +265,7 @@ public class ChallengeController extends BaseController {
                     description = "If challenge is already canceled")
     })
     @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody void accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    public @ApiResponseObject @ResponseBody ChallengeResponse accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException, MessagingException {
 
         if(Strings.isNullOrEmpty(id))
             throw new IdNotSpecifiedException("id_not_specified");
@@ -287,8 +284,7 @@ public class ChallengeController extends BaseController {
             challenge.setParticipantStatus(status);
         }
 
-        challengeService.accomplish(challenge);
-
+        return new ChallengeResponse(challengeService.accomplish(challenge));
     }
 
     @ApiMethod(description = "Marks challenge as failed by its id")

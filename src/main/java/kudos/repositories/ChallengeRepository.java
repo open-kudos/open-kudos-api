@@ -7,20 +7,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-/**
- * Created by chc on 15.8.7.
- */
 public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
-    List<Challenge> findChallengesByCreator(String creator);
-
-    List<Challenge> findChallengesByParticipant(String participant);
+    Challenge findChallengeById(String id);
 
     List<Challenge> findChallengesByCreatorUser(User creator);
 
     List<Challenge> findChallengesByParticipantUser(User participant);
-
-    Challenge findChallengeById(String id);
 
     List<Challenge> findAllChallengesByStatus(Challenge.Status status);
 
@@ -29,9 +22,5 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
     List<Challenge> findAllChallengesByParticipantUserAndStatus(User participant, Challenge.Status status, Pageable pageable);
 
     List<Challenge> findAllChallengesByCreatorUserAndStatus(User creator, Challenge.Status status);
-
-    List<Challenge> findAllChallengesByCreatorAndStatus(User creator, Challenge.Status status, Pageable pageable);
-
-    List<Challenge> findAllChallengesByCreatorOrParticipantAndStatus(User creator, User participant, Challenge.Status status);
 
 }

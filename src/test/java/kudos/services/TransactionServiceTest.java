@@ -16,9 +16,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by vytautassugintas on 02/05/16.
- */
 public class TransactionServiceTest {
 
     private TransactionService transactionService;

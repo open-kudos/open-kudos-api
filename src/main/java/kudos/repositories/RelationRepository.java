@@ -6,9 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-/**
- * Created by chc on 15.8.20.
- */
 public interface RelationRepository extends MongoRepository<Relation,String>  {
 
     List<Relation> getRelationsByFollower(User follower);

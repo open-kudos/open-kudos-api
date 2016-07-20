@@ -7,9 +7,6 @@ import org.springframework.validation.Errors;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by Robertas on 6/7/2016.
- */
 public class LoginFormTest {
 
     private LoginForm form = new LoginForm("first.last@swedbank.lt", "pass");

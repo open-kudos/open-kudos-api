@@ -3,24 +3,18 @@ package kudos.services;
 import kudos.model.Challenge;
 import kudos.model.Transaction;
 import kudos.model.User;
-import kudos.model.history.History;
 import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by vytautassugintas on 22/06/16.
- */
 public class HistoryServiceTest {
 
     private HistoryService historyService;
@@ -29,11 +23,9 @@ public class HistoryServiceTest {
     private ChallengeRepository challengeRepository;
     private UserRepository userRepository;
 
-    private History mockedHistory;
     private Transaction mockedTransaction;
     private Challenge mockedChallenge;
 
-    private List<History> mockedHistories;
     private static List<Transaction> mockedTransactions = new ArrayList<>();
     private static List<Challenge> mockedChallenges = new ArrayList<>();
 
@@ -59,7 +51,6 @@ public class HistoryServiceTest {
 
         historyService = mock(HistoryService.class);
 
-        mockedHistory = mock(History.class);
         mockedTransaction = mock(Transaction.class);
         mockedChallenge = mock(Challenge.class);
 
@@ -67,18 +58,6 @@ public class HistoryServiceTest {
         when(userRepository.findByEmail(any(String.class))).thenReturn(new User("test", "test", "", "test@test.lt"));
         when(transactionRepository.findTransactionsBySenderAndStatus(any(User.class), any(Transaction.Status.class))).thenReturn(mockedTransactions);
         when(challengeRepository.findAllChallengesByCreatorUserAndStatus(any(User.class), any(Challenge.Status.class))).thenReturn(mockedChallenges);
-    }
-
-    @Test
-    public void testIfTransactionModelCanBeTransformedToHistoryModel(){
-        History history = historyService.transformTransactionModelToHistory(mockedTransaction);
-        assertSame(history, history);
-    }
-
-    @Test
-    public void testIfChallengeModelCanBeTransformedToHistoryModel(){
-        History history = historyService.transformChallengeModelToHistory(mockedChallenge);
-        assertSame(history, history);
     }
 
 }

@@ -1,59 +1,39 @@
 package kudos.model;
 
-import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@ApiObject
 @Document
 public class Challenge {
 
-    public enum Status {
-        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, CANCELED, EXPIRED
-    }
-
     @Id
     private String id;
-
-    private String creator;
-    private String participant;
-
     @DBRef
     private User creatorUser;
     @DBRef
     private User participantUser;
 
-    @ApiObjectField
     private Boolean creatorStatus;
-    @ApiObjectField
     private Boolean participantStatus;
-
-    @ApiObjectField
     private String name;
-    @ApiObjectField
     private String description;
-
-    @ApiObjectField
     private String createDate;
-    @ApiObjectField
     private String finishDate;
-    @ApiObjectField
-    private int amount;
-    @ApiObjectField
     private Status status;
+    private int amount;
+
+    public enum Status {
+        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, CANCELED, EXPIRED
+    }
 
     public Challenge(User creatorUser, User participantUser, String name, String description, String createDate, String finishDate, int amount, Status status) {
         this.creatorUser = creatorUser;
         this.participantUser = participantUser;
-
         this.creatorStatus = null;
         this.participantStatus = null;
-
         this.name = name;
         this.description = description;
-
         this.createDate = createDate;
         this.finishDate = finishDate;
         this.amount = amount;
@@ -66,22 +46,6 @@ public class Challenge {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getParticipant() {
-        return participant;
-    }
-
-    public void setParticipant(String participant) {
-        this.participant = participant;
     }
 
     public User getCreatorUser() {

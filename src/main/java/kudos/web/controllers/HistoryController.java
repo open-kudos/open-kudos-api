@@ -1,8 +1,5 @@
 package kudos.web.controllers;
 
-/**
- * Created by vytautassugintas on 21/06/16.
- */
 import kudos.web.beans.response.HistoryResponse;
 import kudos.web.exceptions.UserException;
 import org.jsondoc.core.annotation.Api;
@@ -13,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
-@Api(name = "Transactions Controller", description = "Controller for kudos transactions")
+@Api(name = "History Controller", description = "Controller for user history")
 @Controller
 @RequestMapping("/history")
 public class HistoryController extends BaseController {

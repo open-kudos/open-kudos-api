@@ -7,10 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 
-
-/**
- * Created by chc on 15.7.23.
- */
 public abstract class BaseController {
 
     @Autowired
@@ -32,9 +28,6 @@ public abstract class BaseController {
     protected ChallengeService challengeService;
 
     @Autowired
-    protected TeamChallengeService teamChallengeService;
-
-    @Autowired
     protected RelationService relationService;
 
     @Autowired
@@ -45,9 +38,6 @@ public abstract class BaseController {
 
     @Autowired
     protected HistoryService historyService;
-
-    @Autowired
-    protected MigrationService migrationService;
 
     @Autowired
     @Qualifier(value = "DBTimeFormatter")

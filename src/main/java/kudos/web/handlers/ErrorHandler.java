@@ -19,10 +19,6 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 
-
-/**
- * Created by chc on 15.8.10.
- */
 @ControllerAdvice
 public class ErrorHandler extends ResponseEntityExceptionHandler {
     private final Logger LOG = Logger.getLogger(ErrorHandler.class.getName());

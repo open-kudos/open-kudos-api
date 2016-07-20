@@ -19,9 +19,6 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Created by chc on 15.8.10.
- */
 @Api(name = "Registration Controller", description = "Controller fo registering")
 @Controller
 public class RegistrationController extends BaseController {
