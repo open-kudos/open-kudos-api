@@ -2,10 +2,10 @@ package kudos.web.handlers;
 
 import com.mongodb.MongoException;
 import kudos.exceptions.*;
-import kudos.web.exceptions.FormValidationException;
+import kudos.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.ErrorResponse;
-import kudos.web.exceptions.UserException;
+import kudos.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

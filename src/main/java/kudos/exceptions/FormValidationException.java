@@ -1,4 +1,4 @@
-package kudos.web.exceptions;
+package kudos.exceptions;
 
 import org.springframework.validation.Errors;
 

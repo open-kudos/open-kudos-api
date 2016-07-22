@@ -5,5 +5,5 @@ import kudos.model.User;
 import java.util.List;
 
 public interface CustomUserRepository {
-    List<User> searchAllFields(String filter);
+//    List<User> searchAllFields(String filter);
 }

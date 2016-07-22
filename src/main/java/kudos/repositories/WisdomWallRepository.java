@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface WisdomWallRepository extends MongoRepository<Idea, String> {
 
-      List<Idea> findIdeasByPostedByEmail(String postedBy);
+//      List<Idea> findIdeasByPostedByEmail(String postedBy);
 
 }

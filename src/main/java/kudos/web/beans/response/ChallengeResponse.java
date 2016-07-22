@@ -1,6 +1,7 @@
 package kudos.web.beans.response;
 
 import kudos.model.Challenge;
+import kudos.model.ChallengeStatus;
 
 public class ChallengeResponse extends Response {
 
@@ -16,21 +17,18 @@ public class ChallengeResponse extends Response {
     Boolean participantStatus;
     String description;
     String finishDate;
-    Challenge.Status status;
+    ChallengeStatus status;
 
     public ChallengeResponse(Challenge challenge){
         this.id = challenge.getId();
         this.name = challenge.getName();
         this.amount = challenge.getAmount();
-        this.createDate = challenge.getCreateDateDate();
-        this.creatorName = challenge.getCreatorUser().getFirstName() + " " + challenge.getCreatorUser().getLastName();
-        this.creatorEmail = challenge.getCreatorUser().getEmail();
-        this.creatorStatus = challenge.getCreatorStatus();
-        this.participantName = challenge.getParticipantUser().getFirstName() + " " + challenge.getParticipantUser().getLastName();
-        this.participantEmail = challenge.getParticipantUser().getEmail();
-        this.participantStatus = challenge.getParticipantStatus();
+        this.creatorName = challenge.getCreator().getFirstName() + " " + challenge.getCreator().getLastName();
+        this.creatorEmail = challenge.getCreator().getEmail();
+        this.participantName = challenge.getParticipant().getFirstName() + " " + challenge.getParticipant().getLastName();
+        this.participantEmail = challenge.getParticipant().getEmail();
         this.description = challenge.getDescription();
-        this.finishDate = challenge.getFinishDate();
+        this.finishDate = challenge.getExpirationDate();
         this.status = challenge.getStatus();
     }
 
@@ -38,11 +36,11 @@ public class ChallengeResponse extends Response {
         this.id = id;
     }
 
-    public Challenge.Status getStatus() {
+    public ChallengeStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Challenge.Status status) {
+    public void setStatus(ChallengeStatus status) {
         this.status = status;
     }
 

@@ -16,110 +16,114 @@ import java.util.Properties;
 @Component
 public class EmailService {
 
-    static Properties mailServerProperties;
-    static Session getMailSession;
-    static MimeMessage generateMailMessage;
+//    static Properties mailServerProperties;
+//    static Session getMailSession;
+//    static MimeMessage generateMailMessage;
 
-    public void generateAndSendEmail(String email, String message, String subject) throws MessagingException {
-
-        mailServerProperties = System.getProperties();
+    public void sendEmail(String recipient, String message, String subject) throws MessagingException {
+        Properties mailServerProperties = System.getProperties();
         mailServerProperties.put("mail.smtp.port", "587");
         mailServerProperties.put("mail.smtp.auth", "true");
         mailServerProperties.put("mail.smtp.starttls.enable", "true");
 
-        getMailSession = Session.getDefaultInstance(mailServerProperties, null);
-        generateMailMessage = new MimeMessage(getMailSession);
-        generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
-        generateMailMessage.setSubject(subject);
-        generateMailMessage.setContent(message, "text/html");
-        Transport transport = getMailSession.getTransport("smtp");
+        Session session = Session.getDefaultInstance(mailServerProperties, null);
+        MimeMessage email = generateEmail(recipient, message, subject, session);
+        Transport transport = session.getTransport("smtp");
 
         transport.connect("smtp.gmail.com", "vilniuscckudos@gmail.com", "kudosapp");
-        transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
+        transport.sendMessage(email, email.getAllRecipients());
         transport.close();
     }
 
-    public void generateEmailForNewChallenge(User creator, User participant, Challenge challenge) throws MessagingException{
-        if (participant.isSubscribing()) {
-            String message = "<h2>You got new challenge</h2>"
-                    + "<p>You got challenge from " + creator.getFirstName() + " " + creator.getLastName() + "</p>"
-                    + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
-                    + "<p>Let " + creator.getFirstName() + " " + creator.getLastName() + " know if you accept the challenge in your Openkudos account!</p>"
-                    + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
-
-
-            Runnable runnable = () -> {
-                try {
-                    generateAndSendEmail(participant.getEmail(), message, "You have been challenged!");
-                } catch (MessagingException e) {
-                    e.printStackTrace();
-                }
-            };
-
-            Thread thread = new Thread(runnable);
-            thread.start();
-        }
+    public MimeMessage generateEmail(String recipient, String message, String subject, Session session) throws MessagingException {
+        MimeMessage email = new MimeMessage(session);
+        email.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+        email.setSubject(subject);
+        email.setContent(message, "text/html");
+        return email;
     }
-
-    public void generateEmailForOngoingChallengeSelection(Challenge challenge) throws MessagingException{
-        String text;
-
-        if (challenge.getParticipantStatus() == null) {
-            if (challenge.getParticipantUser().isSubscribing()) {
-                if (challenge.getCreatorStatus()) text = "WON";
-                else text = "LOST";
-
-                String message = "<h2>Challenge updated!</h2>"
-                        + "<p>" + challenge.getCreatorUser().getFirstName() + " " + challenge.getCreatorUser().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
-                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
-                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
-                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
-
-
-                Runnable runnable = () -> {
-                    try {
-                        generateAndSendEmail(challenge.getParticipantUser().getEmail(), message, "Challenge updated!");
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
-                    }
-                };
-
-                Thread thread = new Thread(runnable);
-                thread.start();
-            }
-        } else if (challenge.getCreatorStatus() == null) {
-            if (challenge.getCreatorUser().isSubscribing()){
-                if (challenge.getParticipantStatus()) text = "WON";
-                else text = "LOST";
-
-                String message = "<h2>Challenge updated!</h2>"
-                        + "<p>" + challenge.getParticipantUser().getFirstName() + " " + challenge.getParticipantUser().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
-                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
-                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
-                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
-
-
-                Runnable runnable = () -> {
-                    try {
-                        generateAndSendEmail(challenge.getCreatorUser().getEmail(), message, "Challenge updated!");
-                    } catch (MessagingException e) {
-                        e.printStackTrace();
-                    }
-                };
-
-                Thread thread = new Thread(runnable);
-                thread.start();
-            }
-        }
-    }
-
-    public String checkChallengeDescription(Challenge challenge){
-        if (challenge.getDescription() == null){
-            return challenge.getName();
-        } else {
-            return challenge.getDescription();
-        }
-    }
+//
+//    public void generateEmailForNewChallenge(User creator, User participant, Challenge challenge) throws MessagingException{
+//        if (participant.isSubscribing()) {
+//            String message = "<h2>You got new challenge</h2>"
+//                    + "<p>You got challenge from " + creator.getFirstName() + " " + creator.getLastName() + "</p>"
+//                    + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
+//                    + "<p>Let " + creator.getFirstName() + " " + creator.getLastName() + " know if you accept the challenge in your Openkudos account!</p>"
+//                    + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
+//
+//
+//            Runnable runnable = () -> {
+//                try {
+//                    generateAndSendEmail(participant.getEmail(), message, "You have been challenged!");
+//                } catch (MessagingException e) {
+//                    e.printStackTrace();
+//                }
+//            };
+//
+//            Thread thread = new Thread(runnable);
+//            thread.start();
+//        }
+//    }
+//
+//    public void generateEmailForOngoingChallengeSelection(Challenge challenge) throws MessagingException{
+//        String text;
+//
+//        if (challenge.getParticipantStatus() == null) {
+//            if (challenge.getParticipant().isSubscribing()) {
+//                if (challenge.getCreatorStatus()) text = "WON";
+//                else text = "LOST";
+//
+//                String message = "<h2>Challenge updated!</h2>"
+//                        + "<p>" + challenge.getCreator().getFirstName() + " " + challenge.getCreator().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
+//                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
+//                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
+//                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
+//
+//
+//                Runnable runnable = () -> {
+//                    try {
+//                        generateAndSendEmail(challenge.getParticipant().getEmail(), message, "Challenge updated!");
+//                    } catch (MessagingException e) {
+//                        e.printStackTrace();
+//                    }
+//                };
+//
+//                Thread thread = new Thread(runnable);
+//                thread.start();
+//            }
+//        } else if (challenge.getCreatorStatus() == null) {
+//            if (challenge.getCreator().isSubscribing()){
+//                if (challenge.getParticipantStatus()) text = "WON";
+//                else text = "LOST";
+//
+//                String message = "<h2>Challenge updated!</h2>"
+//                        + "<p>" + challenge.getParticipant().getFirstName() + " " + challenge.getParticipant().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
+//                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
+//                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
+//                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
+//
+//
+//                Runnable runnable = () -> {
+//                    try {
+//                        generateAndSendEmail(challenge.getCreator().getEmail(), message, "Challenge updated!");
+//                    } catch (MessagingException e) {
+//                        e.printStackTrace();
+//                    }
+//                };
+//
+//                Thread thread = new Thread(runnable);
+//                thread.start();
+//            }
+//        }
+//    }
+//
+//    public String checkChallengeDescription(Challenge challenge){
+//        if (challenge.getDescription() == null){
+//            return challenge.getName();
+//        } else {
+//            return challenge.getDescription();
+//        }
+//    }
 }
 
 

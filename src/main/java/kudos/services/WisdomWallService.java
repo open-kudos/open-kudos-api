@@ -3,7 +3,7 @@ package kudos.services;
 import kudos.model.Idea;
 import kudos.model.User;
 import kudos.repositories.WisdomWallRepository;
-import kudos.web.exceptions.UserException;
+import kudos.exceptions.UserException;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,31 +15,31 @@ import java.util.List;
 @Service
 public class WisdomWallService {
 
-    @Autowired
-    private WisdomWallRepository repository;
-    @Autowired
-    private UsersService usersService;
-
-    @Autowired
-    @Qualifier(value = "DBTimeFormatter")
-    DateTimeFormatter dateTimeFormatter;
-
-
-    public Idea addIdeaToWisdomWall(String author, String idea) throws UserException {
-        User postedBy = usersService.getLoggedUser().get();
-        return repository.insert(new Idea(author, postedBy.getEmail(), idea, LocalDateTime.now().toString(dateTimeFormatter)));
-    }
-
-    /**
-     * Returns list of ideas posted by certain user
-     * @return List
-     */
-    public List<Idea> getIdeasByPostedBy(String postedBy) {
-        return repository.findIdeasByPostedByEmail(postedBy);
-    }
-
-    public Idea updateIdeaCreationTime(Idea idea) {
-        return repository.save(idea);
-    }
+//    @Autowired
+//    private WisdomWallRepository repository;
+//    @Autowired
+//    private UsersService usersService;
+//
+//    @Autowired
+//    @Qualifier(value = "DBTimeFormatter")
+//    DateTimeFormatter dateTimeFormatter;
+//
+//
+//    public Idea addIdeaToWisdomWall(String author, String idea) throws UserException {
+//        User postedBy = usersService.getLoggedUser().get();
+//        return repository.insert(new Idea(author, postedBy.getEmail(), idea, LocalDateTime.now().toString(dateTimeFormatter)));
+//    }
+//
+//    /**
+//     * Returns list of ideas posted by certain user
+//     * @return List
+//     */
+//    public List<Idea> getIdeasByPostedBy(String postedBy) {
+//        return repository.findIdeasByPostedByEmail(postedBy);
+//    }
+//
+//    public Idea updateIdeaCreationTime(Idea idea) {
+//        return repository.save(idea);
+//    }
 
 }

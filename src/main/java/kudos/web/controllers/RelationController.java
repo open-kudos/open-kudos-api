@@ -7,7 +7,7 @@ import kudos.model.Relation;
 import kudos.model.User;
 import kudos.web.beans.response.HistoryResponse;
 import kudos.web.beans.response.RelationResponse;
-import kudos.web.exceptions.UserException;
+import kudos.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.jsondoc.core.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -23,70 +23,70 @@ import java.util.Optional;
 @RequestMapping("/relations")
 public class RelationController extends BaseController {
 
-    private Logger LOG = Logger.getLogger(RelationController.class);
-
-    @ApiMethod(description = "service to add relation")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "email", description = "The email of user which logged user wants to make a relationship")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "id_not_specified", description = "if email was not specified"),
-            @ApiError(code = "user_not_exist", description = "If user with specified email does not exist"),
-            @ApiError(code = "relation_already_exists", description = "If relation that logged user wants to create already exists")
-    })
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public @ResponseBody
-    RelationResponse addRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
-        if(Strings.isNullOrEmpty(email)){
-            throw new IdNotSpecifiedException("email_not_specified");
-        }
-        Optional<User> maybeUser = usersService.findByEmail(email);
-        if(!maybeUser.isPresent()){
-            throw new UserException("user_not_exist");
-        }
-        User userToFollow = maybeUser.get();
-        User follower = usersService.getLoggedUser().get();
-        return relationService.addRelation(new Relation(follower, userToFollow));
-    }
-
-    @ApiMethod(description = "service to remove relation")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "email", description = "The email of user which logged user wants to discontinue relationship")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "email_not_specified", description = "If email of user was not specified"),
-            @ApiError(code = "user_not_exist", description = "If user which email was specified does not exist"),
-            @ApiError(code = "relation_not_exist", description = "If relationship which is wanted to be discontinued does not exist")
-    })
-    @RequestMapping(value = "/remove", method = RequestMethod.GET)
-    public void removeRelation(String email) throws UserException, RelationException {
-
-        if(Strings.isNullOrEmpty(email)) throw new RelationException("email_not_specified");
-
-        Optional<User> maybeUser = usersService.findByEmail(email);
-        if(!maybeUser.isPresent()) throw new UserException("user_not_exist");
-
-
-        relationService.removeRelation(email);
-    }
-
-    @ApiMethod(description = "service to get all emails of users that follows logged user")
-    @RequestMapping(value = "/followers", method = RequestMethod.GET)
-    public @ResponseBody List<RelationResponse> getFollowers() throws UserException {
-        return relationService.getAllFollowers();
-    }
-
-    @ApiMethod(description = "service to get all email of users that are followed by logged user")
-    @RequestMapping(value = "/followed", method = RequestMethod.GET)
-    public @ResponseBody List<RelationResponse> getFollowed() throws UserException {
-        return relationService.getAllFollowedUsers();
-    }
-
-    @ApiMethod(description = "service to get all followed users transactions history ")
-    @RequestMapping(value = "/feed", method = RequestMethod.GET)
-    public @ResponseBody List<HistoryResponse> getFollowedUsersHistory(int startIndex, int endIndex) throws UserException {
-        return relationService.getFollowedUsersNewsFeed(startIndex, endIndex);
-    }
+//    private Logger LOG = Logger.getLogger(RelationController.class);
+//
+//    @ApiMethod(description = "service to add relation")
+//    @ApiParams(queryparams = {
+//            @ApiQueryParam(name = "email", description = "The email of user which logged user wants to make a relationship")
+//    })
+//    @ApiErrors(apierrors = {
+//            @ApiError(code = "id_not_specified", description = "if email was not specified"),
+//            @ApiError(code = "user_not_exist", description = "If user with specified email does not exist"),
+//            @ApiError(code = "relation_already_exists", description = "If relation that logged user wants to create already exists")
+//    })
+//    @RequestMapping(value = "/add", method = RequestMethod.POST)
+//    public @ResponseBody
+//    RelationResponse addRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
+//        if(Strings.isNullOrEmpty(email)){
+//            throw new IdNotSpecifiedException("email_not_specified");
+//        }
+//        Optional<User> maybeUser = usersService.findByEmail(email);
+//        if(!maybeUser.isPresent()){
+//            throw new UserException("user_not_exist");
+//        }
+//        User userToFollow = maybeUser.get();
+//        User follower = usersService.getLoggedUser().get();
+//        return relationService.addRelation(new Relation(follower, userToFollow));
+//    }
+//
+//    @ApiMethod(description = "service to remove relation")
+//    @ApiParams(queryparams = {
+//            @ApiQueryParam(name = "email", description = "The email of user which logged user wants to discontinue relationship")
+//    })
+//    @ApiErrors(apierrors = {
+//            @ApiError(code = "email_not_specified", description = "If email of user was not specified"),
+//            @ApiError(code = "user_not_exist", description = "If user which email was specified does not exist"),
+//            @ApiError(code = "relation_not_exist", description = "If relationship which is wanted to be discontinued does not exist")
+//    })
+//    @RequestMapping(value = "/remove", method = RequestMethod.GET)
+//    public void removeRelation(String email) throws UserException, RelationException {
+//
+//        if(Strings.isNullOrEmpty(email)) throw new RelationException("email_not_specified");
+//
+//        Optional<User> maybeUser = usersService.findByEmail(email);
+//        if(!maybeUser.isPresent()) throw new UserException("user_not_exist");
+//
+//
+//        relationService.removeRelation(email);
+//    }
+//
+//    @ApiMethod(description = "service to get all emails of users that follows logged user")
+//    @RequestMapping(value = "/followers", method = RequestMethod.GET)
+//    public @ResponseBody List<RelationResponse> getFollowers() throws UserException {
+//        return relationService.getAllFollowers();
+//    }
+//
+//    @ApiMethod(description = "service to get all email of users that are followed by logged user")
+//    @RequestMapping(value = "/followed", method = RequestMethod.GET)
+//    public @ResponseBody List<RelationResponse> getFollowed() throws UserException {
+//        return relationService.getAllFollowedUsers();
+//    }
+//
+//    @ApiMethod(description = "service to get all followed users transactions history ")
+//    @RequestMapping(value = "/feed", method = RequestMethod.GET)
+//    public @ResponseBody List<HistoryResponse> getFollowedUsersHistory(int startIndex, int endIndex) throws UserException {
+//        return relationService.getFollowedUsersNewsFeed(startIndex, endIndex);
+//    }
 
 
 }

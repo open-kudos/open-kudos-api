@@ -23,9 +23,7 @@ public class UserResponse extends Response {
         this.email = user.getEmail();
         this.birthday = user.getBirthday();
         this.startedToWorkDate = user.getStartedToWorkDate();
-        this.subscribing = user.isSubscribing();
-        this.isCompleted = user.isCompleted();
-        this.lastSeenTransactionTimestamp = user.getLastSeenTransactionTimestamp();
+        this.lastSeenTransactionTimestamp = user.getLastNotificationCheckTime();
     }
 
     public String getId() {

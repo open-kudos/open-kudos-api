@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface RelationRepository extends MongoRepository<Relation,String>  {
 
-    List<Relation> getRelationsByFollower(User follower);
-    List<Relation> getRelationsByUserToFollow(User userToFollow);
-    Relation getRelationByFollowerAndUserToFollow(User follower, User userToFollow);
+//    List<Relation> getRelationsByFollower(User follower);
+//    List<Relation> getRelationsByUserToFollow(User userToFollow);
+//    Relation getRelationByFollowerAndUserToFollow(User follower, User userToFollow);
 
 }

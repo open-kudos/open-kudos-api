@@ -1,4 +1,4 @@
-package kudos.web.beans.form;
+package kudos.web.beans.request;
 
 import com.google.common.base.Strings;
 import org.joda.time.format.DateTimeFormat;

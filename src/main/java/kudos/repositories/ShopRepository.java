@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface ShopRepository extends MongoRepository<ShopItem,String>  {
 
-    List<ShopItem> findAll();
-    ShopItem save(ShopItem item);
-    void delete(String itemId);
-    ShopItem insert(ShopItem item);
-    ShopItem findOne(String itemId);
+//    List<ShopItem> findAll();
+//    ShopItem save(ShopItem item);
+//    void delete(String itemId);
+//    ShopItem insert(ShopItem item);
+//    ShopItem findOne(String itemId);
 
 }

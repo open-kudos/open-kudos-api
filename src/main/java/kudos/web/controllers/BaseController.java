@@ -46,4 +46,7 @@ public abstract class BaseController {
     @Autowired
     protected ShopService shopService;
 
+    @Autowired
+    protected AuthenticationService authenticationService;
+
 }

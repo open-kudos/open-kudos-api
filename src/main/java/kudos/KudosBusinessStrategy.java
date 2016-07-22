@@ -33,14 +33,4 @@ public abstract class KudosBusinessStrategy {
         };
     }
 
-    public static KudosBusinessStrategy createMonthlyStrategy(int deposit, int minDeposit) {
-        return new KudosBusinessStrategy(deposit, minDeposit) {
-
-            @Override
-            public LocalDateTime getStartTime() {
-                return new LocalDateTime().withDayOfMonth(1);
-            }
-        };
-    }
-
 }
