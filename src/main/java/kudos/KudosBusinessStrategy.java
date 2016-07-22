@@ -5,26 +5,20 @@ import org.joda.time.LocalDateTime;
 
 public abstract class KudosBusinessStrategy {
 
-    private final int deposit;
-    private final int minDeposit;
+    private final int weeklyAmount;
 
-    public KudosBusinessStrategy(int deposit, int minDeposit) {
-        this.deposit = deposit;
-        this.minDeposit = minDeposit;
+    public KudosBusinessStrategy(int weeklyAmount) {
+        this.weeklyAmount = weeklyAmount;
     }
 
-    public int getDeposit() {
-        return deposit;
-    }
-
-    public int getMinDeposit() {
-        return minDeposit;
+    public int getWeeklyAmount() {
+        return weeklyAmount;
     }
 
     public abstract LocalDateTime getStartTime();
 
-    public static KudosBusinessStrategy createWeeklyStrategy(int deposit, int minDeposit) {
-        return new KudosBusinessStrategy(deposit, minDeposit) {
+    public static KudosBusinessStrategy createWeeklyStrategy(int weeklyAmount) {
+        return new KudosBusinessStrategy(weeklyAmount) {
 
             @Override
             public LocalDateTime getStartTime() {

@@ -21,8 +21,8 @@ public class HomeController extends BaseController {
         return new IndexResponse(principal != null);
     }
 
-    @RequestMapping(value = "/latestKudosTransactions", method = RequestMethod.GET)
-    public List<KudosTransactionResponse> latestKudosTransactions() {
-        return transactionService.getLatestKudosTransactions();
+    @RequestMapping(value = "/transactions", method = RequestMethod.GET)
+    public List<KudosTransactionResponse> latestTransactions() {
+        return transactionService.getLatestTransactions();
     }
 }

@@ -1,50 +1,44 @@
 package kudos.web.controllers;
 
-import org.jsondoc.core.annotation.*;
-import org.springframework.stereotype.Controller;
+import kudos.exceptions.FormValidationException;
+import kudos.exceptions.InvalidKudosAmountException;
+import kudos.exceptions.UserException;
+import kudos.model.User;
+import kudos.web.beans.request.GiveKudosForm;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.mail.MessagingException;
+import java.util.Optional;
 
 
 @RestController
 @RequestMapping("/kudos")
 public class KudosController extends BaseController {
 
-//    @ApiMethod(description = "Service to send kudos")
-//    @ApiParams(queryparams = {
-//            @ApiQueryParam(name = "receiverEmail", description = "For testing use testK@google.lt"),
-//            @ApiQueryParam(name = "message", description = "Message, explaining why user is giving kudos")
-//    })
-//    @ApiErrors(apierrors = {
-//            @ApiError(code = "receiver_email_not_specified",
-//                    description = "If receiver email was not specified"),
-//            @ApiError(code = "receiver_email_incorrect",
-//                    description = "If receiver email was incorrect"),
-//            @ApiError(code = "amount_negative_or_zero",
-//                    description = "If specified amount was negative or equal to zero"),
-//            @ApiError(code = "amount_not_digit",
-//                    description = "If specified amount is not a digit"),
-//            @ApiError(code = "receiver_not_exist",
-//                    description = "If kudos receiver does not exist")
-//    })
-//    @RequestMapping(value = "/send", method = RequestMethod.POST)
-//    public @ApiResponseObject @ResponseBody TransactionResponse sendKudos(KudosTransferForm kudosTransferForm, Errors errors)
-//            throws FormValidationException, BusinessException, UserException {
-//
-//        new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
-//
-//        if (usersService.getLoggedUser().get().getEmail().equals(kudosTransferForm.getReceiverEmail())){
-//            throw new UserException("cant.send.kudos.to.yourself");
-//        }
-//
-//        if (errors.hasErrors())
-//            throw new FormValidationException(errors);
-//
-//        User user = usersService.findByEmail(kudosTransferForm.getReceiverEmail())
-//                .orElseThrow(() -> new UserException("receiver.not.exist"));
-//
-//        return new TransactionResponse(kudosService.giveKudos(user, Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage()));
-//    }
+    @RequestMapping(value = "/give", method = RequestMethod.POST)
+    public void giveKudos(@RequestBody GiveKudosForm form) throws UserException, InvalidKudosAmountException, MessagingException {
+
+        User sender = authenticationService.getLoggedInUser();
+
+        if (sender.getEmail().equals(form.getReceiverEmail())){
+            throw new UserException("cant_give_kudos_to_yourself");
+        }
+
+        Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());
+
+        if(receiver.isPresent()) {
+            kudosService.giveKudos(sender, receiver.get(), form.getAmount(), form.getMessage());
+        } else {
+            String email = sender.getFirstName() + " " + sender.getLastName() + "wanted to give you KUDOS," +
+                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
+            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist");
+        }
+
+    }
 //
 //    @ApiMethod(description = "Service to get all incoming kudos transactions")
 //    @RequestMapping(value = "/incoming", method = RequestMethod.GET)

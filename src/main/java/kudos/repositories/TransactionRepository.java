@@ -1,6 +1,7 @@
 package kudos.repositories;
 
 import kudos.model.Transaction;
+import kudos.model.TransactionStatus;
 import kudos.model.TransactionType;
 import kudos.model.User;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +25,9 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 //
 //    List<Transaction> findTransactionsBySender(User sender);
 //
-//    List<Transaction> findTransactionsBySenderAndStatus(User sender, TransactionType status);
+    List<Transaction> findTransactionsBySenderAndStatusAndDateGreaterThanOrderByDateDesc(User sender, TransactionStatus status, String date);
+
+    List<Transaction> findTransactionsByReceiverAndStatusAndDateGreaterThanOrderByDateDesc(User receiver, TransactionStatus status, String date);
 //
 //    List<Transaction> findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(User sender, String timestamp);
 //
@@ -34,5 +37,5 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 //
 //    List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp, Pageable pageable);
 //
-    List<Transaction> findTransactionsByTypeOrderByDateDesc(TransactionType type, Pageable pageable);
+    List<Transaction> findTransactionsByStatusOrderByDateDesc(TransactionStatus status, Pageable pageable);
 }

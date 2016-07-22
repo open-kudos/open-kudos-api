@@ -3,7 +3,6 @@ package kudos.services;
 
 import com.google.common.base.Strings;
 import kudos.exceptions.BusinessException;
-import kudos.exceptions.KudosExceededException;
 import kudos.model.ShopItem;
 import kudos.model.Transaction;
 import kudos.model.User;

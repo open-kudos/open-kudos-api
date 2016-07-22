@@ -69,6 +69,16 @@ public class AuthenticationService {
         session.invalidate();
     }
 
+    public User getLoggedInUser() throws UserException {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> user = userRepository.findByEmail(name);
+        if(user.isPresent()) {
+            return user.get();
+        } else {
+            throw new UserException("user_not_logged_in");
+        }
+    }
+
     private String getRandomHash() {
         return new BigInteger(130, new SecureRandom()).toString(32);
     }

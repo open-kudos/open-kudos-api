@@ -4,12 +4,10 @@ import com.mongodb.MongoException;
 import kudos.KudosBusinessStrategy;
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidKudosAmountException;
-import kudos.exceptions.KudosExceededException;
-import kudos.model.Transaction;
-import kudos.model.TransactionType;
-import kudos.model.User;
+import kudos.model.*;
 import kudos.repositories.TransactionRepository;
 import kudos.exceptions.UserException;
+import kudos.repositories.UserRepository;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +25,12 @@ public class KudosService {
 //    SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 //    SimpleDateFormat responseFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 //
-//    @Autowired
-//    private UsersService usersService;
-//    @Autowired
-//    private TransactionRepository repository;
-//    @Autowired
-//    private KudosBusinessStrategy strategy;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
 //    @Autowired
 //    private DateTimeFormatter dateTimeFormatter;
 //
@@ -41,10 +39,20 @@ public class KudosService {
 //        this.dateTimeFormatter = dateTimeFormatter;
 //    }
 //
-//    public Transaction giveKudos(User receiver, int amount, String message) throws BusinessException, MongoException, UserException {
-//        User sender = usersService.getLoggedUser().get();
-//        return transferKudos(sender, receiver, amount, message, TransactionType.KUDOS);
-//    }
+    public void giveKudos(User sender, User receiver, int amount, String message) throws InvalidKudosAmountException {
+        if (amount < 1 || sender.getWeeklyKudos() < amount) {
+            throw new InvalidKudosAmountException("invalid_kudos_amount");
+        }
+
+        transactionRepository.save(new Transaction(sender, receiver, amount, message, TransactionType.KUDOS,
+                LocalDateTime.now().toString(), TransactionStatus.COMPLETED));
+
+        sender.setWeeklyKudos(sender.getWeeklyKudos() - amount);
+        userRepository.save(sender);
+
+        receiver.setTotalKudos(receiver.getTotalKudos()+amount);
+        userRepository.save(receiver);
+    }
 //
 //    public Transaction reduceFreeKudos(User user,  int amount, String message) throws BusinessException, UserException {
 //        return transferKudos(user, usersService.getKudosMaster(), amount, message, TransactionType.KUDOS);

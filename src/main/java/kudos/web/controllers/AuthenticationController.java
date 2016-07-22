@@ -18,7 +18,7 @@ import java.security.Principal;
 public class AuthenticationController extends BaseController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public void register(RegisterForm form) throws MessagingException, UserException {
+    public void register(@RequestBody RegisterForm form) throws MessagingException, UserException {
         User user = authenticationService.registerUser(new User(form.getFirstName(), form.getLastName(),
                 form.getPassword(), form.getEmail().toLowerCase(), UserStatus.NOT_CONFIRMED));
 
@@ -27,7 +27,7 @@ public class AuthenticationController extends BaseController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public void login(LoginForm form, HttpServletRequest request) throws UserException {
+    public void login(@RequestBody LoginForm form, HttpServletRequest request) throws UserException {
         authenticationService.login(form.getEmail().toLowerCase(), form.getPassword(), request);
     }
 

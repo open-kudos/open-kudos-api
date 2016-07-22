@@ -73,12 +73,6 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(KudosExceededException.class)
-    public ResponseEntity<String> handleKudosExceededException(HttpServletRequest request,
-                                                                           KudosExceededException e){
-        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
     public ResponseEntity<String> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
                                                                  AuthenticationCredentialsNotFoundException e){

@@ -1,5 +1,6 @@
 package kudos.services;
 
+import kudos.model.TransactionStatus;
 import kudos.model.TransactionType;
 import kudos.repositories.TransactionRepository;
 import kudos.web.beans.response.KudosTransactionResponse;
@@ -32,8 +33,9 @@ public class TransactionService {
 //        return repository.findTransactionByTimestampGreaterThanOrderByTimestampDesc(transactionDateFormat.format(strategy.getStartTime().toDate()), new PageRequest(page, pageSize));
 //    }
 //
-    public List<KudosTransactionResponse> getLatestKudosTransactions(){
-        return transactionRepository.findTransactionsByTypeOrderByDateDesc(TransactionType.KUDOS, new PageRequest(0, 10)).stream().map(KudosTransactionResponse::new).collect(Collectors.toList());
+    public List<KudosTransactionResponse> getLatestTransactions(){
+        return transactionRepository.findTransactionsByStatusOrderByDateDesc(TransactionStatus.COMPLETED,
+                new PageRequest(0, 10)).stream().map(KudosTransactionResponse::new).collect(Collectors.toList());
     }
 //
 //    public List<TransactionResponse> getNewTransactions(String timestamp) throws UserException{

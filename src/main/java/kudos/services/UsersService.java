@@ -1,11 +1,13 @@
 package kudos.services;
 
+import com.google.common.base.Strings;
 import kudos.model.User;
 import kudos.model.UserStatus;
 import kudos.repositories.UserRepository;
 import kudos.exceptions.UserException;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,9 @@ import java.util.Optional;
 
 @Service
 public class UsersService {
+
+    @Value("${kudos.maxNameLength}")
+    private String maxNameLength;
 
     @Autowired
     private UserRepository userRepository;
@@ -60,52 +65,23 @@ public class UsersService {
 //        }
 //    }
 //
-//    public Optional<User> findByEmail(String email) throws UserException {
-//        return Optional.ofNullable(userRepository.findByEmail(email));
-//    }
-//
-//    public Optional<User> findById(String id) throws UserException {
-//        return Optional.ofNullable(userRepository.findById(id));
-//    }
-//
-//    public Optional<User> getLoggedUser() throws UserException {
-//        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-//        return findByEmail(name);
-//    }
-//
-//    public void registerUser(User user) throws UserException, MessagingException {
-//        if (userRepository.exists(user.getEmail().toLowerCase())) throw new UserException("user_already_exists");
-//
-//        String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
-//        user.setPassword(password);
-//
-//        user.setEmailHash(getRandomHash());
-//        user.setTotalKudos(0);
-//        user.setLastNotificationCheckTime("");
-//
-//        userRepository.save(user);
-//
-//        String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
-//        emailService.sendEmail(user.getEmail(), message, "Greetings from Acorns app");
-//    }
-//
-//    public void confirmRegistration(String hashedEmail) throws UserException {
-//        Optional<User> user = userRepository.findUserByEmailHash(hashedEmail);
-//        if (user.isPresent()) {
-//            user.get().setStatus(UserStatus.NOT_COMPLETED);
-//            userRepository.save(user.get());
-//        } else {
-//            throw new UserException("user_not_found");
-//        }
-//    }
-//
-//    public User updateUser(MyProfileForm myProfileForm) throws UserException, MessagingException, IOException, TemplateException {
-//        User user = getLoggedUser().get();
-//        user.setBirthday(myProfileForm.getBirthday());
-//        user.setStartedToWorkDate(myProfileForm.getStartedToWorkDate());
-//        userRepository.save(user);
-//        return user;
-//    }
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findByUserId(String id) {
+        return userRepository.findById(id);
+    }
+
+    public void updateUserProfile(User user, String firstName, String lastName, String birthday, String startedToWork) {
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setBirthday(birthday);
+        user.setStartedToWorkDate(startedToWork);
+        if(!Strings.isNullOrEmpty(birthday) && !Strings.isNullOrEmpty(startedToWork))
+            user.setStatus(UserStatus.COMPLETED);
+        userRepository.save(user);
+    }
 //
 //    public void disableUsersAccount() throws UserException {
 //        wipeAllUserData();
@@ -116,12 +92,7 @@ public class UsersService {
 //        return new UserResponse(user);
 //    }
 //
-//    public void login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
-//        SecurityContext securityContext = SecurityContextHolder.getContext();
-//        securityContext.setAuthentication(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)));
-//        request.getSession().setMaxInactiveInterval(0);
-//        request.getSession(true).setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
-//    }
+
 //
 ////    public boolean subscribe() throws UserException{
 ////        return setSubscribe(true);
