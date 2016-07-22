@@ -1,12 +1,21 @@
 package kudos.web.controllers;
 
-import org.jsondoc.core.annotation.*;
-import org.springframework.stereotype.Controller;
+import kudos.exceptions.BusinessException;
+import kudos.exceptions.InvalidKudosAmountException;
+import kudos.exceptions.UserException;
+import kudos.model.Challenge;
+import kudos.model.User;
+import kudos.web.beans.request.GiveChallengeForm;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-@Api(name = "Challenge Controller", description = "Controller for managing challenges")
-@RequestMapping("/challenges")
-@Controller
+import javax.mail.MessagingException;
+import java.util.Optional;
+
+@RequestMapping("/challenge")
+@RestController
 public class ChallengeController extends BaseController {
 
 //    @ApiMethod(description = "Service to create challenges")
@@ -46,23 +55,22 @@ public class ChallengeController extends BaseController {
 //            @ApiError(code = "participant_not_exist",
 //                    description = "If participant user does not exist")
 //    })
-//    @RequestMapping(value = "/create", method = RequestMethod.POST)
-//    public @ApiResponseObject @ResponseBody ChallengeResponse challenge(ChallengeTransferForm request, Errors errors)
-//            throws FormValidationException, ParseException, BusinessException, UserException, MessagingException {
-//
-//        new ChallengeTransferForm.ChallengeTransferFormValidator().validate(request, errors);
-//
-//        if (errors.hasErrors())
-//            throw new FormValidationException(errors);
-//
-//        return new ChallengeResponse(challengeService.create(
-//                request.getParticipant(),
-//                request.getName(),
-//                request.getDescription(),
-//                request.getFinishDate(),
-//                Integer.parseInt(request.getAmount())
-//        ));
-//    }
+    @RequestMapping(value = "/give", method = RequestMethod.POST)
+    public void giveChallenge(@RequestBody GiveChallengeForm form) throws UserException, MessagingException, InvalidKudosAmountException {
+        User creator = authenticationService.getLoggedInUser();
+        Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());
+
+        if(receiver.isPresent()) {
+            Challenge challenge = challengeService.giveChallenge(creator, receiver.get(), form.getName(),
+                    form.getDescription(), form.getExpirationDate(), form.getAmount());
+            emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
+        } else {
+            String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
+                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
+            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist");
+        }
+    }
 //
 //    @ApiMethod(description = "Gets all challenges that logged user has created")
 //    @RequestMapping(value = "/created", method = RequestMethod.GET)

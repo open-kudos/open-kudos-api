@@ -15,18 +15,20 @@ public class Challenge {
     private User participant;
     private String name;
     private String description;
-    private int amount;
+    @DBRef
+    private Transaction transaction;
     private String expirationDate;
     private ChallengeStatus status;
 
 
-    public Challenge(User creator, User participant, String name, String description, int amount, String expirationDate, ChallengeStatus status) {
+    public Challenge(User creator, User participant, String name, String description, Transaction transaction,
+                     String expirationDate, ChallengeStatus status) {
         this.creator = creator;
         this.participant = participant;
         this.name = name;
         this.description = description;
         this.expirationDate = expirationDate;
-        this.amount = amount;
+        this.transaction = transaction;
         this.status = status;
     }
 
@@ -70,12 +72,12 @@ public class Challenge {
         this.description = description;
     }
 
-    public int getAmount() {
-        return amount;
+    public Transaction getTransaction() {
+        return transaction;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 
     public String getExpirationDate() {

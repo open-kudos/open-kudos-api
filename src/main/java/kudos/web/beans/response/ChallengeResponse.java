@@ -22,7 +22,7 @@ public class ChallengeResponse extends Response {
     public ChallengeResponse(Challenge challenge){
         this.id = challenge.getId();
         this.name = challenge.getName();
-        this.amount = challenge.getAmount();
+        this.amount = challenge.getTransaction().getAmount();
         this.creatorName = challenge.getCreator().getFirstName() + " " + challenge.getCreator().getLastName();
         this.creatorEmail = challenge.getCreator().getEmail();
         this.participantName = challenge.getParticipant().getFirstName() + " " + challenge.getParticipant().getLastName();

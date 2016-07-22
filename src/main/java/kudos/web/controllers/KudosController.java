@@ -23,10 +23,6 @@ public class KudosController extends BaseController {
 
         User sender = authenticationService.getLoggedInUser();
 
-        if (sender.getEmail().equals(form.getReceiverEmail())){
-            throw new UserException("cant_give_kudos_to_yourself");
-        }
-
         Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());
 
         if(receiver.isPresent()) {

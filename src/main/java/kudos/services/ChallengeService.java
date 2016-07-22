@@ -2,8 +2,11 @@ package kudos.services;
 
 import kudos.exceptions.BusinessException;
 import kudos.exceptions.InvalidChallengeStatusException;
+import kudos.exceptions.InvalidKudosAmountException;
 import kudos.model.*;
 import kudos.repositories.ChallengeRepository;
+import kudos.repositories.TransactionRepository;
+import kudos.repositories.UserRepository;
 import kudos.web.beans.response.ChallengeResponse;
 import kudos.exceptions.UserException;
 import org.joda.time.DateTimeConstants;
@@ -22,12 +25,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Scope("prototype")
 public class ChallengeService {
 
-//    private ChallengeRepository challengeRepository;
-//    private KudosService kudosService;
-//    private UsersService usersService;
 //
 //
 //    @Autowired
@@ -37,36 +36,35 @@ public class ChallengeService {
 //    @Qualifier(value = "DBTimeFormatter")
 //    DateTimeFormatter dateTimeFormatter;
 //
-//    @Autowired
-//    public ChallengeService(ChallengeRepository challengeRepository, KudosService kudosService, UsersService usersService) {
-//        this.challengeRepository = challengeRepository;
-//        this.kudosService = kudosService;
-//        this.usersService = usersService;
-//    }
-//
-//    public Challenge save(Challenge challenge) {
-//        return challengeRepository.save(challenge);
-//    }
-//
-//    public Challenge create(String participantEmail, String name, String description, String finishDate, int amount) throws BusinessException, UserException, MessagingException {
-//        User participant = usersService.findByEmail(participantEmail).get();
-//        User creator = usersService.getLoggedUser().get();
-//        kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
-//
-//        Challenge challenge = new Challenge(
-//                creator,
-//                participant,
-//                name,
-//                description,
-//                amount,
-//                finishDate,
-//                ChallengeStatus.CREATED
-//        );
-//
-//        emailService.generateEmailForNewChallenge(creator, participant, challenge);
-//
-//        return save(challenge);
-//    }
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private ChallengeRepository challengeRepository;
+
+    public Challenge giveChallenge(User creator, User receiver, String name, String description, String expirationDate,
+                                   int amount) throws UserException, InvalidKudosAmountException {
+
+        if (creator.getEmail().equals(receiver.getEmail())){
+            throw new UserException("cant_give_challenge_to_yourself");
+        }
+
+        if (amount < 1 || creator.getWeeklyKudos() < amount) {
+            throw new InvalidKudosAmountException("invalid_kudos_amount");
+        }
+
+        Transaction transaction = transactionRepository.save(new Transaction(creator, receiver, amount, name,
+                TransactionType.CHALLENGE, LocalDateTime.now().toString(), TransactionStatus.PENDING));
+
+        creator.setWeeklyKudos(creator.getWeeklyKudos() - amount);
+        userRepository.save(creator);
+
+        return challengeRepository.save(new Challenge(creator, receiver, name, description, transaction, expirationDate,
+                ChallengeStatus.CREATED));
+    }
 //
 //    public Optional<Challenge> getChallenge(String id) {
 //        return Optional.ofNullable(challengeRepository.findChallengeById(id));

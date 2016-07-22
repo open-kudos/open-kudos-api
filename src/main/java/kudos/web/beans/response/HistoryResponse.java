@@ -44,7 +44,7 @@ public class HistoryResponse {
         this.receiverFullName = challenge.getParticipant().getFirstName() + " " + challenge.getParticipant().getLastName();
         this.senderEmail = challenge.getCreator().getEmail();
         this.senderFullName = challenge.getCreator().getFirstName() + " " + challenge.getCreator().getLastName();
-        this.amount = challenge.getAmount() * 2;
+        this.amount = challenge.getTransaction().getAmount() * 2;
         this.comment = challenge.getDescription();
         this.status = TransactionType.CHALLENGE;
     }
