@@ -1,15 +1,17 @@
 package kudos.web.beans.response;
 
+import kudos.model.LeaderBoardItem;
+
 public class LeaderBoardItemResponse extends Response {
 
     private String fullName;
-    private Integer kudosAmount;
+    private int kudosAmount;
     private String userId;
 
-    public LeaderBoardItemResponse(String fullName, String userId, Integer kudosAmount){
-        this.userId = userId;
-        this.fullName = fullName;
-        this.kudosAmount = kudosAmount;
+    public LeaderBoardItemResponse(LeaderBoardItem item){
+        this.userId = item.getUserId();
+        this.fullName = item.getFullName();
+        this.kudosAmount = item.getKudosAmount();
     }
 
     public String getFullName() {
@@ -20,11 +22,11 @@ public class LeaderBoardItemResponse extends Response {
         this.fullName = fullName;
     }
 
-    public Integer getKudosAmount() {
+    public int getKudosAmount() {
         return kudosAmount;
     }
 
-    public void setKudosAmount(Integer kudosAmount) {
+    public void setKudosAmount(int kudosAmount) {
         this.kudosAmount = kudosAmount;
     }
 

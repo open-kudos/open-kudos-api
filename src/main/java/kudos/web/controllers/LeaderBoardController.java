@@ -1,6 +1,5 @@
 package kudos.web.controllers;
 
-import kudos.exceptions.UserException;
 import kudos.model.LeaderBoardItem;
 import kudos.web.beans.response.LeaderBoardItemResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/leaderboard")
@@ -26,11 +26,7 @@ public class LeaderBoardController extends BaseController {
     }
 
     public List<LeaderBoardItemResponse> convert(List<LeaderBoardItem> items) {
-        List<LeaderBoardItemResponse> response = new ArrayList<>();
-        for(LeaderBoardItem item : items) {
-            response.add(new LeaderBoardItemResponse(item.getFullName(), item.getUserId(), item.getKudosAmount()));
-        }
-        return response;
+        return items.stream().map(LeaderBoardItemResponse::new).collect(Collectors.toList());
     }
 
 

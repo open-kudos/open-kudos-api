@@ -7,10 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
-//    Challenge findChallengeById(String id);
+    Optional<Challenge> findChallengeById(String id);
 //
 //    List<Challenge> findChallengesByCreatorUser(User creator);
 //
@@ -23,5 +24,9 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 //    List<Challenge> findAllChallengesByParticipantUserAndStatus(User participant, ChallengeStatus status, Pageable pageable);
 //
 //    List<Challenge> findAllChallengesByCreatorUserAndStatus(User creator, ChallengeStatus status);
+
+      List<Challenge> findChallengesByCreatorAndStatus(User creator, ChallengeStatus status);
+
+    List<Challenge> findChallengesByParticipantAndStatus(User participant, ChallengeStatus status);
 
 }

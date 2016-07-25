@@ -1,5 +1,5 @@
 package kudos.model;
 
 public enum ChallengeStatus {
-    CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, FAILED, EXPIRED
+    CREATED, ACCEPTED, ACCOMPLISHED, FAILED
 }

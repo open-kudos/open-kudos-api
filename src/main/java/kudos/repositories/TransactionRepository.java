@@ -38,4 +38,6 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 //    List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp, Pageable pageable);
 //
     List<Transaction> findTransactionsByStatusOrderByDateDesc(TransactionStatus status, Pageable pageable);
+
+    //Transaction findTransactionById(String id);
 }
