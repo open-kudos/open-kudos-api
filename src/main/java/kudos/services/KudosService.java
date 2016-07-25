@@ -39,7 +39,7 @@ public class KudosService {
 //        this.dateTimeFormatter = dateTimeFormatter;
 //    }
 //
-    public void giveKudos(User sender, User receiver, int amount, String message) throws InvalidKudosAmountException,
+    public Transaction giveKudos(User sender, User receiver, int amount, String message) throws InvalidKudosAmountException,
             UserException {
         if (sender.getEmail().equals(receiver.getEmail())){
             throw new UserException("cant_give_kudos_to_yourself");
@@ -49,14 +49,15 @@ public class KudosService {
             throw new InvalidKudosAmountException("invalid_kudos_amount");
         }
 
-        transactionRepository.save(new Transaction(sender, receiver, amount, message, TransactionType.KUDOS,
-                LocalDateTime.now().toString(), TransactionStatus.COMPLETED));
+        Transaction transaction = transactionRepository.save(new Transaction(sender, receiver, amount, message,
+                TransactionType.KUDOS, LocalDateTime.now().toString(), TransactionStatus.COMPLETED));
 
         sender.setWeeklyKudos(sender.getWeeklyKudos() - amount);
         userRepository.save(sender);
 
         receiver.setTotalKudos(receiver.getTotalKudos() + amount);
         userRepository.save(receiver);
+        return transaction;
     }
 //
 //    public Transaction reduceFreeKudos(User user,  int amount, String message) throws BusinessException, UserException {

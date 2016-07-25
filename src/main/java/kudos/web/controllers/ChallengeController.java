@@ -20,7 +20,8 @@ import java.util.Optional;
 public class ChallengeController extends BaseController {
 
     @RequestMapping(value = "/give", method = RequestMethod.POST)
-    public void giveChallenge(@RequestBody GiveChallengeForm form) throws UserException, MessagingException, InvalidKudosAmountException {
+    public ChallengeResponse giveChallenge(@RequestBody GiveChallengeForm form) throws UserException, MessagingException,
+            InvalidKudosAmountException {
         User creator = authenticationService.getLoggedInUser();
         Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());
 
@@ -28,6 +29,9 @@ public class ChallengeController extends BaseController {
             Challenge challenge = challengeService.giveChallenge(creator, receiver.get(), form.getName(),
                     form.getDescription(), form.getExpirationDate(), form.getAmount());
             emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
+            ChallengeResponse response = new ChallengeResponse(challenge);
+            response.setActions(getAllowedActions(creator, challenge));
+            return response;
         } else {
             String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
                     " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
