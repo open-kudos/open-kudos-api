@@ -34,6 +34,20 @@ public class LeaderBoardService {
         return sortListByAmountOfKudos(topReceivers, 0, 5);
     }
 
+    public List<LeaderBoardItem> getTopReceiversFromAllTime() {
+        List<LeaderBoardItem> topReceivers = userRepository.findUsersByStatusNot(UserStatus.NOT_CONFIRMED)
+                .stream().map(user -> createLeaderBoardItem(user, calculateReceiversTransactionsAmount(user)))
+                .collect(Collectors.toList());
+        return sortListByAmountOfKudos(topReceivers, 0, 5);
+    }
+
+    public List<LeaderBoardItem> getTopSendersFromAllTime() {
+        List<LeaderBoardItem> topSenders = userRepository.findUsersByStatusNot(UserStatus.NOT_CONFIRMED)
+                .stream().map(user -> createLeaderBoardItem(user, calculateSendersTransactionsAmount(user)))
+                .collect(Collectors.toList());
+        return sortListByAmountOfKudos(topSenders, 0, 5);
+    }
+
     public List<LeaderBoardItem> sortListByAmountOfKudos(List<LeaderBoardItem> leaderBoardItems, int startingIndex, int endingIndex) {
         try {
             return leaderBoardItems.stream().sorted((l1, l2) -> Integer.valueOf(l2.getKudosAmount())
@@ -57,6 +71,18 @@ public class LeaderBoardService {
         List<Transaction> transactions = transactionRepository
                 .findTransactionsByReceiverAndStatusAndDateGreaterThanOrderByDateDesc(user, TransactionStatus.COMPLETED,
                         LocalDateTime.now().minusDays(periodInDays).toString());
+        return calculateTransactionsAmountForChallengesAndKudosGiving(transactions);
+    }
+
+    public int calculateSendersTransactionsAmount(User user) {
+        List<Transaction> transactions = transactionRepository
+                .findTransactionsBySenderAndStatusOrderByDateDesc(user, TransactionStatus.COMPLETED);
+        return calculateTransactionsAmountForChallengesAndKudosGiving(transactions);
+    }
+
+    public int calculateReceiversTransactionsAmount(User user) {
+        List<Transaction> transactions = transactionRepository
+                .findTransactionsByReceiverAndStatusOrderByDateDesc(user, TransactionStatus.COMPLETED);
         return calculateTransactionsAmountForChallengesAndKudosGiving(transactions);
     }
 

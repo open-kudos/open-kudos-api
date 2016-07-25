@@ -28,6 +28,10 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
     List<Transaction> findTransactionsBySenderAndStatusAndDateGreaterThanOrderByDateDesc(User sender, TransactionStatus status, String date);
 
     List<Transaction> findTransactionsByReceiverAndStatusAndDateGreaterThanOrderByDateDesc(User receiver, TransactionStatus status, String date);
+
+    List<Transaction> findTransactionsBySenderAndStatusOrderByDateDesc(User sender, TransactionStatus status);
+
+    List<Transaction> findTransactionsByReceiverAndStatusOrderByDateDesc(User receiver, TransactionStatus status);
 //
 //    List<Transaction> findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(User sender, String timestamp);
 //
