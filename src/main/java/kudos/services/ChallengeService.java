@@ -1,29 +1,18 @@
 package kudos.services;
 
-import kudos.exceptions.BusinessException;
-import kudos.exceptions.InvalidChallengeStatusException;
 import kudos.exceptions.InvalidKudosAmountException;
+import kudos.exceptions.UserException;
 import kudos.model.*;
 import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
-import kudos.web.beans.response.ChallengeActions;
-import kudos.web.beans.response.ChallengeResponse;
-import kudos.exceptions.UserException;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ChallengeService {
@@ -145,7 +134,7 @@ public class ChallengeService {
         if(challenge.getStatus() != ChallengeStatus.CREATED)
             throw new UserException("cannot_accept_or_decline_challenge");
 
-        if(challenge.getParticipant() != user)
+        if(!challenge.getParticipant().getId().equals(user.getId()))
             throw new UserException("cannot_accept_or_decline_challenge");
 
         if(LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now()))
@@ -156,7 +145,7 @@ public class ChallengeService {
         if(challenge.getStatus() != ChallengeStatus.ACCEPTED)
             throw new UserException("cannot_complete_or_fail_challenge");
 
-        if(challenge.getCreator() != user)
+        if(!challenge.getCreator().getId().equals(user.getId()))
             throw new UserException("cannot_complete_or_fail_challenge");
 
         //TODO can this work with optional challenge date?
