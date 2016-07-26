@@ -29,9 +29,7 @@ public class ChallengeController extends BaseController {
             Challenge challenge = challengeService.giveChallenge(creator, receiver.get(), form.getName(),
                     form.getDescription(), form.getExpirationDate(), form.getAmount());
             emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
-            ChallengeResponse response = new ChallengeResponse(challenge);
-            response.setActions(getAllowedActions(creator, challenge));
-            return response;
+            return new ChallengeResponse(challenge, getAllowedActions(creator, challenge));
         } else {
             String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
                     " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
@@ -97,9 +95,7 @@ public class ChallengeController extends BaseController {
         List<ChallengeResponse> response = new ArrayList<>();
 
         for(Challenge item : challenges) {
-            ChallengeResponse result = new ChallengeResponse(item);
-            result.setActions(getAllowedActions(user, item));
-            response.add(result);
+            response.add(new ChallengeResponse(item, getAllowedActions(user, item)));
         }
         return response;
     }

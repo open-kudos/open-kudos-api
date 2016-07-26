@@ -1,6 +1,6 @@
 package kudos.web.beans.response;
 
-public class ChallengeActions {
+public class ChallengeActions extends Response {
 
     private boolean canCancel;
     private boolean canAccept;

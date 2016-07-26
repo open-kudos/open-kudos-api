@@ -17,7 +17,7 @@ public class ChallengeResponse extends Response {
     private String status;
     private ChallengeActions actions;
 
-    public ChallengeResponse(Challenge challenge){
+    public ChallengeResponse(Challenge challenge, ChallengeActions actions){
         this.id = challenge.getId();
         this.name = challenge.getName();
         this.amount = challenge.getTransaction().getAmount();
@@ -28,6 +28,7 @@ public class ChallengeResponse extends Response {
         this.description = challenge.getDescription();
         this.expirationDate = challenge.getExpirationDate();
         this.status = challenge.getStatus().name();
+        this.actions = actions;
     }
 
     public String getId() {
