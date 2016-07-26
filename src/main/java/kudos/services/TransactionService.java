@@ -1,11 +1,15 @@
 package kudos.services;
 
+import kudos.model.Transaction;
 import kudos.model.TransactionStatus;
 import kudos.model.TransactionType;
+import kudos.model.User;
 import kudos.repositories.TransactionRepository;
 import kudos.web.beans.response.KudosTransactionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +41,17 @@ public class TransactionService {
         return transactionRepository.findTransactionsByStatusOrderByDateDesc(TransactionStatus.COMPLETED,
                 new PageRequest(0, 10)).stream().map(KudosTransactionResponse::new).collect(Collectors.toList());
     }
+
+    public Page<Transaction> getGivenKudosHistory(User user, Pageable pageable) {
+        return transactionRepository.findTransactionsBySenderAndStatusOrderByDateDesc(user,
+                TransactionStatus.COMPLETED, pageable);
+    }
+
+    public Page<Transaction> getReceivedKudosHistory(User user, Pageable pageable) {
+        return transactionRepository.findTransactionsByReceiverAndStatusOrderByDateDesc(user,
+                TransactionStatus.COMPLETED, pageable);
+    }
+
 //
 //    public List<TransactionResponse> getNewTransactions(String timestamp) throws UserException{
 //        User currentUser = usersService.getLoggedUser().get();

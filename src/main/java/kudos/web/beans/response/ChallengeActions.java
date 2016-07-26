@@ -2,58 +2,58 @@ package kudos.web.beans.response;
 
 public class ChallengeActions extends Response {
 
-    private boolean canCancel;
-    private boolean canAccept;
-    private boolean canDecline;
-    private boolean canMarkAsCompleted;
-    private boolean canMarkAsFailed;
+    private boolean cancelAllowed;
+    private boolean acceptAllowed;
+    private boolean declineAllowed;
+    private boolean markAsCompletedAllowed;
+    private boolean markAsFailedAllowed;
 
-    public ChallengeActions(boolean canCancel, boolean canAccept, boolean canDecline, boolean canMarkAsCompleted,
-                            boolean canMarkAsFailed){
-        this.canCancel = canCancel;
-        this.canAccept = canAccept;
-        this.canDecline = canDecline;
-        this.canMarkAsCompleted = canMarkAsCompleted;
-        this.canMarkAsFailed = canMarkAsFailed;
+    public ChallengeActions(boolean cancelAllowed, boolean acceptAllowed, boolean declineAllowed, boolean markAsCompletedAllowed,
+                            boolean markAsFailedAllowed){
+        this.cancelAllowed = cancelAllowed;
+        this.acceptAllowed = acceptAllowed;
+        this.declineAllowed = declineAllowed;
+        this.markAsCompletedAllowed = markAsCompletedAllowed;
+        this.markAsFailedAllowed = markAsFailedAllowed;
     }
 
-    public boolean canCancel() {
-        return canCancel;
+    public boolean isCancelAllowed() {
+        return cancelAllowed;
     }
 
-    public void setCanCancel(boolean canCancel) {
-        this.canCancel = canCancel;
+    public void setCancelAllowed(boolean cancelAllowed) {
+        this.cancelAllowed = cancelAllowed;
     }
 
-    public boolean canAccept() {
-        return canAccept;
+    public boolean isAcceptAllowed() {
+        return acceptAllowed;
     }
 
-    public void setCanAccept(boolean canAccept) {
-        this.canAccept = canAccept;
+    public void setAcceptAllowed(boolean acceptAllowed) {
+        this.acceptAllowed = acceptAllowed;
     }
 
-    public boolean canDecline() {
-        return canDecline;
+    public boolean isDeclineAllowed() {
+        return declineAllowed;
     }
 
-    public void setCanDecline(boolean canDecline) {
-        this.canDecline = canDecline;
+    public void setDeclineAllowed(boolean declineAllowed) {
+        this.declineAllowed = declineAllowed;
     }
 
-    public boolean canMarkAsCompleted() {
-        return canMarkAsCompleted;
+    public boolean isMarkAsCompletedAllowed() {
+        return markAsCompletedAllowed;
     }
 
-    public void setCanMarkAsCompleted(boolean canMarkAsCompleted) {
-        this.canMarkAsCompleted = canMarkAsCompleted;
+    public void setMarkAsCompletedAllowed(boolean markAsCompletedAllowed) {
+        this.markAsCompletedAllowed = markAsCompletedAllowed;
     }
 
-    public boolean canMarkAsFailed() {
-        return canMarkAsFailed;
+    public boolean isMarkAsFailedAllowed() {
+        return markAsFailedAllowed;
     }
 
-    public void setCanMarkAsFailed(boolean canMarkAsFailed) {
-        this.canMarkAsFailed = canMarkAsFailed;
+    public void setMarkAsFailedAllowed(boolean markAsFailedAllowed) {
+        this.markAsFailedAllowed = markAsFailedAllowed;
     }
 }

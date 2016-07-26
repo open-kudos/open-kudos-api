@@ -9,6 +9,7 @@ public class KudosTransactionResponse extends Response {
     private String receiverFullName;
     private String senderId;
     private String senderFullName;
+    private String type;
 
     public KudosTransactionResponse(Transaction transaction) {
         this.amount = transaction.getAmount();
@@ -65,5 +66,13 @@ public class KudosTransactionResponse extends Response {
 
     public void setSenderFullName(String senderFullName) {
         this.senderFullName = senderFullName;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

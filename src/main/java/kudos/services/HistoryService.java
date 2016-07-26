@@ -55,12 +55,6 @@ public class HistoryService {
 //        return historyList;
 //    }
 //
-//    public List<HistoryResponse> sortListByTimestamp(List<HistoryResponse> historyList, int startingIndex, int endingIndex){
-//        try {
-//            return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
-//        } catch (IndexOutOfBoundsException e){
-//            return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList());
-//        }
-//    }
+
 
 }
