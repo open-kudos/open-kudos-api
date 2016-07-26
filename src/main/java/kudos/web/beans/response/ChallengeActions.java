@@ -56,4 +56,24 @@ public class ChallengeActions extends Response {
     public void setMarkAsFailedAllowed(boolean markAsFailedAllowed) {
         this.markAsFailedAllowed = markAsFailedAllowed;
     }
+
+    public boolean isCanCancel() {
+        return canCancel;
+    }
+
+    public boolean isCanAccept() {
+        return canAccept;
+    }
+
+    public boolean isCanDecline() {
+        return canDecline;
+    }
+
+    public boolean isCanMarkAsCompleted() {
+        return canMarkAsCompleted;
+    }
+
+    public boolean isCanMarkAsFailed() {
+        return canMarkAsFailed;
+    }
 }
