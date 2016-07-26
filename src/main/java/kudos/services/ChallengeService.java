@@ -56,8 +56,11 @@ public class ChallengeService {
             throw new InvalidKudosAmountException("invalid_kudos_amount");
         }
 
-        if(LocalDateTime.parse(expirationDate).isBefore(LocalDateTime.now()))
+        if(expirationDate != null && LocalDateTime.parse(expirationDate).isBefore(LocalDateTime.now())) {
             throw new UserException("invalid_challenge_date");
+        } else {
+            expirationDate = LocalDateTime.now().plusYears(10).toString();
+        }
 
         Transaction transaction = transactionRepository.save(new Transaction(creator, receiver, amount, name,
                 TransactionType.CHALLENGE, LocalDateTime.now().toString(), TransactionStatus.PENDING));
