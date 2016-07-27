@@ -144,11 +144,13 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllSentAndReceivedChallenges(User user) {
-        return challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.CREATED, user, user);
+        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipant(ChallengeStatus.CREATED, user,
+                ChallengeStatus.CREATED, user);
     }
 
     public List<Challenge> getAllOngoingChallenges(User user) {
-        return challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.ACCEPTED, user, user);
+        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipant(ChallengeStatus.ACCEPTED, user,
+                ChallengeStatus.ACCEPTED, user);
     }
 
     public List<Challenge> getAllFailedAndAccomplishedChallenges(User user) {
