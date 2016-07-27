@@ -70,10 +70,10 @@ public class ChallengeService {
         }
     }
 
-    public void acceptChallenge(Challenge challenge, User user) throws UserException {
+    public Challenge acceptChallenge(Challenge challenge, User user) throws UserException {
         checkIfCanAcceptOrDecline(challenge, user);
         challenge.setStatus(ChallengeStatus.ACCEPTED);
-        challengeRepository.save(challenge);
+        return challengeRepository.save(challenge);
     }
 
     public void declineChallenge(Challenge challenge, User user) throws UserException {

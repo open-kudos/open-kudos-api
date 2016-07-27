@@ -3,17 +3,14 @@ package kudos.web.controllers;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.Transaction;
+import kudos.model.TransactionType;
 import kudos.model.User;
 import kudos.web.beans.request.GiveKudosForm;
 import kudos.web.beans.response.KudosTransactionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import java.util.ArrayList;
@@ -34,7 +31,7 @@ public class KudosController extends BaseController {
 
         if(receiver.isPresent()) {
             return new KudosTransactionResponse(kudosService.giveKudos(sender, receiver.get(), form.getAmount(),
-                    form.getMessage()));
+                    form.getMessage()), "GIVEN");
         } else {
             String email = sender.getFirstName() + " " + sender.getLastName() + "wanted to give you KUDOS," +
                     " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
@@ -44,31 +41,42 @@ public class KudosController extends BaseController {
     }
 
     @RequestMapping(value = "/history/given", method = RequestMethod.GET)
-    public Page<KudosTransactionResponse> getGivenKudosHistory(Pageable pageable) throws UserException {
+    public Page<KudosTransactionResponse> getGivenKudosHistory(@RequestParam(value="page") int page,
+                                                               @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(transactionService.getGivenKudosHistory(user, pageable), "GIVEN");
+        return convert(transactionService.getGivenKudosHistory(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/history/received", method = RequestMethod.GET)
-    public Page<KudosTransactionResponse> getReceivedKudosHistory(Pageable pageable) throws UserException {
+    public Page<KudosTransactionResponse> getReceivedKudosHistory(@RequestParam(value="page") int page,
+                                                                  @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(transactionService.getReceivedKudosHistory(user, pageable), "RECEIVED");
+        return convert(transactionService.getReceivedKudosHistory(user, new PageRequest(page, size)), user);
     }
 
-//    @RequestMapping(value = "/history", method = RequestMethod.GET)
-//    public Page<KudosTransactionResponse> getReceivedKudosHistory(Pageable pageable) throws UserException {
-//        User user = authenticationService.getLoggedInUser();
-//        return convert(transactionService.getKudosHistory(user, pageable), "RECEIVED");
-//    }
+    @RequestMapping(value = "/history", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getKudosHistory(@RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(transactionService.getKudosHistory(user, new PageRequest(page, size)), user);
+    }
 
-    private Page<KudosTransactionResponse> convert(Page<Transaction> input, String type) {
+    private Page<KudosTransactionResponse> convert(Page<Transaction> input, User user) {
         List<KudosTransactionResponse> transactions = new ArrayList<>();
         for(Transaction transaction : input.getContent()) {
-            KudosTransactionResponse trans = new KudosTransactionResponse(transaction);
-            trans.setType(type);
-            transactions.add(trans);
+            transactions.add(new KudosTransactionResponse(transaction, getKudosTransactionType(user, transaction)));
         }
         return new PageImpl<>(transactions, new PageRequest(input.getNumber(), input.getSize()), input.getTotalElements());
+    }
+
+    private String getKudosTransactionType(User user, Transaction transaction) {
+        if(transaction.getType() == TransactionType.KUDOS && transaction.getSender().getId().equals(user.getId())) {
+            return "GIVEN";
+        } else if(transaction.getType() == TransactionType.KUDOS && transaction.getReceiver().getId().equals(user.getId())) {
+            return "RECEIVED";
+        } else {
+            return "UNKNOWN";
+        }
     }
 
     //    public List<HistoryResponse> sortListByTimestamp(List<HistoryResponse> historyList, int startingIndex, int endingIndex){

@@ -1,5 +1,6 @@
 package kudos.web.controllers;
 
+import kudos.model.Transaction;
 import kudos.web.beans.response.IndexResponse;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.KudosTransactionResponse;
@@ -9,6 +10,7 @@ import org.jsondoc.core.annotation.ApiResponseObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(name = "Home Controller",description = "Service to test connection / check whether someone is logged in or not.")
@@ -23,6 +25,14 @@ public class HomeController extends BaseController {
 
     @RequestMapping(value = "/transactions", method = RequestMethod.GET)
     public List<KudosTransactionResponse> latestTransactions() {
-        return transactionService.getLatestTransactions();
+        return convert(transactionService.getLatestTransactions());
+    }
+
+    private List<KudosTransactionResponse> convert(List<Transaction> input) {
+        List<KudosTransactionResponse> transactions = new ArrayList<>();
+        for(Transaction transaction : input) {
+            transactions.add(new KudosTransactionResponse(transaction, "UNKNOWN"));
+        }
+        return transactions;
     }
 }

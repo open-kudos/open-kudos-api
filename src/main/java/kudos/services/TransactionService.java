@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,9 +38,9 @@ public class TransactionService {
 //        return repository.findTransactionByTimestampGreaterThanOrderByTimestampDesc(transactionDateFormat.format(strategy.getStartTime().toDate()), new PageRequest(page, pageSize));
 //    }
 //
-    public List<KudosTransactionResponse> getLatestTransactions(){
+    public List<Transaction> getLatestTransactions(){
         return transactionRepository.findTransactionsByStatusOrderByDateDesc(TransactionStatus.COMPLETED,
-                new PageRequest(0, 10)).stream().map(KudosTransactionResponse::new).collect(Collectors.toList());
+                new PageRequest(0, 10));
     }
 
     public Page<Transaction> getGivenKudosHistory(User user, Pageable pageable) {
@@ -49,6 +50,11 @@ public class TransactionService {
 
     public Page<Transaction> getReceivedKudosHistory(User user, Pageable pageable) {
         return transactionRepository.findTransactionsByReceiverAndStatusOrderByDateDesc(user,
+                TransactionStatus.COMPLETED, pageable);
+    }
+
+    public Page<Transaction> getKudosHistory(User user, Pageable pageable) {
+        return transactionRepository.findTransactionsBySenderOrReceiverAndStatusOrderByDateDesc(user, user,
                 TransactionStatus.COMPLETED, pageable);
     }
 

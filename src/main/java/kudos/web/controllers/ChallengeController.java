@@ -57,10 +57,11 @@ public class ChallengeController extends BaseController {
     }
 
     @RequestMapping(value = "/accept/{challengeId}", method = RequestMethod.POST)
-    public void accept(@PathVariable String challengeId) throws UserException {
+    public ChallengeResponse accept(@PathVariable String challengeId) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        Challenge challenge = challengeService.getChallengeById(challengeId);
-        challengeService.acceptChallenge(challenge, user);
+        Challenge challengeToAccept = challengeService.getChallengeById(challengeId);
+        Challenge challengeToReturn = challengeService.acceptChallenge(challengeToAccept, user);
+        return new ChallengeResponse(challengeToReturn, getAllowedActions(user, challengeToReturn));
     }
 
     @RequestMapping(value = "/decline/{challengeId}", method = RequestMethod.POST)

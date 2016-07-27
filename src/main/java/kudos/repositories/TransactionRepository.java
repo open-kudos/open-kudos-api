@@ -7,6 +7,7 @@ import kudos.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
 
@@ -47,6 +48,8 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
     Page<Transaction> findTransactionsBySenderAndStatusOrderByDateDesc(User sender, TransactionStatus status, Pageable pageable);
 
     Page<Transaction> findTransactionsByReceiverAndStatusOrderByDateDesc(User receiver, TransactionStatus status, Pageable pageable);
+
+    Page<Transaction> findTransactionsBySenderOrReceiverAndStatusOrderByDateDesc(User sender, User receiver, TransactionStatus status, Pageable pageable);
 
     //Transaction findTransactionById(String id);
 }

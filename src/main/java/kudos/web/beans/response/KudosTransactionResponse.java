@@ -10,14 +10,17 @@ public class KudosTransactionResponse extends Response {
     private String senderId;
     private String senderFullName;
     private String type;
+    private String date;
 
-    public KudosTransactionResponse(Transaction transaction) {
+    public KudosTransactionResponse(Transaction transaction, String type) {
         this.amount = transaction.getAmount();
         this.message = transaction.getMessage();
         this.receiverId = transaction.getReceiver().getId();
         this.receiverFullName = transaction.getReceiver().getFirstName() + " " + transaction.getReceiver().getLastName();
         this.senderId = transaction.getSender().getId();
         this.senderFullName = transaction.getSender().getFirstName() + " " + transaction.getSender().getLastName();
+        this.type = type;
+        this.date = transaction.getDate();
     }
 
     public int getAmount() {
@@ -75,4 +78,13 @@ public class KudosTransactionResponse extends Response {
     public void setType(String type) {
         this.type = type;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
 }
