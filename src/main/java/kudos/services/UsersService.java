@@ -82,6 +82,7 @@ public class UsersService {
             user.setStatus(UserStatus.COMPLETED);
         userRepository.save(user);
     }
+
 //
 //    public void disableUsersAccount() throws UserException {
 //        wipeAllUserData();

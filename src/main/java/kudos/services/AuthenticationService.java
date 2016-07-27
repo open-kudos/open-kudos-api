@@ -1,8 +1,12 @@
 package kudos.services;
 
+import kudos.KudosBusinessStrategy;
 import kudos.exceptions.UserException;
+import kudos.model.Transaction;
+import kudos.model.TransactionStatus;
 import kudos.model.User;
 import kudos.model.UserStatus;
+import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,12 @@ public class AuthenticationService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    protected KudosBusinessStrategy kudosBusinessStrategy;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
     public User registerUser(User user) throws UserException, MessagingException {
         if (userRepository.exists(user.getEmail().toLowerCase())) throw new UserException("user_already_exists");
 
@@ -39,7 +49,7 @@ public class AuthenticationService {
 
         user.setEmailHash(getRandomHash());
         user.setTotalKudos(0);
-        user.setWeeklyKudos(50);
+        user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount());
 
         return userRepository.save(user);
 
@@ -73,10 +83,21 @@ public class AuthenticationService {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByEmail(name);
         if(user.isPresent()) {
-            return user.get();
+            return updateWeeklyKudos(user.get());
         } else {
             throw new UserException("user_not_logged_in");
         }
+    }
+
+    public User updateWeeklyKudos(User user) {
+        int usedThisWeek = transactionRepository.findTransactionsBySenderAndDateGreaterThan(user,
+                kudosBusinessStrategy.getStartTime().toString())
+                .stream().filter(transaction -> transaction.getStatus() == TransactionStatus.COMPLETED
+                        || transaction.getStatus() == TransactionStatus.PENDING)
+                .mapToInt(Transaction::getAmount).sum();
+
+        user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount() - usedThisWeek);
+        return userRepository.save(user);
     }
 
     private String getRandomHash() {
