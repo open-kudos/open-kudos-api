@@ -8,6 +8,9 @@ import kudos.model.User;
 import kudos.web.beans.request.GiveChallengeForm;
 import kudos.web.beans.response.ChallengeActions;
 import kudos.web.beans.response.ChallengeResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -39,63 +42,78 @@ public class ChallengeController extends BaseController {
     }
 
     @RequestMapping(value = "/sentAndReceived", method = RequestMethod.GET)
-    public List<ChallengeResponse> sentAndReceived() throws UserException {
+    public Page<ChallengeResponse> sentAndReceived(@RequestParam(value="page") int page,
+                                                   @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(challengeService.getAllSentAndReceivedChallenges(user), user);
+        return convert(challengeService.getAllSentAndReceivedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/sentAndReceived/{userId}", method = RequestMethod.GET)
-    public List<ChallengeResponse> sentAndReceived(@PathVariable String userId) throws UserException {
+    public Page<ChallengeResponse> sentAndReceived(@PathVariable String userId,
+                                                   @RequestParam(value="page") int page,
+                                                   @RequestParam(value="size") int size) throws UserException {
         User user = usersService.findByUserId(userId);
-        return convert(challengeService.getAllSentAndReceivedChallenges(user), user);
+        return convert(challengeService.getAllSentAndReceivedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/ongoing", method = RequestMethod.GET)
-    public List<ChallengeResponse> ongoing() throws UserException {
+    public Page<ChallengeResponse> ongoing(@RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(challengeService.getAllOngoingChallenges(user), user);
+        return convert(challengeService.getAllOngoingChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/ongoing/{userId}", method = RequestMethod.GET)
-    public List<ChallengeResponse> ongoing(@PathVariable String userId) throws UserException {
+    public Page<ChallengeResponse> ongoing(@PathVariable String userId,
+                                           @RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
         User user = usersService.findByUserId(userId);
-        return convert(challengeService.getAllOngoingChallenges(user), user);
+        return convert(challengeService.getAllOngoingChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/history", method = RequestMethod.GET)
-    public List<ChallengeResponse> history() throws UserException {
+    public Page<ChallengeResponse> history(@RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user), user);
+        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/history/{userId}", method = RequestMethod.GET)
-    public List<ChallengeResponse> history(@PathVariable String userId) throws UserException {
+    public Page<ChallengeResponse> history(@PathVariable String userId,
+                                           @RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
         User user = usersService.findByUserId(userId);
-        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user), user);
+        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/history/failed", method = RequestMethod.GET)
-    public List<ChallengeResponse> historyForFailed() throws UserException {
+    public Page<ChallengeResponse> historyForFailed(@RequestParam(value="page") int page,
+                                                    @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(challengeService.getAllFailedChallenges(user), user);
+        return convert(challengeService.getAllFailedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/history/failed/{userId}", method = RequestMethod.GET)
-    public List<ChallengeResponse> historyForFailed(@PathVariable String userId) throws UserException {
+    public Page<ChallengeResponse> historyForFailed(@PathVariable String userId,
+                                                     @RequestParam(value="page") int page,
+                                                     @RequestParam(value="size") int size) throws UserException {
         User user = usersService.findByUserId(userId);
-        return convert(challengeService.getAllFailedChallenges(user), user);
+        return convert(challengeService.getAllFailedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/history/accomplished", method = RequestMethod.GET)
-    public List<ChallengeResponse> historyForAccomplished() throws UserException {
+    public Page<ChallengeResponse> historyForAccomplished(@RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(challengeService.getAllAccomplishedChallenges(user), user);
+        return convert(challengeService.getAllAccomplishedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/history/accomplished/{userId}", method = RequestMethod.GET)
-    public List<ChallengeResponse> historyForAccomplished(@PathVariable String userId) throws UserException {
+    public Page<ChallengeResponse> historyForAccomplished(@PathVariable String userId,
+                                                          @RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
         User user = usersService.findByUserId(userId);
-        return convert(challengeService.getAllAccomplishedChallenges(user), user);
+        return convert(challengeService.getAllAccomplishedChallenges(user, new PageRequest(page, size)), user);
     }
 
     @RequestMapping(value = "/accept/{challengeId}", method = RequestMethod.POST)
@@ -134,13 +152,14 @@ public class ChallengeController extends BaseController {
         challengeService.markChallengeAsFailed(challenge, user);
     }
 
-    public List<ChallengeResponse> convert(List<Challenge> challenges, User user) throws UserException {
+    public Page<ChallengeResponse> convert(Page<Challenge> challenges, User user) throws UserException {
         List<ChallengeResponse> response = new ArrayList<>();
 
-        for(Challenge item : challenges) {
+        for(Challenge item : challenges.getContent()) {
             response.add(new ChallengeResponse(item, getAllowedActions(user, item)));
         }
-        return response;
+        return new PageImpl<>(response, new PageRequest(challenges.getNumber(), challenges.getSize()),
+                challenges.getTotalElements());
     }
 
     public ChallengeActions getAllowedActions(User user, Challenge challenge) throws UserException {

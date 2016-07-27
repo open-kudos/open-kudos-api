@@ -1,5 +1,6 @@
 package kudos.services;
 
+import com.google.common.base.Strings;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
@@ -8,10 +9,10 @@ import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,7 +45,8 @@ public class ChallengeService {
                 TransactionType.CHALLENGE, LocalDateTime.now().toString(), TransactionStatus.PENDING));
 
         Challenge challenge = new Challenge(creator, receiver, name, transaction, ChallengeStatus.CREATED);
-        challenge.setExpirationDate(expirationDate);
+        challenge.setExpirationDate(Strings.isNullOrEmpty(expirationDate) ? null : LocalDateTime.parse(expirationDate).toString());
+        challenge.setCreatedDate(LocalDateTime.now().toString());
         challenge.setDescription(description);
 
         return challengeRepository.save(challenge);
@@ -62,7 +64,6 @@ public class ChallengeService {
     public Challenge acceptChallenge(Challenge challenge, User user) throws UserException {
         checkIfCanAcceptOrDecline(challenge, user);
         challenge.setStatus(ChallengeStatus.ACCEPTED);
-        challenge.setStartDate(LocalDateTime.now().toString());
         return challengeRepository.save(challenge);
     }
 
@@ -143,29 +144,29 @@ public class ChallengeService {
 //            throw new UserException("cannot_complete_or_fail_challenge");
     }
 
-    public List<Challenge> getAllSentAndReceivedChallenges(User user) {
-        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipant(ChallengeStatus.CREATED, user,
-                ChallengeStatus.CREATED, user);
+    public Page<Challenge> getAllSentAndReceivedChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(
+                ChallengeStatus.CREATED, user, ChallengeStatus.CREATED, user, pageable);
     }
 
-    public List<Challenge> getAllOngoingChallenges(User user) {
-        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipant(ChallengeStatus.ACCEPTED, user,
-                ChallengeStatus.ACCEPTED, user);
+    public Page<Challenge> getAllOngoingChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(
+                ChallengeStatus.ACCEPTED, user, ChallengeStatus.ACCEPTED, user, pageable);
     }
 
-    public List<Challenge> getAllFailedAndAccomplishedChallenges(User user) {
-        List<Challenge> challenges = new ArrayList<>();
-        challenges.addAll(getAllAccomplishedChallenges(user));
-        challenges.addAll(getAllFailedChallenges(user));
-        return challenges;
+    public Page<Challenge> getAllFailedAndAccomplishedChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndParticipantOrStatusAndParticipantOrderByClosedDateDesc(
+                ChallengeStatus.FAILED, user, ChallengeStatus.ACCOMPLISHED, user, pageable);
     }
 
-    public List<Challenge> getAllFailedChallenges(User user) {
-        return challengeRepository.findChallengesByStatusAndParticipant(ChallengeStatus.FAILED, user);
+    public Page<Challenge> getAllFailedChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndParticipantOrderByClosedDateDesc(ChallengeStatus.FAILED, user,
+                pageable);
     }
 
-    public List<Challenge> getAllAccomplishedChallenges(User user) {
-        return challengeRepository.findChallengesByStatusAndParticipant(ChallengeStatus.ACCOMPLISHED, user);
+    public Page<Challenge> getAllAccomplishedChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndParticipantOrderByClosedDateDesc(ChallengeStatus.ACCOMPLISHED, user,
+                pageable);
     }
 
 }

@@ -18,7 +18,7 @@ public class Challenge {
     @DBRef
     private Transaction transaction;
     private String expirationDate;
-    private String startDate;
+    private String createdDate;
     private String closedDate;
     private ChallengeStatus status;
 
@@ -95,12 +95,12 @@ public class Challenge {
         this.status = status;
     }
 
-    public String getStartDate() {
-        return startDate;
+    public String getCreatedDate() {
+        return createdDate;
     }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
     }
 
     public String getClosedDate() {
