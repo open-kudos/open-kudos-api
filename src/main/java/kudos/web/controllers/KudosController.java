@@ -61,6 +61,30 @@ public class KudosController extends BaseController {
         return convert(transactionService.getKudosHistory(user, new PageRequest(page, size)), user);
     }
 
+    @RequestMapping(value = "/history/{userId}", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getKudosHistory(@PathVariable String userId,
+                                                          @RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(transactionService.getKudosHistory(user, new PageRequest(page, size)), user);
+    }
+
+    @RequestMapping(value = "/history/received/{userId}", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getReceivedKudosHistory(@PathVariable String userId,
+                                                                  @RequestParam(value="page") int page,
+                                                                  @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(transactionService.getReceivedKudosHistory(user, new PageRequest(page, size)), user);
+    }
+
+    @RequestMapping(value = "/history/given/{userId}", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getGivenKudosHistory(@PathVariable String userId,
+                                                               @RequestParam(value="page") int page,
+                                                               @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(transactionService.getGivenKudosHistory(user, new PageRequest(page, size)), user);
+    }
+
     private Page<KudosTransactionResponse> convert(Page<Transaction> input, User user) {
         List<KudosTransactionResponse> transactions = new ArrayList<>();
         for(Transaction transaction : input.getContent()) {
@@ -78,13 +102,5 @@ public class KudosController extends BaseController {
             return "UNKNOWN";
         }
     }
-
-    //    public List<HistoryResponse> sortListByTimestamp(List<HistoryResponse> historyList, int startingIndex, int endingIndex){
-//        try {
-//            return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList()).subList(startingIndex, endingIndex);
-//        } catch (IndexOutOfBoundsException e){
-//            return historyList.stream().sorted((h1, h2) -> h2.getTimestamp().compareTo(h1.getTimestamp())).collect(Collectors.toList());
-//        }
-//    }
 
 }

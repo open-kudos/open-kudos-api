@@ -44,16 +44,58 @@ public class ChallengeController extends BaseController {
         return convert(challengeService.getAllSentAndReceivedChallenges(user), user);
     }
 
+    @RequestMapping(value = "/sentAndReceived/{userId}", method = RequestMethod.GET)
+    public List<ChallengeResponse> sentAndReceived(@PathVariable String userId) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllSentAndReceivedChallenges(user), user);
+    }
+
     @RequestMapping(value = "/ongoing", method = RequestMethod.GET)
     public List<ChallengeResponse> ongoing() throws UserException {
         User user = authenticationService.getLoggedInUser();
         return convert(challengeService.getAllOngoingChallenges(user), user);
     }
 
+    @RequestMapping(value = "/ongoing/{userId}", method = RequestMethod.GET)
+    public List<ChallengeResponse> ongoing(@PathVariable String userId) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllOngoingChallenges(user), user);
+    }
+
     @RequestMapping(value = "/history", method = RequestMethod.GET)
     public List<ChallengeResponse> history() throws UserException {
         User user = authenticationService.getLoggedInUser();
-        return convert(challengeService.getAllFailedAndCompletedChallenges(user), user);
+        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user), user);
+    }
+
+    @RequestMapping(value = "/history/{userId}", method = RequestMethod.GET)
+    public List<ChallengeResponse> history(@PathVariable String userId) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user), user);
+    }
+
+    @RequestMapping(value = "/history/failed", method = RequestMethod.GET)
+    public List<ChallengeResponse> historyForFailed() throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(challengeService.getAllFailedChallenges(user), user);
+    }
+
+    @RequestMapping(value = "/history/failed/{userId}", method = RequestMethod.GET)
+    public List<ChallengeResponse> historyForFailed(@PathVariable String userId) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllFailedChallenges(user), user);
+    }
+
+    @RequestMapping(value = "/history/accomplished", method = RequestMethod.GET)
+    public List<ChallengeResponse> historyForAccomplished() throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(challengeService.getAllAccomplishedChallenges(user), user);
+    }
+
+    @RequestMapping(value = "/history/accomplished/{userId}", method = RequestMethod.GET)
+    public List<ChallengeResponse> historyForAccomplished(@PathVariable String userId) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllAccomplishedChallenges(user), user);
     }
 
     @RequestMapping(value = "/accept/{challengeId}", method = RequestMethod.POST)

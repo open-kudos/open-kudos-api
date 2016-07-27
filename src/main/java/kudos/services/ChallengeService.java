@@ -17,15 +17,6 @@ import java.util.Optional;
 @Service
 public class ChallengeService {
 
-//
-//
-//    @Autowired
-//    private EmailService emailService;
-//
-//    @Autowired
-//    @Qualifier(value = "DBTimeFormatter")
-//    DateTimeFormatter dateTimeFormatter;
-//
     @Autowired
     private UserRepository userRepository;
 
@@ -160,13 +151,19 @@ public class ChallengeService {
         return challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.ACCEPTED, user, user);
     }
 
-    public List<Challenge> getAllFailedAndCompletedChallenges(User user) {
+    public List<Challenge> getAllFailedAndAccomplishedChallenges(User user) {
         List<Challenge> challenges = new ArrayList<>();
-        challenges.addAll(challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.ACCOMPLISHED,
-                user, user));
-        challenges.addAll(challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.FAILED,
-                user, user));
+        challenges.addAll(getAllAccomplishedChallenges(user));
+        challenges.addAll(getAllFailedChallenges(user));
         return challenges;
+    }
+
+    public List<Challenge> getAllFailedChallenges(User user) {
+        return challengeRepository.findChallengesByStatusAndParticipant(ChallengeStatus.FAILED, user);
+    }
+
+    public List<Challenge> getAllAccomplishedChallenges(User user) {
+        return challengeRepository.findChallengesByStatusAndParticipant(ChallengeStatus.ACCOMPLISHED, user);
     }
 
 }

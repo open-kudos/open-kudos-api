@@ -26,12 +26,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/profile/{userId}", method = RequestMethod.GET)
     public UserResponse getUserProfile(@PathVariable String userId) throws UserException {
-        Optional<User> user = usersService.findByUserId(userId);
-        if(user.isPresent()) {
-            return new UserResponse(user.get());
-        } else {
-            throw new UserException("user_not_found");
-        }
+        return new UserResponse(usersService.findByUserId(userId));
     }
 
 }

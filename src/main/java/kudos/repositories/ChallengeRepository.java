@@ -27,6 +27,8 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
     List<Challenge> findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus status, User creator, User participant);
 
+    List<Challenge> findChallengesByStatusAndParticipant(ChallengeStatus status, User participant);
+
     //List<Challenge> findChallengesByParticipantAndStatus(User participant, ChallengeStatus status);
 
 }
