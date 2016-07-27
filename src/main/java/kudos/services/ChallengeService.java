@@ -153,19 +153,19 @@ public class ChallengeService {
     }
 
     public List<Challenge> getAllSentAndReceivedChallenges(User user) {
-        return challengeRepository.findChallengesByCreatorOrParticipantAndStatus(user, user, ChallengeStatus.CREATED);
+        return challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.CREATED, user, user);
     }
 
     public List<Challenge> getAllOngoingChallenges(User user) {
-        return challengeRepository.findChallengesByCreatorOrParticipantAndStatus(user, user, ChallengeStatus.ACCEPTED);
+        return challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.ACCEPTED, user, user);
     }
 
     public List<Challenge> getAllFailedAndCompletedChallenges(User user) {
         List<Challenge> challenges = new ArrayList<>();
-        challenges.addAll(challengeRepository.findChallengesByCreatorOrParticipantAndStatus(user, user,
-                ChallengeStatus.ACCOMPLISHED));
-        challenges.addAll(challengeRepository.findChallengesByCreatorOrParticipantAndStatus(user, user,
-                ChallengeStatus.FAILED));
+        challenges.addAll(challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.ACCOMPLISHED,
+                user, user));
+        challenges.addAll(challengeRepository.findChallengesByStatusAndCreatorOrParticipant(ChallengeStatus.FAILED,
+                user, user));
         return challenges;
     }
 
