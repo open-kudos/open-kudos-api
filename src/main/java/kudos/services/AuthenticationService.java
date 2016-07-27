@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -90,14 +91,24 @@ public class AuthenticationService {
     }
 
     public User updateWeeklyKudos(User user) {
-        int usedThisWeek = transactionRepository.findTransactionsBySenderAndDateGreaterThan(user,
-                kudosBusinessStrategy.getStartTime().toString())
-                .stream().filter(transaction -> transaction.getStatus() == TransactionStatus.COMPLETED
-                        || transaction.getStatus() == TransactionStatus.PENDING)
-                .mapToInt(Transaction::getAmount).sum();
+        List<Transaction> transactions = transactionRepository.findTransactionsBySenderAndDateGreaterThan(user,
+                kudosBusinessStrategy.getStartTime().toString());
 
-        user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount() - usedThisWeek);
+        int usedThisWeek = countUsedKudos(transactions);
+        int shouldBeReturnedThisWeek = countKudosToReturn(transactions);
+
+        user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount() - usedThisWeek + shouldBeReturnedThisWeek);
         return userRepository.save(user);
+    }
+
+    public int countUsedKudos(List<Transaction> transactions) {
+        return transactions.stream().filter(transaction -> transaction.getStatus() == TransactionStatus.COMPLETED
+                || transaction.getStatus() == TransactionStatus.PENDING).mapToInt(Transaction::getAmount).sum();
+    }
+
+    public int countKudosToReturn(List<Transaction> transactions) {
+        return transactions.stream().filter(transaction -> transaction.getStatus() == TransactionStatus.CANCELED)
+                .mapToInt(Transaction::getAmount).sum();
     }
 
     private String getRandomHash() {

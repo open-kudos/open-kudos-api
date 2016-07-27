@@ -18,16 +18,15 @@ public class Challenge {
     @DBRef
     private Transaction transaction;
     private String expirationDate;
+    private String startDate;
+    private String closedDate;
     private ChallengeStatus status;
 
 
-    public Challenge(User creator, User participant, String name, String description, Transaction transaction,
-                     String expirationDate, ChallengeStatus status) {
+    public Challenge(User creator, User participant, String name, Transaction transaction, ChallengeStatus status) {
         this.creator = creator;
         this.participant = participant;
         this.name = name;
-        this.description = description;
-        this.expirationDate = expirationDate;
         this.transaction = transaction;
         this.status = status;
     }
@@ -94,5 +93,21 @@ public class Challenge {
 
     public void setStatus(ChallengeStatus status) {
         this.status = status;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(String closedDate) {
+        this.closedDate = closedDate;
     }
 }

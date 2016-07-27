@@ -52,9 +52,6 @@ public class KudosService {
         Transaction transaction = transactionRepository.save(new Transaction(sender, receiver, amount, message,
                 TransactionType.KUDOS, LocalDateTime.now().toString(), TransactionStatus.COMPLETED));
 
-        sender.setWeeklyKudos(sender.getWeeklyKudos() - amount);
-        userRepository.save(sender);
-
         receiver.setTotalKudos(receiver.getTotalKudos() + amount);
         userRepository.save(receiver);
         return transaction;
