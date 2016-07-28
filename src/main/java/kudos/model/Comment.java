@@ -13,11 +13,14 @@ public class Comment {
     private User creator;
     private String text;
     private String creationDate;
+    @DBRef
+    private Challenge challenge;
 
-    public Comment(User creator, String text, String creationDate) {
+    public Comment(User creator, String text, String creationDate, Challenge challenge) {
         this.creator = creator;
         this.text = text;
         this.creationDate = creationDate;
+        this.challenge = challenge;
     }
 
     public String getId() {
@@ -50,5 +53,13 @@ public class Comment {
 
     public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Challenge getChallenge() {
+        return challenge;
+    }
+
+    public void setChallenge(Challenge challenge) {
+        this.challenge = challenge;
     }
 }

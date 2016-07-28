@@ -4,10 +4,14 @@ import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.Challenge;
 import kudos.model.ChallengeStatus;
+import kudos.model.Comment;
 import kudos.model.User;
+import kudos.web.beans.request.AddCommentForm;
 import kudos.web.beans.request.GiveChallengeForm;
 import kudos.web.beans.response.ChallengeActions;
 import kudos.web.beans.response.ChallengeResponse;
+import kudos.web.beans.response.CommentResponse;
+import org.joda.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +43,24 @@ public class ChallengeController extends BaseController {
             emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
             throw new UserException("receiver_does_not_exist");
         }
+    }
+
+    @RequestMapping(value = "/{challengeId}/addComment", method = RequestMethod.POST)
+    public void addCommentToChallenge(@PathVariable String challengeId,
+                                      @RequestBody AddCommentForm form) throws UserException {
+        User creator = authenticationService.getLoggedInUser();
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+
+        challengeService.addComment(new Comment(creator, form.getComment(), LocalDateTime.now().toString(), challenge));
+    }
+
+    @RequestMapping(value = "/{challengeId}/comments", method = RequestMethod.GET)
+    public Page<CommentResponse> getChallengeComments(@PathVariable String challengeId,
+                                                      @RequestParam(value="page") int page,
+                                                      @RequestParam(value="size") int size) throws UserException {
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+
+        return convert(challengeService.getComments(challenge, new PageRequest(page, size)));
     }
 
     @RequestMapping(value = "/sentAndReceived", method = RequestMethod.GET)
@@ -116,7 +138,7 @@ public class ChallengeController extends BaseController {
         return convert(challengeService.getAllAccomplishedChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @RequestMapping(value = "/accept/{challengeId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{challengeId}/accept", method = RequestMethod.POST)
     public ChallengeResponse accept(@PathVariable String challengeId) throws UserException {
         User user = authenticationService.getLoggedInUser();
         Challenge challengeToAccept = challengeService.getChallengeById(challengeId);
@@ -124,28 +146,28 @@ public class ChallengeController extends BaseController {
         return new ChallengeResponse(challengeToReturn, getAllowedActions(user, challengeToReturn));
     }
 
-    @RequestMapping(value = "/decline/{challengeId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{challengeId}/decline", method = RequestMethod.POST)
     public void decline(@PathVariable String challengeId) throws UserException {
         User user = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
         challengeService.declineChallenge(challenge, user);
     }
 
-    @RequestMapping(value = "/cancel/{challengeId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{challengeId}/cancel", method = RequestMethod.POST)
     public void cancel(@PathVariable String challengeId) throws UserException {
         User user = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
         challengeService.cancelChallenge(challenge, user);
     }
 
-    @RequestMapping(value = "/markAsCompleted/{challengeId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{challengeId}/markAsCompleted", method = RequestMethod.POST)
     public void markAsCompleted(@PathVariable String challengeId) throws UserException {
         User user = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
         challengeService.markChallengeAsCompleted(challenge, user);
     }
 
-    @RequestMapping(value = "/markAsFailed/{challengeId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{challengeId}/markAsFailed", method = RequestMethod.POST)
     public void markAsFailed(@PathVariable String challengeId) throws UserException {
         User user = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
@@ -160,6 +182,17 @@ public class ChallengeController extends BaseController {
         }
         return new PageImpl<>(response, new PageRequest(challenges.getNumber(), challenges.getSize()),
                 challenges.getTotalElements());
+    }
+
+    public Page<CommentResponse> convert(Page<Comment> comments) throws UserException {
+        List<CommentResponse> response = new ArrayList<>();
+
+        for(Comment item : comments.getContent()) {
+            response.add(new CommentResponse(item.getCreator().getId(), item.getCreator().getFirstName() + " "
+                    + item.getCreator().getLastName(), item.getText()));
+        }
+        return new PageImpl<>(response, new PageRequest(comments.getNumber(), comments.getSize()),
+                comments.getTotalElements());
     }
 
     public ChallengeActions getAllowedActions(User user, Challenge challenge) throws UserException {

@@ -5,14 +5,19 @@ import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
 import kudos.repositories.ChallengeRepository;
+import kudos.repositories.CommentRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +31,9 @@ public class ChallengeService {
 
     @Autowired
     private ChallengeRepository challengeRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     public Challenge giveChallenge(User creator, User receiver, String name, String description, String expirationDate,
                                    int amount) throws UserException, InvalidKudosAmountException {
@@ -71,7 +79,7 @@ public class ChallengeService {
         checkIfCanAcceptOrDecline(challenge, user);
         //TODO create notification that challenge was declined
 
-        //TODO check if decline happened in the same week and give back weekly kudos should happen auto if transaction is deleted
+        transactionRepository.delete(challenge.getTransaction());
         challengeRepository.delete(challenge);
     }
 
@@ -81,9 +89,10 @@ public class ChallengeService {
         if(challenge.getStatus() != ChallengeStatus.CREATED)
             throw new UserException("cannot_cancel_challenge");
 
-        if(challenge.getCreator() != user)
+        if(!challenge.getCreator().getId().equals(user.getId()))
             throw new UserException("cannot_cancel_challenge");
-        //TODO check if cancel happened in the same week and give back weekly kudos should happen auto if transaction is deleted
+
+        transactionRepository.delete(challenge.getTransaction());
         challengeRepository.delete(challenge);
     }
 
@@ -114,8 +123,6 @@ public class ChallengeService {
         transaction.setStatus(TransactionStatus.CANCELED);
         transactionRepository.save(transaction);
 
-        //TODO check if failure happened in the same week and give back weekly kudos should be auto
-
         challenge.setStatus(ChallengeStatus.FAILED);
         challenge.setClosedDate(LocalDateTime.now().toString());
         challengeRepository.save(challenge);
@@ -128,7 +135,7 @@ public class ChallengeService {
         if(!challenge.getParticipant().getId().equals(user.getId()))
             throw new UserException("cannot_accept_or_decline_challenge");
 
-        if(LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now()))
+        if(challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now()))
             throw new UserException("cannot_accept_or_decline_challenge");
     }
 
@@ -139,14 +146,26 @@ public class ChallengeService {
         if(!challenge.getCreator().getId().equals(user.getId()))
             throw new UserException("cannot_complete_or_fail_challenge");
 
-        //TODO can this work with optional challenge date?
-//        if(LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate())))
-//            throw new UserException("cannot_complete_or_fail_challenge");
+        if(challenge.getExpirationDate() != null && LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate())))
+            throw new UserException("cannot_complete_or_fail_challenge");
     }
 
     public Page<Challenge> getAllSentAndReceivedChallenges(User user, Pageable pageable) {
-        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(
-                ChallengeStatus.CREATED, user, ChallengeStatus.CREATED, user, pageable);
+//        Page<Challenge> challengesParticipant = challengeRepository
+//                .findChallengesByStatusAndParticipantOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, pageable);
+//        Page<Challenge> challengesCreator = challengeRepository
+//                .findChallengesByStatusAndCreatorOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, pageable);
+//        if(challengesCreator.hasContent() && challengesParticipant.hasContent()) {
+//            return mergeChallengePages(challengesCreator, challengesParticipant, pageable,
+//                    new DateComparatorDescendingByCreated());
+//        } else if(challengesCreator.hasContent() && !challengesParticipant.hasContent()) {
+//            return challengesCreator;
+//        } else if(!challengesCreator.hasContent() && challengesParticipant.hasContent()) {
+//            return challengesParticipant;
+//        } else {
+//            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+//        }
+        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, ChallengeStatus.CREATED, user, pageable);
     }
 
     public Page<Challenge> getAllOngoingChallenges(User user, Pageable pageable) {
@@ -167,6 +186,24 @@ public class ChallengeService {
     public Page<Challenge> getAllAccomplishedChallenges(User user, Pageable pageable) {
         return challengeRepository.findChallengesByStatusAndParticipantOrderByClosedDateDesc(ChallengeStatus.ACCOMPLISHED, user,
                 pageable);
+    }
+
+    public void addComment(Comment comment) throws UserException {
+        commentRepository.save(comment);
+    }
+
+    public Page<Comment> getComments(Challenge challenge, Pageable pageable) throws UserException {
+        return commentRepository.findCommentsByChallengeOrderByCreationDateDesc(challenge, pageable);
+    }
+
+    private Page<Challenge> mergeChallengePages(Page<Challenge> challenges1, Page<Challenge> challenges2,
+                                                Pageable pageable, Comparator<Challenge> comparator) {
+        List<Challenge> merged = new ArrayList<>();
+        merged.addAll(challenges1.getContent());
+        merged.addAll(challenges2.getContent());
+        merged.sort(comparator);
+        int endIndex = merged.size() < pageable.getPageSize() ? merged.size() : pageable.getPageSize();
+        return new PageImpl<>(merged.subList(0, endIndex), pageable, challenges1.getTotalElements()+challenges2.getTotalElements());
     }
 
 }
