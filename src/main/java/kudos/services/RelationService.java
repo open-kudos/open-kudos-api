@@ -29,7 +29,6 @@ public class RelationService {
         relationRepository.save(new Relation(follower, userToFollow, LocalDateTime.now().toString()));
     }
 
-
     public Page<Relation> getUsersWhoFollowUser(User user, Pageable pageable) throws UserException {
         return relationRepository.findRelationsByUserToFollowOrderByAddedDateDesc(user, pageable);
     }

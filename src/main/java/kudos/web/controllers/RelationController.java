@@ -51,7 +51,6 @@ public class RelationController extends BaseController {
         relationService.unfollow(follower, userToUnfollow);
     }
 
-
     @RequestMapping(value = "/followers", method = RequestMethod.GET)
     public Page<RelationResponse> getFollowers(@RequestParam(value="page") int page,
                                                @RequestParam(value="size") int size) throws UserException {

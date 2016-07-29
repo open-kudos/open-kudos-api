@@ -6,8 +6,6 @@ import kudos.web.beans.request.ProfileForm;
 import kudos.web.beans.response.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/user")
 public class UserController extends BaseController {

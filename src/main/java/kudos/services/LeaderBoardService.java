@@ -91,8 +91,6 @@ public class LeaderBoardService {
                 || transaction.getType() == TransactionType.CHALLENGE).mapToInt(Transaction::getAmount).sum();
     }
 
-
-
     private LeaderBoardItem createLeaderBoardItem(User user, int kudosAmount) {
         return new LeaderBoardItem(user.getFirstName() + " " + user.getLastName(), user.getId(), kudosAmount);
     }

@@ -31,5 +31,4 @@ public class WisdomWallService {
                 LocalDateTime.now().toString());
     }
 
-
 }

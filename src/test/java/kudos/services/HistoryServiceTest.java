@@ -17,8 +17,6 @@ import static org.mockito.Mockito.when;
 
 public class HistoryServiceTest {
 
-    private HistoryService historyService;
-
     private TransactionRepository transactionRepository;
     private ChallengeRepository challengeRepository;
     private UserRepository userRepository;
