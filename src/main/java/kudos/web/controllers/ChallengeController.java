@@ -41,7 +41,7 @@ public class ChallengeController extends BaseController {
             String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
                     " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
             emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
-            throw new UserException("receiver_does_not_exist");
+            throw new UserException("receiver_does_not_exist_email_sent");
         }
     }
 

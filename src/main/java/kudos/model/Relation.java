@@ -13,10 +13,12 @@ public class Relation {
     private User follower;
     @DBRef
     private User userToFollow;
+    private String addedDate;
 
-    public Relation(User follower, User userToFollow) {
+    public Relation(User follower, User userToFollow, String addedDate) {
         this.follower = follower;
         this.userToFollow = userToFollow;
+        this.addedDate = addedDate;
     }
 
     public User getFollower() {
@@ -41,5 +43,13 @@ public class Relation {
 
     public void setUserToFollow(User userToFollow) {
         this.userToFollow = userToFollow;
+    }
+
+    public String getAddedDate() {
+        return addedDate;
+    }
+
+    public void setAddedDate(String addedDate) {
+        this.addedDate = addedDate;
     }
 }

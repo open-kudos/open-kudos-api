@@ -1,47 +1,31 @@
 package kudos.web.beans.response;
 
-import kudos.model.Relation;
+public class RelationResponse extends Response {
 
-public class RelationResponse extends Response{
-
-    private String id;
-
-    private String followerEmail;
-    private String followerName;
-
+    private String userId;
+    private String userFullName;
     private String userEmail;
-    private String userName;
 
-    public RelationResponse(Relation relation){
-        this.id = relation.getId();
-        this.followerEmail = relation.getFollower().getEmail();
-        this.followerName = relation.getFollower().getFirstName() + " " + relation.getFollower().getLastName();
-        this.userEmail = relation.getUserToFollow().getEmail();
-        this.userName = relation.getUserToFollow().getFirstName() + " " + relation.getUserToFollow().getLastName();
+    public RelationResponse(String userId, String userFullName, String userEmail){
+        this.userId = userId;
+        this.userFullName = userFullName;
+        this.userEmail = userEmail;
     }
 
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
-    public String getFollowerEmail() {
-        return followerEmail;
+    public String getUserFullName() {
+        return userFullName;
     }
 
-    public void setFollowerEmail(String followerEmail) {
-        this.followerEmail = followerEmail;
-    }
-
-    public String getFollowerName() {
-        return followerName;
-    }
-
-    public void setFollowerName(String followerName) {
-        this.followerName = followerName;
+    public void setUserFullName(String userFullName) {
+        this.userFullName = userFullName;
     }
 
     public String getUserEmail() {
@@ -51,13 +35,4 @@ public class RelationResponse extends Response{
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
     }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
 }

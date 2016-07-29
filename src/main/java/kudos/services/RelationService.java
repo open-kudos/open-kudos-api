@@ -4,77 +4,48 @@ import kudos.exceptions.RelationException;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.repositories.RelationRepository;
-import kudos.repositories.UserRepository;
-import kudos.web.beans.response.HistoryResponse;
-import kudos.web.beans.response.RelationResponse;
 import kudos.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class RelationService {
 
-//    @Autowired
-//    private UsersService usersService;
-//
-//    @Autowired
-//    private RelationRepository relationRepository;
-//
-//    @Autowired
-//    private HistoryService historyService;
-//
-//    @Autowired
-//    private UserRepository userRepository;
-//
-//    public RelationResponse addRelation(Relation relation) throws RelationException {
-//        if(relationRepository.getRelationByFollowerAndUserToFollow(relation.getFollower(),relation.getUserToFollow()) != null){
-//            throw new RelationException("relation_already_exists");
-//        }
-//
-//        if(relation.getFollower().equals(relation.getUserToFollow())){
-//            throw new RelationException("cant_follow_yourself");
-//        }
-//
-//        return new RelationResponse(relationRepository.save(relation));
-//    }
-//
-//    public List<RelationResponse> getAllFollowedUsers() throws UserException {
-//        User follower = usersService.getLoggedUser().get();
-//        return relationRepository.getRelationsByFollower(follower).stream().map(RelationResponse::new).collect(Collectors.toList());
-//    }
-//
-//    public List<RelationResponse> getAllFollowers() throws UserException {
-//        User currentUser = usersService.getLoggedUser().get();
-//        return relationRepository.getRelationsByUserToFollow(currentUser).stream().map(RelationResponse::new).collect(Collectors.toList());
-//
-//    }
-//
-//    public void removeRelation(String email) throws RelationException, UserException {
-//        User loggedUser = usersService.getLoggedUser().get();
-//        User userToRemoveRelation = userRepository.findByEmail(email);
-//        Relation relationToRemove = relationRepository.getRelationByFollowerAndUserToFollow(loggedUser, userToRemoveRelation);
-//
-//        if(relationToRemove == null){
-//            throw new RelationException("relation_not_exist");
-//        }
-//
-//        relationRepository.delete(relationToRemove);
-//    }
-//
-//    public List<HistoryResponse> getFollowedUsersNewsFeed(int startingIndex, int endingIndex) throws UserException {
-//        User currentUser = usersService.getLoggedUser().get();
-//        List<HistoryResponse> followedUsersNewsFeed = new ArrayList<>();
-//        List<Relation> currentUserRelations = relationRepository.getRelationsByFollower(currentUser);
-//
-//        for (Relation relation : currentUserRelations){
-//            followedUsersNewsFeed.addAll(historyService.getAllUserHistory(relation.getUserToFollow()));
-//        }
-//
-//        return historyService.sortListByTimestamp(followedUsersNewsFeed, startingIndex, endingIndex);
-//    }
+    @Autowired
+    private RelationRepository relationRepository;
+
+    public void follow(User follower, User userToFollow) throws RelationException {
+        if(relationRepository.findRelationByFollowerAndUserToFollow(follower, userToFollow).isPresent())
+            throw new RelationException("relation_already_exists");
+
+        if(follower.getId().equals(userToFollow.getId()))
+            throw new RelationException("cant_follow_yourself");
+
+        relationRepository.save(new Relation(follower, userToFollow, LocalDateTime.now().toString()));
+    }
+
+
+    public Page<Relation> getUsersWhoFollowUser(User user, Pageable pageable) throws UserException {
+        return relationRepository.findRelationsByUserToFollowOrderByAddedDateDesc(user, pageable);
+    }
+
+    public Page<Relation> getUsersFollowedByUser(User user, Pageable pageable) throws UserException {
+        return relationRepository.findRelationsByFollowerOrderByAddedDateDesc(user, pageable);
+
+    }
+
+    public void unfollow(User follower, User userToUnfollow) throws RelationException {
+        Optional<Relation> relation = relationRepository.findRelationByFollowerAndUserToFollow(follower, userToUnfollow);
+        if(relation.isPresent()){
+            relationRepository.delete(relation.get());
+        } else {
+            throw new RelationException("relation_does_not_exist");
+        }
+    }
 
 }
