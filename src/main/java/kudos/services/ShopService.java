@@ -10,6 +10,8 @@ import kudos.repositories.ShopRepository;
 import kudos.repositories.TransactionRepository;
 import kudos.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,55 +20,46 @@ import java.util.List;
 @Service
 public class ShopService {
 
-//    @Autowired
-//    private ShopRepository shopRepository;
-//
-//    @Autowired
-//    private TransactionRepository transactionRepository;
-//
-//    @Autowired
-//    private UsersService usersService;
-//
-//    @Autowired
-//    private KudosService kudosService;
-//
-//    public List<ShopItem> availableItemsInShop() {
-//        return shopRepository.findAll();
-//    }
-//
-//    public void addItemToShop(ShopItem item) {
-//        shopRepository.insert(item);
-//    }
-//
-//    public void removeItemFromShop(String itemId) {
-//        shopRepository.delete(itemId);
-//    }
-//
-//    public ShopItem editItemOnShop(String itemId, String name, Integer price, String description, Integer amount, String pictureUrl) {
-//        ShopItem oldItem = shopRepository.findOne(itemId);
-//
-//        if(!Strings.isNullOrEmpty(name))
-//            oldItem.setName(name);
-//
-//        if(!Strings.isNullOrEmpty(description))
-//            oldItem.setDescription(description);
-//
-//        if(price != null && price > 0)
-//            oldItem.setPrice(price);
-//
-//        if(amount != null && amount > 0)
-//            oldItem.setAmount(amount);
-//
-//        if(!Strings.isNullOrEmpty(pictureUrl))
-//            oldItem.setPictureUrl(pictureUrl);
-//
-//        return shopRepository.save(oldItem);
-//    }
-//
-//    public void buyItemFromShop(String itemId) throws UserException, BusinessException {
-//        User kudosMaster = usersService.getKudosMaster();
-//        User user = usersService.getLoggedUser().get();
-//
+    @Autowired
+    private ShopRepository shopRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    public Page<ShopItem> getItemsAvailableInShopForBuying(Pageable pageable) {
+        return shopRepository.findShopItemsByAmountGreaterThan(0, pageable);
+    }
+
+    public void addItemToShop(ShopItem item) {
+        shopRepository.insert(item);
+    }
+
+    public void removeItemFromShop(String itemId) {
+        shopRepository.delete(itemId);
+    }
+
+    public ShopItem editItemOnShop(String itemId, String name, Integer price, String description, Integer amount, String pictureUrl) {
+        ShopItem oldItem = shopRepository.findOne(itemId);
+
+        if(!Strings.isNullOrEmpty(name))
+            oldItem.setName(name);
+
+        if(!Strings.isNullOrEmpty(description))
+            oldItem.setDescription(description);
+
+        if(price != null && price > 0)
+            oldItem.setPrice(price);
+
+        if(amount != null && amount > 0)
+            oldItem.setAmount(amount);
+
+        if(!Strings.isNullOrEmpty(pictureUrl))
+            oldItem.setPictureUrl(pictureUrl);
+
+        return shopRepository.save(oldItem);
+    }
+
+    public void buyItemFromShop(String itemId, User user) throws UserException, BusinessException {
 //        ShopItem item = shopRepository.findOne(itemId);
 //
 //        //kudosService.takeSystemKudos(user, item.getPrice()*-1, "Buying: " + item.getName(), Transaction.Status.SHOP);
@@ -88,7 +81,7 @@ public class ShopService {
 //            item.setAmount(item.getAmount() + 1);
 //            shopRepository.save(item);
 //        }
-//    }
+    }
 
 
 }

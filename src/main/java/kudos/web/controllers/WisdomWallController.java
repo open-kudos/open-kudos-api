@@ -5,6 +5,7 @@ import kudos.model.Idea;
 import kudos.model.User;
 import kudos.web.beans.request.AddIdeaForm;
 import kudos.web.beans.response.IdeaResponse;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WisdomWallController extends BaseController {
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public void addIdea(AddIdeaForm addIdeaForm) throws UserException {
+    public void addIdea(@RequestBody AddIdeaForm addIdeaForm) throws UserException {
         User creator = authenticationService.getLoggedInUser();
         wisdomWallService.addIdea(creator, addIdeaForm.getAuthor(), addIdeaForm.getPhrase());
     }

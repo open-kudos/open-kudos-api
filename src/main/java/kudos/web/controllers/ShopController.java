@@ -3,9 +3,18 @@ package kudos.web.controllers;
 import kudos.exceptions.BusinessException;
 import kudos.model.ShopItem;
 import kudos.exceptions.UserException;
+import kudos.model.User;
+import kudos.web.beans.request.AddShopItemForm;
+import kudos.web.beans.request.EditShopItemForm;
+import kudos.web.beans.response.ShopItemResponse;
 import org.jsondoc.core.annotation.Api;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(description = "service to manage web shop", name = "Shop Controller")
@@ -13,38 +22,40 @@ import java.util.List;
 @RequestMapping("/shop")
 public class ShopController extends BaseController {
 
-//    @RequestMapping(value = "/items", method = RequestMethod.GET)
-//    public List<ShopItem> items() throws UserException {
-//        return shopService.availableItemsInShop();
-//    }
-//
-//    @RequestMapping(value = "/buy/{itemId}", method = RequestMethod.POST)
-//    public void buy(@PathVariable String itemId) throws UserException, BusinessException {
-//        shopService.buyItemFromShop(itemId);
-//    }
-//
+    @RequestMapping(value = "/items", method = RequestMethod.GET)
+    public Page<ShopItemResponse> items(@RequestParam(value="page") int page,
+                                        @RequestParam(value="size") int size) throws UserException {
+        return convert(shopService.getItemsAvailableInShopForBuying(new PageRequest(page, size)));
+    }
+
+    @RequestMapping(value = "/{itemId}/buy", method = RequestMethod.POST)
+    public void buy(@PathVariable String itemId) throws UserException, BusinessException {
+        User user = authenticationService.getLoggedInUser();
+        //shopService.buyItemFromShop(user, itemId);
+    }
+
 //    @RequestMapping(value = "/add", method = RequestMethod.POST)
-//    public void add(@RequestParam(value="name") String name,
-//                              @RequestParam(value="price") int price,
-//                              @RequestParam(value="description") String description,
-//                              @RequestParam(value="amount") int amount,
-//                              @RequestParam(value="pictureUrl") String pictureUrl) throws UserException {
+//    public ShopItemResponse add(@Valid @RequestBody AddShopItemForm form) throws UserException {
 //        shopService.addItemToShop(new ShopItem(name, price, description, amount, pictureUrl));
 //    }
-//
-//    @RequestMapping(value = "/delete/{itemId}", method = RequestMethod.POST)
-//    public void delete(@PathVariable String itemId) throws UserException {
-//        shopService.removeItemFromShop(itemId);
-//    }
-//
-//    @RequestMapping(value = "/edit/{itemId}", method = RequestMethod.POST)
-//    public ShopItem edit(@PathVariable String itemId,
-//                                   @RequestParam(value="name", required = false) String name,
-//                                   @RequestParam(value="price", required = false) Integer price,
-//                                   @RequestParam(value="description", required = false) String description,
-//                                   @RequestParam(value="amount", required = false) Integer amount,
-//                                   @RequestParam(value="pictureUrl", required = false) String pictureUrl) throws UserException {
+
+    @RequestMapping(value = "/{itemId}/delete", method = RequestMethod.POST)
+    public void delete(@PathVariable String itemId) throws UserException {
+        shopService.removeItemFromShop(itemId);
+    }
+
+//    @RequestMapping(value = "/{itemId}/edit", method = RequestMethod.POST)
+//    public ShopItemResponse edit(@PathVariable String itemId,
+//                                 @RequestBody EditShopItemForm form) throws UserException {
 //        return shopService.editItemOnShop(itemId, name, price, description, amount, pictureUrl);
 //    }
 
+    public Page<ShopItemResponse> convert(Page<ShopItem> items) throws UserException {
+        List<ShopItemResponse> response = new ArrayList<>();
+
+        for(ShopItem item : items.getContent()) {
+            response.add(new ShopItemResponse(item));
+        }
+        return new PageImpl<>(response, new PageRequest(items.getNumber(), items.getSize()), items.getTotalElements());
+    }
 }
