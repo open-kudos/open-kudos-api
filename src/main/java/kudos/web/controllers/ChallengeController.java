@@ -189,7 +189,7 @@ public class ChallengeController extends BaseController {
 
         for(Comment item : comments.getContent()) {
             response.add(new CommentResponse(item.getCreator().getId(), item.getCreator().getFirstName() + " "
-                    + item.getCreator().getLastName(), item.getText()));
+                    + item.getCreator().getLastName(), item.getText(), item.getCreationDate()));
         }
         return new PageImpl<>(response, new PageRequest(comments.getNumber(), comments.getSize()),
                 comments.getTotalElements());
