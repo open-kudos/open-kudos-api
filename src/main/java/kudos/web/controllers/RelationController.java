@@ -1,92 +1,85 @@
 package kudos.web.controllers;
 
-import com.google.common.base.Strings;
-import kudos.exceptions.IdNotSpecifiedException;
 import kudos.exceptions.RelationException;
 import kudos.model.Relation;
 import kudos.model.User;
-import kudos.web.beans.response.HistoryResponse;
 import kudos.web.beans.response.RelationResponse;
-import kudos.web.exceptions.UserException;
-import org.apache.log4j.Logger;
+import kudos.exceptions.UserException;
 import org.jsondoc.core.annotation.*;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Api(description = "service to manage user relations", name = "Relation Controller")
-@Controller
-@RequestMapping("/relations")
+@RestController
+@RequestMapping("/relation")
 public class RelationController extends BaseController {
 
-    private Logger LOG = Logger.getLogger(RelationController.class);
-
-    @ApiMethod(description = "service to add relation")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "email", description = "The email of user which logged user wants to make a relationship")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "id_not_specified", description = "if email was not specified"),
-            @ApiError(code = "user_not_exist", description = "If user with specified email does not exist"),
-            @ApiError(code = "relation_already_exists", description = "If relation that logged user wants to create already exists")
-    })
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public @ResponseBody
-    RelationResponse addRelation(String email) throws IdNotSpecifiedException, UserException, RelationException {
-        if(Strings.isNullOrEmpty(email)){
-            throw new IdNotSpecifiedException("email_not_specified");
-        }
-        Optional<User> maybeUser = usersService.findByEmail(email);
-        if(!maybeUser.isPresent()){
-            throw new UserException("user_not_exist");
-        }
-        User userToFollow = maybeUser.get();
-        User follower = usersService.getLoggedUser().get();
-        return relationService.addRelation(new Relation(follower, userToFollow));
+    @RequestMapping(value = "/follow/{userId}", method = RequestMethod.POST)
+    public void followById(@PathVariable String userId) throws UserException, RelationException {
+        User follower = authenticationService.getLoggedInUser();
+        User userToFollow = usersService.findByUserId(userId);
+        relationService.follow(follower, userToFollow);
     }
 
-    @ApiMethod(description = "service to remove relation")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "email", description = "The email of user which logged user wants to discontinue relationship")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "email_not_specified", description = "If email of user was not specified"),
-            @ApiError(code = "user_not_exist", description = "If user which email was specified does not exist"),
-            @ApiError(code = "relation_not_exist", description = "If relationship which is wanted to be discontinued does not exist")
-    })
-    @RequestMapping(value = "/remove", method = RequestMethod.GET)
-    public void removeRelation(String email) throws UserException, RelationException {
+    @RequestMapping(value = "/follow", method = RequestMethod.POST)
+    public void followByEmail(@RequestParam String userEmail) throws UserException, RelationException, MessagingException {
+        User follower = authenticationService.getLoggedInUser();
+        Optional<User> userToFollow = usersService.findByEmail(userEmail.toLowerCase());
 
-        if(Strings.isNullOrEmpty(email)) throw new RelationException("email_not_specified");
-
-        Optional<User> maybeUser = usersService.findByEmail(email);
-        if(!maybeUser.isPresent()) throw new UserException("user_not_exist");
-
-
-        relationService.removeRelation(email);
+        if(userToFollow.isPresent()) {
+            relationService.follow(follower, userToFollow.get());
+        } else {
+            String email = follower.getFirstName() + " " + follower.getLastName() + "wanted to add you to his" +
+                    " followed users list, but you are not registered. Maybe it is time to do it? Go to" +
+                    " www.openkudos.com and try it!";
+            emailService.sendEmail(userEmail.toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist_email_sent");
+        }
     }
 
-    @ApiMethod(description = "service to get all emails of users that follows logged user")
+    @RequestMapping(value = "/unfollow/{userId}", method = RequestMethod.POST)
+    public void unfollow(@PathVariable String userId) throws UserException, RelationException {
+        User follower = authenticationService.getLoggedInUser();
+        User userToUnfollow = usersService.findByUserId(userId);
+        relationService.unfollow(follower, userToUnfollow);
+    }
+
     @RequestMapping(value = "/followers", method = RequestMethod.GET)
-    public @ResponseBody List<RelationResponse> getFollowers() throws UserException {
-        return relationService.getAllFollowers();
+    public Page<RelationResponse> getFollowers(@RequestParam(value="page") int page,
+                                               @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(relationService.getUsersWhoFollowUser(user, new PageRequest(page, size)), true);
     }
 
-    @ApiMethod(description = "service to get all email of users that are followed by logged user")
-    @RequestMapping(value = "/followed", method = RequestMethod.GET)
-    public @ResponseBody List<RelationResponse> getFollowed() throws UserException {
-        return relationService.getAllFollowedUsers();
+    @RequestMapping(value = "/following", method = RequestMethod.GET)
+    public Page<RelationResponse> getFollowing(@RequestParam(value="page") int page,
+                                               @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(relationService.getUsersFollowedByUser(user, new PageRequest(page, size)), false);
     }
 
-    @ApiMethod(description = "service to get all followed users transactions history ")
-    @RequestMapping(value = "/feed", method = RequestMethod.GET)
-    public @ResponseBody List<HistoryResponse> getFollowedUsersHistory(int startIndex, int endIndex) throws UserException {
-        return relationService.getFollowedUsersNewsFeed(startIndex, endIndex);
-    }
+    public Page<RelationResponse> convert(Page<Relation> relations, boolean followers) throws UserException {
+        List<RelationResponse> response = new ArrayList<>();
 
+        for(Relation item : relations.getContent()) {
+            User user;
+            if(followers) {
+                user = item.getFollower();
+            } else {
+                user = item.getUserToFollow();
+            }
+            response.add(new RelationResponse(user.getId(), user.getFirstName() + " " + user.getLastName(),
+                    user.getEmail()));
+        }
+        return new PageImpl<>(response, new PageRequest(relations.getNumber(), relations.getSize()),
+                relations.getTotalElements());
+    }
 
 }

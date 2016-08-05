@@ -2,23 +2,25 @@ package kudos.web.beans.response;
 
 import kudos.model.Transaction;
 
-public class TransactionResponse extends Response {
-    int amount;
-    String message;
-    String receiverEmail;
-    String receiverFullName;
-    String senderEmail;
-    String senderFullName;
-    String timestamp;
+public class KudosTransactionResponse extends Response {
+    private int amount;
+    private String message;
+    private String receiverId;
+    private String receiverFullName;
+    private String senderId;
+    private String senderFullName;
+    private String type;
+    private String date;
 
-    public TransactionResponse(Transaction transaction) {
+    public KudosTransactionResponse(Transaction transaction, String type) {
         this.amount = transaction.getAmount();
         this.message = transaction.getMessage();
-        this.receiverEmail = transaction.getReceiver().getEmail();
+        this.receiverId = transaction.getReceiver().getId();
         this.receiverFullName = transaction.getReceiver().getFirstName() + " " + transaction.getReceiver().getLastName();
-        this.senderEmail = transaction.getSender().getEmail();
+        this.senderId = transaction.getSender().getId();
         this.senderFullName = transaction.getSender().getFirstName() + " " + transaction.getSender().getLastName();
-        this.timestamp = transaction.getTimestamp();
+        this.type = type;
+        this.date = transaction.getDate();
     }
 
     public int getAmount() {
@@ -37,12 +39,12 @@ public class TransactionResponse extends Response {
         this.message = message;
     }
 
-    public String getReceiverEmail() {
-        return receiverEmail;
+    public String getReceiverId() {
+        return receiverId;
     }
 
-    public void setReceiverEmail(String receiverEmail) {
-        this.receiverEmail = receiverEmail;
+    public void setReceiverId(String receiverId) {
+        this.receiverId = receiverId;
     }
 
     public String getReceiverFullName() {
@@ -53,12 +55,12 @@ public class TransactionResponse extends Response {
         this.receiverFullName = receiverFullName;
     }
 
-    public String getSenderEmail() {
-        return senderEmail;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setSenderEmail(String senderEmai) {
-        this.senderEmail = senderEmai;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     public String getSenderFullName() {
@@ -69,11 +71,20 @@ public class TransactionResponse extends Response {
         this.senderFullName = senderFullName;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public String getType() {
+        return type;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setType(String type) {
+        this.type = type;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
 }

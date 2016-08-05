@@ -37,13 +37,16 @@ public abstract class BaseController {
     protected EmailService emailService;
 
     @Autowired
-    protected HistoryService historyService;
-
-    @Autowired
     @Qualifier(value = "DBTimeFormatter")
     protected DateTimeFormatter formatter;
 
     @Autowired
     protected ShopService shopService;
+
+    @Autowired
+    protected AuthenticationService authenticationService;
+
+    @Autowired
+    protected LeaderBoardService leaderBoardService;
 
 }

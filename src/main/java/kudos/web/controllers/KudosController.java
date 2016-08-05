@@ -1,84 +1,106 @@
 package kudos.web.controllers;
 
-import kudos.exceptions.BusinessException;
+import kudos.exceptions.InvalidKudosAmountException;
+import kudos.exceptions.UserException;
 import kudos.model.Transaction;
+import kudos.model.TransactionType;
 import kudos.model.User;
-import kudos.web.beans.form.KudosTransferForm;
-import kudos.web.beans.response.TransactionResponse;
-import kudos.web.exceptions.FormValidationException;
-import kudos.web.exceptions.UserException;
-import org.jsondoc.core.annotation.*;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import kudos.web.beans.request.GiveKudosForm;
+import kudos.web.beans.response.KudosTransactionResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import javax.mail.MessagingException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-@Api(name = "Kudos Controller", description = "Controller for giving/pending/receiving kudos")
-@Controller
+
+@RestController
 @RequestMapping("/kudos")
 public class KudosController extends BaseController {
 
-    @ApiMethod(description = "Service to send kudos")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "receiverEmail", description = "For testing use testK@google.lt"),
-            @ApiQueryParam(name = "message", description = "Message, explaining why user is giving kudos")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "receiver_email_not_specified",
-                    description = "If receiver email was not specified"),
-            @ApiError(code = "receiver_email_incorrect",
-                    description = "If receiver email was incorrect"),
-            @ApiError(code = "amount_negative_or_zero",
-                    description = "If specified amount was negative or equal to zero"),
-            @ApiError(code = "amount_not_digit",
-                    description = "If specified amount is not a digit"),
-            @ApiError(code = "receiver_not_exist",
-                    description = "If kudos receiver does not exist")
-    })
-    @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody TransactionResponse sendKudos(KudosTransferForm kudosTransferForm, Errors errors)
-            throws FormValidationException, BusinessException, UserException {
+    @RequestMapping(value = "/give", method = RequestMethod.POST)
+    public KudosTransactionResponse giveKudos(@RequestBody GiveKudosForm form) throws UserException,
+            InvalidKudosAmountException, MessagingException {
 
-        new KudosTransferForm.KudosFormValidator().validate(kudosTransferForm, errors);
+        User sender = authenticationService.getLoggedInUser();
+        Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());
 
-        if (usersService.getLoggedUser().get().getEmail().equals(kudosTransferForm.getReceiverEmail())){
-            throw new UserException("cant.send.kudos.to.yourself");
+        if(receiver.isPresent()) {
+            return new KudosTransactionResponse(kudosService.giveKudos(sender, receiver.get(), form.getAmount(),
+                    form.getMessage()), "GIVEN");
+        } else {
+            String email = sender.getFirstName() + " " + sender.getLastName() + "wanted to give you KUDOS," +
+                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
+            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist_email_sent");
         }
-
-        if (errors.hasErrors())
-            throw new FormValidationException(errors);
-
-        User user = usersService.findByEmail(kudosTransferForm.getReceiverEmail())
-                .orElseThrow(() -> new UserException("receiver.not.exist"));
-
-        return new TransactionResponse(kudosService.giveKudos(user, Integer.parseInt(kudosTransferForm.getAmount()), kudosTransferForm.getMessage()));
     }
 
-    @ApiMethod(description = "Service to get all incoming kudos transactions")
-    @RequestMapping(value = "/incoming", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Transaction> showIncomingTransactionHistory() throws UserException {
-        return kudosService.getAllLoggedUserIncomingTransactions();
+    @RequestMapping(value = "/history/given", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getGivenKudosHistory(@RequestParam(value="page") int page,
+                                                               @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(transactionService.getGivenKudosHistory(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Service to get all outgoing kudos transactions")
-    @RequestMapping(value = "/outgoing", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Transaction> showOutcomingTransactionHistory() throws UserException {
-        return kudosService.getAllLoggedUserOutgoingTransactions();
+    @RequestMapping(value = "/history/received", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getReceivedKudosHistory(@RequestParam(value="page") int page,
+                                                                  @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(transactionService.getReceivedKudosHistory(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Service to get remaining kudos amount")
-    @RequestMapping(value = "/remaining", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody int showRemainingKudos(Principal principal) throws UserException {
-        return kudosService.getFreeKudos(usersService.getLoggedUser().get());
+    @RequestMapping(value = "/history", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getKudosHistory(@RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(transactionService.getKudosHistory(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Service to get received kudos")
-    @RequestMapping(value = "/received", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody int receivedKudos(Principal principal) throws UserException {
-        return kudosService.getKudos(usersService.getLoggedUser().get());
+    @RequestMapping(value = "/history/{userId}", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getKudosHistory(@PathVariable String userId,
+                                                          @RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(transactionService.getKudosHistory(user, new PageRequest(page, size)), user);
     }
+
+    @RequestMapping(value = "/history/received/{userId}", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getReceivedKudosHistory(@PathVariable String userId,
+                                                                  @RequestParam(value="page") int page,
+                                                                  @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(transactionService.getReceivedKudosHistory(user, new PageRequest(page, size)), user);
+    }
+
+    @RequestMapping(value = "/history/given/{userId}", method = RequestMethod.GET)
+    public Page<KudosTransactionResponse> getGivenKudosHistory(@PathVariable String userId,
+                                                               @RequestParam(value="page") int page,
+                                                               @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(transactionService.getGivenKudosHistory(user, new PageRequest(page, size)), user);
+    }
+
+    private Page<KudosTransactionResponse> convert(Page<Transaction> input, User user) {
+        List<KudosTransactionResponse> transactions = new ArrayList<>();
+        for(Transaction transaction : input.getContent()) {
+            transactions.add(new KudosTransactionResponse(transaction, getKudosTransactionType(user, transaction)));
+        }
+        return new PageImpl<>(transactions, new PageRequest(input.getNumber(), input.getSize()), input.getTotalElements());
+    }
+
+    private String getKudosTransactionType(User user, Transaction transaction) {
+        if(transaction.getType() == TransactionType.KUDOS && transaction.getSender().getId().equals(user.getId())) {
+            return "GIVEN";
+        } else if(transaction.getType() == TransactionType.KUDOS && transaction.getReceiver().getId().equals(user.getId())) {
+            return "RECEIVED";
+        } else {
+            return "UNKNOWN";
+        }
+    }
+
 }

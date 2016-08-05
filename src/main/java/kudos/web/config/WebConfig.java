@@ -4,20 +4,24 @@ import kudos.KudosBusinessStrategy;
 import kudos.web.servlet.JsonViewResolver;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactory;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 @Configuration
+@EnableWebMvc
+@EnableSpringDataWebSupport
 public class WebConfig extends WebMvcConfigurerAdapter {
+
+    @Value("${kudos.weeklyAmount}")
+    private int kudosWeeklyAmount;
 
     @Bean
     public ViewResolver viewResolver() {
@@ -40,7 +44,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public KudosBusinessStrategy kudosBusinessStrategy() {
-        return KudosBusinessStrategy.createWeeklyStrategy(50, 1);
+        return KudosBusinessStrategy.createWeeklyStrategy(kudosWeeklyAmount);
     }
 
     @Bean(name = "DBTimeFormatter")

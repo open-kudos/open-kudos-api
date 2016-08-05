@@ -1,20 +1,19 @@
 package kudos.web.beans.response;
 
 import kudos.model.User;
+import kudos.model.UserStatus;
 
 public class UserResponse extends Response {
 
-    protected String id;
-    protected String firstName;
-    protected String lastName;
-    protected String email;
-
-    protected String birthday;
-    protected String startedToWorkDate;
-
-    protected boolean subscribing;
-    protected boolean isCompleted;
-    protected String lastSeenTransactionTimestamp;
+    private String id;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String birthday;
+    private String startedToWorkDate;
+    private boolean isCompleted;
+    private int totalKudos;
+    private int weeklyKudos;
 
     public UserResponse(User user){
         this.id = user.getId();
@@ -23,9 +22,13 @@ public class UserResponse extends Response {
         this.email = user.getEmail();
         this.birthday = user.getBirthday();
         this.startedToWorkDate = user.getStartedToWorkDate();
-        this.subscribing = user.isSubscribing();
-        this.isCompleted = user.isCompleted();
-        this.lastSeenTransactionTimestamp = user.getLastSeenTransactionTimestamp();
+        this.totalKudos = user.getTotalKudos();
+        this.weeklyKudos = user.getWeeklyKudos();
+        if(user.getStatus().equals(UserStatus.COMPLETED)) {
+            this.isCompleted = true;
+        } else {
+            this.isCompleted = false;
+        }
     }
 
     public String getId() {
@@ -34,6 +37,14 @@ public class UserResponse extends Response {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getFirstName() {
@@ -52,14 +63,6 @@ public class UserResponse extends Response {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getBirthday() {
         return birthday;
     }
@@ -76,27 +79,27 @@ public class UserResponse extends Response {
         this.startedToWorkDate = startedToWorkDate;
     }
 
-    public boolean isSubscribing() {
-        return subscribing;
-    }
-
-    public void setSubscribing(boolean subscribing) {
-        this.subscribing = subscribing;
-    }
-
     public boolean isCompleted() {
         return isCompleted;
     }
 
-    public void setCompleted(boolean completed) {
-        isCompleted = completed;
+    public void setCompleted(boolean isCompleted) {
+        this.isCompleted = isCompleted;
     }
 
-    public String getLastSeenTransactionTimestamp() {
-        return lastSeenTransactionTimestamp;
+    public int getTotalKudos() {
+        return totalKudos;
     }
 
-    public void setLastSeenTransactionTimestamp(String lastSeenTransactionTimestamp) {
-        this.lastSeenTransactionTimestamp = lastSeenTransactionTimestamp;
+    public void setTotalKudos(int totalKudos) {
+        this.totalKudos = totalKudos;
+    }
+
+    public int getWeeklyKudos() {
+        return weeklyKudos;
+    }
+
+    public void setWeeklyKudos(int weeklyKudos) {
+        this.weeklyKudos = weeklyKudos;
     }
 }

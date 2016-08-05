@@ -2,10 +2,10 @@ package kudos.web.handlers;
 
 import com.mongodb.MongoException;
 import kudos.exceptions.*;
-import kudos.web.exceptions.FormValidationException;
+import kudos.exceptions.FormValidationException;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.ErrorResponse;
-import kudos.web.exceptions.UserException;
+import kudos.exceptions.UserException;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +24,16 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     private final Logger LOG = Logger.getLogger(ErrorHandler.class.getName());
 
     @ExceptionHandler(FormValidationException.class)
-    public ResponseEntity<Response> handleFromValidationException(HttpServletRequest request, FormValidationException exception)   {
+    public ResponseEntity<Response> handleFromValidationException(HttpServletRequest request,
+                                                                  FormValidationException exception)   {
         LOG.info("error count is: " + exception.getErrors().getErrorCount());
         Errors errors = exception.getErrors();
         return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(InvalidKudosAmountException.class)
-    public ResponseEntity<String> handleInvalidKudosAmountException(HttpServletRequest request, InvalidKudosAmountException e){
+    public ResponseEntity<String> handleInvalidKudosAmountException(HttpServletRequest request,
+                                                                    InvalidKudosAmountException e){
         return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
     }
 
@@ -55,30 +57,6 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidChallengeStatusException.class)
-    public ResponseEntity<String> handleInvalidChallengeStatusException(HttpServletRequest request,
-           InvalidChallengeStatusException e){
-        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(WrongChallengeEditorException.class)
-    public ResponseEntity<String> handleInvalidChallengeStatusException(HttpServletRequest request,
-                                    WrongChallengeEditorException e){
-        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(IdNotSpecifiedException.class)
-    public ResponseEntity<String> handleChallengeIdNotSpecifiedException(HttpServletRequest request,
-                                                                          IdNotSpecifiedException e){
-        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(KudosExceededException.class)
-    public ResponseEntity<String> handleKudosExceededException(HttpServletRequest request,
-                                                                           KudosExceededException e){
-        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
     public ResponseEntity<String> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
                                                                  AuthenticationCredentialsNotFoundException e){
@@ -86,20 +64,17 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ParseException.class)
-    public ResponseEntity<String> handleIntegerParseException(HttpServletRequest request,
-                                                                                     ParseException e){
+    public ResponseEntity<String> handleIntegerParseException(HttpServletRequest request, ParseException e){
         return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ChallengeException.class)
-    public ResponseEntity<String> handleChallengeException(HttpServletRequest request,
-                                                              ChallengeException e){
+    public ResponseEntity<String> handleChallengeException(HttpServletRequest request, ChallengeException e){
         return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(RelationException.class)
-    public ResponseEntity<String> handleRelationExceptionException(HttpServletRequest request,
-                                                           RelationException e){
+    public ResponseEntity<String> handleRelationExceptionException(HttpServletRequest request, RelationException e){
         return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
     }
 

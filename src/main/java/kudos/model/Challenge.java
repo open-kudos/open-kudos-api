@@ -10,33 +10,24 @@ public class Challenge {
     @Id
     private String id;
     @DBRef
-    private User creatorUser;
+    private User creator;
     @DBRef
-    private User participantUser;
-
-    private Boolean creatorStatus;
-    private Boolean participantStatus;
+    private User participant;
     private String name;
     private String description;
-    private String createDate;
-    private String finishDate;
-    private Status status;
-    private int amount;
+    @DBRef
+    private Transaction transaction;
+    private String expirationDate;
+    private String createdDate;
+    private String closedDate;
+    private ChallengeStatus status;
 
-    public enum Status {
-        CREATED, ACCEPTED, DECLINED, ACCOMPLISHED, CANCELED, EXPIRED
-    }
 
-    public Challenge(User creatorUser, User participantUser, String name, String description, String createDate, String finishDate, int amount, Status status) {
-        this.creatorUser = creatorUser;
-        this.participantUser = participantUser;
-        this.creatorStatus = null;
-        this.participantStatus = null;
+    public Challenge(User creator, User participant, String name, Transaction transaction, ChallengeStatus status) {
+        this.creator = creator;
+        this.participant = participant;
         this.name = name;
-        this.description = description;
-        this.createDate = createDate;
-        this.finishDate = finishDate;
-        this.amount = amount;
+        this.transaction = transaction;
         this.status = status;
     }
 
@@ -48,20 +39,20 @@ public class Challenge {
         this.id = id;
     }
 
-    public User getCreatorUser() {
-        return creatorUser;
+    public User getCreator() {
+        return creator;
     }
 
-    public void setCreatorUser(User creatorUser) {
-        this.creatorUser = creatorUser;
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
-    public User getParticipantUser() {
-        return participantUser;
+    public User getParticipant() {
+        return participant;
     }
 
-    public void setParticipantUser(User participantUser) {
-        this.participantUser = participantUser;
+    public void setParticipant(User participant) {
+        this.participant = participant;
     }
 
     public String getName() {
@@ -80,51 +71,43 @@ public class Challenge {
         this.description = description;
     }
 
-    public String getCreateDateDate() {
-        return createDate;
+    public Transaction getTransaction() {
+        return transaction;
     }
 
-    public void setCreateDateDate(String dueDate) {
-        this.createDate = dueDate;
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 
-    public String getFinishDate() {
-        return finishDate;
+    public String getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setFinishDate(String finishDate) {
-        this.finishDate = finishDate;
+    public void setExpirationDate(String expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
-    public Status getStatus() {
+    public ChallengeStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(ChallengeStatus status) {
         this.status = status;
     }
 
-    public void setCreatorStatus(Boolean creatorStatus) {
-        this.creatorStatus = creatorStatus;
+    public String getCreatedDate() {
+        return createdDate;
     }
 
-    public void setParticipantStatus(Boolean participantStatus) {
-        this.participantStatus = participantStatus;
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
     }
 
-    public Boolean getCreatorStatus() {
-        return creatorStatus;
+    public String getClosedDate() {
+        return closedDate;
     }
 
-    public Boolean getParticipantStatus() {
-        return participantStatus;
+    public void setClosedDate(String closedDate) {
+        this.closedDate = closedDate;
     }
 }

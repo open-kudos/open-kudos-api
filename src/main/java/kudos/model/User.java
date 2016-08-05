@@ -1,171 +1,88 @@
 package kudos.model;
 
 
-import com.google.common.base.Strings;
-import freemarker.template.TemplateException;
-import kudos.web.beans.form.MyProfileForm;
-import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.mail.MessagingException;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 
 @Document
 public class User {
     @Id
     @Indexed(unique = true)
-    protected String id;
-    protected String email;
-    protected String password;
-    protected String firstName;
-    protected String lastName;
+    private String id;
+    private String email;
+    private String password;
+    private String firstName;
+    private String lastName;
+    private String birthday;
+    private String startedToWorkDate;
+    private String emailHash;
+    private UserStatus status;
+    private int totalKudos;
+    private int weeklyKudos;
 
-    protected String birthday;
-    protected String phone;
-
-    protected String startedToWorkDate;
-    protected String position;
-
-    protected String emailHash;
-
-    protected boolean isCompleted = false;
-    protected boolean subscribing = true;
-    protected boolean showBirthday = false;
-    protected boolean isConfirmed = false;
-
-    protected String department;
-    protected String location;
-    protected String team;
-
-    protected String lastSeenTransactionTimestamp;
-
-    public User(String firstName, String lastName, String password, String email) {
+    public User(String firstName, String lastName, String password, String email, UserStatus status) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
-    }
-
-    public User(String password, String email) {
-        this.password = password;
-        this.email = email;
-    }
-
-    public User() {}
-
-    public User getUpdatedUser(MyProfileForm myProfileForm) throws MessagingException, IOException, TemplateException {
-        String newEmail = myProfileForm.getEmail();
-        String newPassword = myProfileForm.getNewPassword();
-        String newFirstName = myProfileForm.getFirstName();
-        String newLastName = myProfileForm.getLastName();
-
-        this.email = !Strings.isNullOrEmpty(newEmail) ? newEmail : this.email;
-
-        if (!Strings.isNullOrEmpty(newPassword) && !new StrongPasswordEncryptor().checkPassword(newPassword, this.password)) {
-            this.password = new StrongPasswordEncryptor().encryptPassword(newPassword);
-        }
-
-        if (!Strings.isNullOrEmpty(newFirstName) && !newFirstName.equals(this.firstName)) {
-            this.firstName = newFirstName;
-        }
-
-        if (!Strings.isNullOrEmpty(newLastName) && !newLastName.equals(this.lastName)) {
-            this.lastName = newLastName;
-        }
-
-        this.birthday = myProfileForm.getBirthday();
-        this.phone = myProfileForm.getPhone();
-        this.startedToWorkDate = myProfileForm.getStartedToWorkDate();
-        this.position = myProfileForm.getPosition();
-        this.department = myProfileForm.getDepartment();
-        this.location = myProfileForm.getLocation();
-        this.team = myProfileForm.getTeam();
-        this.showBirthday = myProfileForm.getShowBirthday();
-        this.subscribing = myProfileForm.isSubscribing();
-        this.isCompleted = isUserCompleted();
-
-        return this;
-
+        this.status = status;
     }
 
     public String getId() {
         return id;
     }
 
-    private String getRandomHash() {
-        return new BigInteger(130, new SecureRandom()).toString(32);
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getDepartment() {
-        return department;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getBirthday() {
         return birthday;
     }
 
-    public String getPhone() {
-        return phone;
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 
     public String getStartedToWorkDate() {
         return startedToWorkDate;
     }
 
-    public String getPosition() {
-        return position;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getTeam() {
-        return team;
-    }
-
-    public boolean isCompleted() {
-        return isCompleted;
-    }
-
-    public boolean isSubscribing() {
-        return subscribing;
-    }
-
-    public void setSubscribing(boolean subscribing) {
-        this.subscribing = subscribing;
-    }
-
-    public boolean isShowBirthday() {
-        return showBirthday;
-    }
-
-    public boolean isConfirmed() {
-        return isConfirmed;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    public void markUserAsConfirmed() {
-        this.isConfirmed = true;
+    public void setStartedToWorkDate(String startedToWorkDate) {
+        this.startedToWorkDate = startedToWorkDate;
     }
 
     public String getEmailHash() {
@@ -176,23 +93,27 @@ public class User {
         this.emailHash = emailHash;
     }
 
-    public String getLastSeenTransactionTimestamp() {
-        return lastSeenTransactionTimestamp;
+    public UserStatus getStatus() {
+        return status;
     }
 
-    public void setLastSeenTransactionTimestamp(String lastSeenTransactionTimestamp) {
-        this.lastSeenTransactionTimestamp = lastSeenTransactionTimestamp;
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
-    private boolean isUserCompleted() {
-        return !Strings.isNullOrEmpty(this.getStartedToWorkDate()) && !Strings.isNullOrEmpty(this.getBirthday());
+    public int getTotalKudos() {
+        return totalKudos;
     }
 
-    public void setCompleted(boolean completed) {
-        isCompleted = completed;
+    public void setTotalKudos(int totalKudos) {
+        this.totalKudos = totalKudos;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public int getWeeklyKudos() {
+        return weeklyKudos;
+    }
+
+    public void setWeeklyKudos(int weeklyKudos) {
+        this.weeklyKudos = weeklyKudos;
     }
 }

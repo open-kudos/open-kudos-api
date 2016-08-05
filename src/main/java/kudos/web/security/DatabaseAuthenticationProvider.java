@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
@@ -34,9 +35,9 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         String name = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        User user = userRepository.findByEmail(name);
+        Optional<User> user = userRepository.findByEmail(name);
 
-        if ((user != null && new StrongPasswordEncryptor().checkPassword(password, user.getPassword()))) {
+        if ((user.isPresent() && new StrongPasswordEncryptor().checkPassword(password, user.get().getPassword()))) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
 

@@ -2,6 +2,7 @@ package kudos.web.beans.response;
 
 import kudos.model.Challenge;
 import kudos.model.Transaction;
+import kudos.model.TransactionType;
 
 public class HistoryResponse {
 
@@ -12,9 +13,9 @@ public class HistoryResponse {
         private int amount;
         private String comment;
         private String timestamp;
-        private Transaction.Status status;
+        private TransactionType status;
 
-        public HistoryResponse(String receiverEmail, String receiverFullName, String senderEmail, String senderFullName, int amount, String comment, String timestamp, Transaction.Status status) {
+        public HistoryResponse(String receiverEmail, String receiverFullName, String senderEmail, String senderFullName, int amount, String comment, String timestamp, TransactionType status) {
             this.receiverEmail = receiverEmail;
             this.receiverFullName = receiverFullName;
             this.senderEmail = senderEmail;
@@ -33,33 +34,21 @@ public class HistoryResponse {
             this.senderFullName = transaction.getSender().getFirstName() + " " + transaction.getSender().getLastName();
             this.amount = transaction.getAmount();
             this.comment = transaction.getMessage();
-            this.timestamp = transaction.getTimestamp();
-            this.status = transaction.getStatus();
+            this.timestamp = transaction.getDate();
+            this.status = transaction.getType();
         }
     }
 
     public HistoryResponse(Challenge challenge) {
-        this.receiverEmail = challenge.getParticipantUser().getEmail();
-        this.receiverFullName = challenge.getParticipantUser().getFirstName() + " " + challenge.getParticipantUser().getLastName();
-        this.senderEmail = challenge.getCreatorUser().getEmail();
-        this.senderFullName = challenge.getCreatorUser().getFirstName() + " " + challenge.getCreatorUser().getLastName();
-        this.amount = challenge.getAmount() * 2;
+        this.receiverEmail = challenge.getParticipant().getEmail();
+        this.receiverFullName = challenge.getParticipant().getFirstName() + " " + challenge.getParticipant().getLastName();
+        this.senderEmail = challenge.getCreator().getEmail();
+        this.senderFullName = challenge.getCreator().getFirstName() + " " + challenge.getCreator().getLastName();
+        this.amount = challenge.getTransaction().getAmount() * 2;
         this.comment = challenge.getDescription();
-        this.timestamp = challenge.getCreateDateDate();
-        this.status = challengeStatus(challenge.getCreatorStatus(), challenge.getParticipantStatus());
+        this.status = TransactionType.CHALLENGE;
     }
 
-    private Transaction.Status challengeStatus(Boolean creatorStatus, Boolean participantStatus){
-        if (creatorStatus != null)
-            if (creatorStatus) return Transaction.Status.COMPLETED_CHALLENGE_CREATOR;
-            else return Transaction.Status.COMPLETED_CHALLENGE_PARTICIPANT;
-
-        if (participantStatus != null)
-            if (participantStatus) return Transaction.Status.COMPLETED_CHALLENGE_PARTICIPANT;
-            else return Transaction.Status.COMPLETED_CHALLENGE_CREATOR;
-
-        return Transaction.Status.COMPLETED_CHALLENGE;
-    }
 
         public String getReceiverEmail() {
             return receiverEmail;
@@ -117,11 +106,11 @@ public class HistoryResponse {
             this.timestamp = timestamp;
         }
 
-        public Transaction.Status getStatus() {
+        public TransactionType getStatus() {
             return status;
         }
 
-        public void setStatus(Transaction.Status status) {
+        public void setStatus(TransactionType status) {
             this.status = status;
         }
 }

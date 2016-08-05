@@ -1,237 +1,209 @@
 package kudos.services;
 
-import kudos.exceptions.BusinessException;
-import kudos.exceptions.InvalidChallengeStatusException;
-import kudos.model.Challenge;
-import kudos.model.Transaction;
-import kudos.model.User;
+import com.google.common.base.Strings;
+import kudos.exceptions.InvalidKudosAmountException;
+import kudos.exceptions.UserException;
+import kudos.model.*;
 import kudos.repositories.ChallengeRepository;
-import kudos.web.beans.response.ChallengeResponse;
-import kudos.web.exceptions.UserException;
-import org.joda.time.DateTimeConstants;
+import kudos.repositories.CommentRepository;
+import kudos.repositories.TransactionRepository;
+import kudos.repositories.UserRepository;
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-@Scope("prototype")
 public class ChallengeService {
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
     private ChallengeRepository challengeRepository;
-    private KudosService kudosService;
-    private UsersService usersService;
-
 
     @Autowired
-    private EmailService emailService;
+    private CommentRepository commentRepository;
 
-    @Autowired
-    @Qualifier(value = "DBTimeFormatter")
-    DateTimeFormatter dateTimeFormatter;
+    public Challenge giveChallenge(User creator, User receiver, String name, String description, String expirationDate,
+                                   int amount) throws UserException, InvalidKudosAmountException {
+        if (creator.getEmail().equals(receiver.getEmail())){
+            throw new UserException("cant_give_challenge_to_yourself");
+        }
 
-    @Autowired
-    public ChallengeService(ChallengeRepository challengeRepository, KudosService kudosService, UsersService usersService) {
-        this.challengeRepository = challengeRepository;
-        this.kudosService = kudosService;
-        this.usersService = usersService;
-    }
+        if (amount < 1 || creator.getWeeklyKudos() < amount) {
+            throw new InvalidKudosAmountException("invalid_kudos_amount");
+        }
 
-    public Challenge save(Challenge challenge) {
+        if(expirationDate != null && LocalDateTime.parse(expirationDate).isBefore(LocalDateTime.now())) {
+            throw new UserException("invalid_challenge_date");
+        }
+
+        Transaction transaction = transactionRepository.save(new Transaction(creator, receiver, amount, name,
+                TransactionType.CHALLENGE, LocalDateTime.now().toString(), TransactionStatus.PENDING));
+
+        Challenge challenge = new Challenge(creator, receiver, name, transaction, ChallengeStatus.CREATED);
+        challenge.setExpirationDate(Strings.isNullOrEmpty(expirationDate) ? null : LocalDateTime.parse(expirationDate).toString());
+        challenge.setCreatedDate(LocalDateTime.now().toString());
+        challenge.setDescription(description);
+
         return challengeRepository.save(challenge);
     }
 
-    public Challenge create(String participantEmail, String name, String description, String finishDate, int amount) throws BusinessException, UserException, MessagingException {
-        User participant = usersService.findByEmail(participantEmail).get();
-        User creator = usersService.getLoggedUser().get();
-        kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), amount, name);
-
-        Challenge challenge = new Challenge(
-                creator,
-                participant,
-                name,
-                description,
-                LocalDateTime.now().toString(dateTimeFormatter),
-                finishDate,
-                amount, Challenge.Status.CREATED
-        );
-
-        emailService.generateEmailForNewChallenge(creator, participant, challenge);
-
-        return save(challenge);
-    }
-
-    public Optional<Challenge> getChallenge(String id) {
-        return Optional.ofNullable(challengeRepository.findChallengeById(id));
-    }
-
-    public Challenge accept(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        kudosService.reduceFreeKudos(usersService.getLoggedUser().get(), challenge.getAmount(), "");
-        return setStatusAndSave(challenge, Challenge.Status.ACCEPTED);
-    }
-
-    public Challenge decline(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
-        if (!checkIfNewWeekStarted(challenge)) {
-            kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.DECLINED_CHALLENGE);
-        }
-        return setStatusAndSave(challenge, Challenge.Status.DECLINED);
-    }
-
-    public Challenge cancel(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedCanceledOrAccepted(challenge);
-        User creator = usersService.findById(challenge.getCreatorUser().getId()).orElseThrow(() -> new UserException("receiver.not.exist"));
-        if (!checkIfNewWeekStarted(challenge)) {
-            kudosService.retrieveSystemKudos(creator, challenge.getAmount(), challenge.getName(), Transaction.Status.CANCELED_CHALLENGE);
-        }
-        return setStatusAndSave(challenge, Challenge.Status.CANCELED);
-    }
-
-    public Challenge accomplish(Challenge challenge) throws BusinessException, UserException, MessagingException {
-        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-
-        if (challenge.getParticipantStatus() == null) {
-            emailService.generateEmailForOngoingChallengeSelection(challenge);
-            return setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
-        } else if (challenge.getCreatorStatus() == null) {
-            emailService.generateEmailForOngoingChallengeSelection(challenge);
-            return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
-        } else if (challenge.getCreatorStatus() == challenge.getParticipantStatus()) {
-            challenge.setCreatorStatus(null);
-            challenge.setParticipantStatus(null);
-            setCreatorStatusAndSave(challenge, challenge.getCreatorStatus());
-            return setParticipantStatusAndSave(challenge, challenge.getParticipantStatus());
-        }
-
-        kudosService.takeSystemKudos(checkWhoIsWinner(challenge), 2 * challenge.getAmount(), challenge.getName(), Transaction.Status.COMPLETED_CHALLENGE);
-        return setStatusAndSave(challenge, Challenge.Status.ACCOMPLISHED);
-    }
-
-    public Challenge expire(Challenge challenge) throws BusinessException, UserException {
-        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-        if (!checkIfNewWeekStarted(challenge)) {
-            kudosService.retrieveSystemKudos(challenge.getCreatorUser(), challenge.getAmount(), challenge.getName(), Transaction.Status.EXPIRED_CHALLENGE);
-        }
-        return setStatusAndSave(challenge, Challenge.Status.EXPIRED);
-    }
-
-    public List<Challenge> getAllUserParticipatedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), status);
-    }
-
-    public List<Challenge> getAllUserParticipatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
-        return challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), status, new PageRequest(page, pageSize));
-    }
-
-    public List<Challenge> getAllUserCreatedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), status);
-    }
-
-    public List<Challenge> getAllUserCreatedChallenges() throws UserException {
-        return challengeRepository.findChallengesByCreatorUser(usersService.getLoggedUser().get());
-    }
-
-    public List<Challenge> getAllUserParticipatedChallenges() throws UserException {
-        return challengeRepository.findChallengesByParticipantUser(usersService.getLoggedUser().get());
-    }
-
-    public List<Challenge> getAllAcceptedChallenges() {
-        return challengeRepository.findAllChallengesByStatus(Challenge.Status.ACCEPTED);
-    }
-
-    public List<Challenge> getAllCreatedChallenges() {
-        return challengeRepository.findAllChallengesByStatus(Challenge.Status.CREATED);
-    }
-
-    private void checkNotAccomplishedDeclinedFailedCanceledOrAccepted(Challenge challenge) throws InvalidChallengeStatusException {
-        switch (challenge.getStatus()) {
-            case ACCEPTED:
-                throw new InvalidChallengeStatusException("challenge_already_accepted");
-        }
-        checkNotAccomplishedDeclinedFailedOrCanceled(challenge);
-    }
-
-    public List<ChallengeResponse> getAllNewChallenges() throws UserException {
-        List<Challenge> newChallenges = new ArrayList<>();
-        newChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CREATED));
-        newChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CREATED));
-        return newChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
-    }
-
-    public List<ChallengeResponse> getAllOngoingChallenges() throws UserException {
-        List<Challenge> ongoingChallenges = new ArrayList<>();
-        ongoingChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCEPTED));
-        ongoingChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCEPTED));
-        return ongoingChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
-    }
-
-    public List<ChallengeResponse> getAllCompletedChallenges() throws UserException {
-        List<Challenge> completedChallenges = new ArrayList<>();
-
-        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCOMPLISHED));
-        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CANCELED));
-        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.DECLINED));
-        completedChallenges.addAll(challengeRepository.findAllChallengesByCreatorUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.EXPIRED));
-
-        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.ACCOMPLISHED));
-        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.CANCELED));
-        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.DECLINED));
-        completedChallenges.addAll(challengeRepository.findAllChallengesByParticipantUserAndStatus(usersService.getLoggedUser().get(), Challenge.Status.EXPIRED));
-
-        return completedChallenges.stream().map(ChallengeResponse::new).collect(Collectors.toList());
-    }
-
-    private void checkNotAccomplishedDeclinedFailedOrCanceled(Challenge challenge) throws InvalidChallengeStatusException {
-        switch (challenge.getStatus()) {
-            case ACCOMPLISHED:
-                throw new InvalidChallengeStatusException("challenge_already_accomplished");
-            case DECLINED:
-                throw new InvalidChallengeStatusException("challenge_already_declined");
-            case EXPIRED:
-                throw new InvalidChallengeStatusException("challenge_already_expired");
-            case CANCELED:
-                throw new InvalidChallengeStatusException("challenge_already_canceled");
+    public Challenge getChallengeById(String id) throws UserException {
+        Optional<Challenge> challenge = challengeRepository.findChallengeById(id);
+        if(challenge.isPresent()) {
+            return challenge.get();
+        } else {
+            throw new UserException("challenge_not_found");
         }
     }
 
-    private User checkWhoIsWinner(Challenge challenge) {
-        if (challenge.getCreatorStatus() && !challenge.getParticipantStatus()) {
-            return challenge.getCreatorUser();
-        }
-        return challenge.getParticipantUser();
+    public Challenge acceptChallenge(Challenge challenge, User user) throws UserException {
+        checkIfCanAcceptOrDecline(challenge, user);
+        challenge.setStatus(ChallengeStatus.ACCEPTED);
+        return challengeRepository.save(challenge);
     }
 
-    private Challenge setStatusAndSave(Challenge challenge, Challenge.Status status) {
-        Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
-        databaseChallenge.setStatus(status);
-        return challengeRepository.save(databaseChallenge);
+    public void declineChallenge(Challenge challenge, User user) throws UserException {
+        checkIfCanAcceptOrDecline(challenge, user);
+        //TODO create notification that challenge was declined
+
+        transactionRepository.delete(challenge.getTransaction());
+        challengeRepository.delete(challenge);
     }
 
-    private Challenge setCreatorStatusAndSave(Challenge challenge, Boolean status) {
-        Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
-        databaseChallenge.setCreatorStatus(status);
-        return challengeRepository.save(databaseChallenge);
+    public void cancelChallenge(Challenge challenge, User user) throws UserException {
+        //TODO create notification that challenge was canceled
+
+        if(challenge.getStatus() != ChallengeStatus.CREATED)
+            throw new UserException("cannot_cancel_challenge");
+
+        if(!challenge.getCreator().getId().equals(user.getId()))
+            throw new UserException("cannot_cancel_challenge");
+
+        transactionRepository.delete(challenge.getTransaction());
+        challengeRepository.delete(challenge);
     }
 
-    private Challenge setParticipantStatusAndSave(Challenge challenge, Boolean status) {
-        Challenge databaseChallenge = challengeRepository.findChallengeById(challenge.getId());
-        databaseChallenge.setParticipantStatus(status);
-        return challengeRepository.save(databaseChallenge);
+    public void markChallengeAsCompleted(Challenge challenge, User user) throws UserException {
+        checkIfCanMarkAsCompletedOrDFailed(challenge, user);
+
+        //TODO create notification that challenge was completed
+
+        Transaction transaction = challenge.getTransaction();
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transactionRepository.save(transaction);
+
+        User participant = challenge.getParticipant();
+        participant.setTotalKudos(participant.getTotalKudos()+transaction.getAmount());
+        userRepository.save(participant);
+
+        challenge.setStatus(ChallengeStatus.ACCOMPLISHED);
+        challenge.setClosedDate(LocalDateTime.now().toString());
+        challengeRepository.save(challenge);
     }
 
-    private boolean checkIfNewWeekStarted(Challenge challenge) {
-        LocalDateTime startOfWeek = new LocalDateTime().withDayOfWeek(DateTimeConstants.MONDAY).withHourOfDay(0).withMinuteOfHour(0);
-        return dateTimeFormatter.parseLocalDateTime(challenge.getCreateDateDate()).isBefore(startOfWeek);
+    public void markChallengeAsFailed(Challenge challenge, User user) throws UserException {
+        checkIfCanMarkAsCompletedOrDFailed(challenge, user);
+
+        //TODO create notification that challenge was failed
+
+        Transaction transaction = challenge.getTransaction();
+        transaction.setStatus(TransactionStatus.CANCELED);
+        transactionRepository.save(transaction);
+
+        challenge.setStatus(ChallengeStatus.FAILED);
+        challenge.setClosedDate(LocalDateTime.now().toString());
+        challengeRepository.save(challenge);
     }
+
+    public void checkIfCanAcceptOrDecline(Challenge challenge, User user) throws UserException {
+        if(challenge.getStatus() != ChallengeStatus.CREATED)
+            throw new UserException("cannot_accept_or_decline_challenge");
+
+        if(!challenge.getParticipant().getId().equals(user.getId()))
+            throw new UserException("cannot_accept_or_decline_challenge");
+
+        if(challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now()))
+            throw new UserException("cannot_accept_or_decline_challenge");
+    }
+
+    public void checkIfCanMarkAsCompletedOrDFailed(Challenge challenge, User user) throws UserException {
+        if(challenge.getStatus() != ChallengeStatus.ACCEPTED)
+            throw new UserException("cannot_complete_or_fail_challenge");
+
+        if(!challenge.getCreator().getId().equals(user.getId()))
+            throw new UserException("cannot_complete_or_fail_challenge");
+
+        if(challenge.getExpirationDate() != null && LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate())))
+            throw new UserException("cannot_complete_or_fail_challenge");
+    }
+
+    public Page<Challenge> getAllSentAndReceivedChallenges(User user, Pageable pageable) {
+//        Page<Challenge> challengesParticipant = challengeRepository
+//                .findChallengesByStatusAndParticipantOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, pageable);
+//        Page<Challenge> challengesCreator = challengeRepository
+//                .findChallengesByStatusAndCreatorOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, pageable);
+//        if(challengesCreator.hasContent() && challengesParticipant.hasContent()) {
+//            return mergeChallengePages(challengesCreator, challengesParticipant, pageable,
+//                    new DateComparatorDescendingByCreated());
+//        } else if(challengesCreator.hasContent() && !challengesParticipant.hasContent()) {
+//            return challengesCreator;
+//        } else if(!challengesCreator.hasContent() && challengesParticipant.hasContent()) {
+//            return challengesParticipant;
+//        } else {
+//            return new PageImpl<>(new ArrayList<>(), pageable, 0);
+//        }
+        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, ChallengeStatus.CREATED, user, pageable);
+    }
+
+    public Page<Challenge> getAllOngoingChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(
+                ChallengeStatus.ACCEPTED, user, ChallengeStatus.ACCEPTED, user, pageable);
+    }
+
+    public Page<Challenge> getAllFailedAndAccomplishedChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndParticipantOrStatusAndParticipantOrderByClosedDateDesc(
+                ChallengeStatus.FAILED, user, ChallengeStatus.ACCOMPLISHED, user, pageable);
+    }
+
+    public Page<Challenge> getAllFailedChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndParticipantOrderByClosedDateDesc(ChallengeStatus.FAILED, user,
+                pageable);
+    }
+
+    public Page<Challenge> getAllAccomplishedChallenges(User user, Pageable pageable) {
+        return challengeRepository.findChallengesByStatusAndParticipantOrderByClosedDateDesc(ChallengeStatus.ACCOMPLISHED, user,
+                pageable);
+    }
+
+    public void addComment(Comment comment) throws UserException {
+        commentRepository.save(comment);
+    }
+
+    public Page<Comment> getComments(Challenge challenge, Pageable pageable) throws UserException {
+        return commentRepository.findCommentsByChallengeOrderByCreationDateDesc(challenge, pageable);
+    }
+
+    private Page<Challenge> mergeChallengePages(Page<Challenge> challenges1, Page<Challenge> challenges2,
+                                                Pageable pageable, Comparator<Challenge> comparator) {
+        List<Challenge> merged = new ArrayList<>();
+        merged.addAll(challenges1.getContent());
+        merged.addAll(challenges2.getContent());
+        merged.sort(comparator);
+        int endIndex = merged.size() < pageable.getPageSize() ? merged.size() : pageable.getPageSize();
+        return new PageImpl<>(merged.subList(0, endIndex), pageable, challenges1.getTotalElements()+challenges2.getTotalElements());
+    }
+
 }

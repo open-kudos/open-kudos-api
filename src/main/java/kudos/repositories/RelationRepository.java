@@ -2,14 +2,16 @@ package kudos.repositories;
 
 import kudos.model.Relation;
 import kudos.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface RelationRepository extends MongoRepository<Relation,String>  {
 
-    List<Relation> getRelationsByFollower(User follower);
-    List<Relation> getRelationsByUserToFollow(User userToFollow);
-    Relation getRelationByFollowerAndUserToFollow(User follower, User userToFollow);
+    Page<Relation> findRelationsByFollowerOrderByAddedDateDesc(User follower, Pageable pageable);
+    Page<Relation> findRelationsByUserToFollowOrderByAddedDateDesc(User userToFollow, Pageable pageable);
+    Optional<Relation> findRelationByFollowerAndUserToFollow(User follower, User userToFollow);
 
 }

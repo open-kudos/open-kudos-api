@@ -1,4 +1,4 @@
-package kudos.web.exceptions;
+package kudos.exceptions;
 
 public class UserException extends Exception {
 

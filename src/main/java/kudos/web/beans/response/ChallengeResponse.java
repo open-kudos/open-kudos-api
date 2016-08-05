@@ -1,77 +1,42 @@
 package kudos.web.beans.response;
 
 import kudos.model.Challenge;
+import kudos.model.ChallengeStatus;
 
 public class ChallengeResponse extends Response {
 
-    int amount;
-    String id;
-    String name;
-    String createDate;
-    String creatorName;
-    String creatorEmail;
-    Boolean creatorStatus;
-    String participantName;
-    String participantEmail;
-    Boolean participantStatus;
-    String description;
-    String finishDate;
-    Challenge.Status status;
+    private String id;
+    private int amount;
+    private String name;
+    private String creatorFullName;
+    private String creatorId;
+    private String participantFullName;
+    private String participantId;
+    private String description;
+    private String expirationDate;
+    private String status;
+    private ChallengeActions actions;
 
-    public ChallengeResponse(Challenge challenge){
+    public ChallengeResponse(Challenge challenge, ChallengeActions actions){
         this.id = challenge.getId();
         this.name = challenge.getName();
-        this.amount = challenge.getAmount();
-        this.createDate = challenge.getCreateDateDate();
-        this.creatorName = challenge.getCreatorUser().getFirstName() + " " + challenge.getCreatorUser().getLastName();
-        this.creatorEmail = challenge.getCreatorUser().getEmail();
-        this.creatorStatus = challenge.getCreatorStatus();
-        this.participantName = challenge.getParticipantUser().getFirstName() + " " + challenge.getParticipantUser().getLastName();
-        this.participantEmail = challenge.getParticipantUser().getEmail();
-        this.participantStatus = challenge.getParticipantStatus();
+        this.amount = challenge.getTransaction().getAmount();
+        this.creatorFullName = challenge.getCreator().getFirstName() + " " + challenge.getCreator().getLastName();
+        this.creatorId = challenge.getCreator().getId();
+        this.participantFullName = challenge.getParticipant().getFirstName() + " " + challenge.getParticipant().getLastName();
+        this.participantId = challenge.getParticipant().getId();
         this.description = challenge.getDescription();
-        this.finishDate = challenge.getFinishDate();
-        this.status = challenge.getStatus();
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Challenge.Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Challenge.Status status) {
-        this.status = status;
+        this.expirationDate = challenge.getExpirationDate();
+        this.status = challenge.getStatus().name();
+        this.actions = actions;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getFinishDate() {
-        return finishDate;
-    }
-
-    public void setFinishDate(String finishDate) {
-        this.finishDate = finishDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public int getAmount() {
@@ -82,59 +47,75 @@ public class ChallengeResponse extends Response {
         this.amount = amount;
     }
 
-    public String getCreateDate() {
-        return createDate;
+    public String getName() {
+        return name;
     }
 
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCreatorName() {
-        return creatorName;
+    public String getCreatorFullName() {
+        return creatorFullName;
     }
 
-    public void setCreatorName(String creatorName) {
-        this.creatorName = creatorName;
+    public void setCreatorFullName(String creatorFullName) {
+        this.creatorFullName = creatorFullName;
     }
 
-    public String getCreatorEmail() {
-        return creatorEmail;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setCreatorEmail(String creatorEmail) {
-        this.creatorEmail = creatorEmail;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
-    public Boolean getCreatorStatus() {
-        return creatorStatus;
+    public String getParticipantFullName() {
+        return participantFullName;
     }
 
-    public void setCreatorStatus(Boolean creatorStatus) {
-        this.creatorStatus = creatorStatus;
+    public void setParticipantFullName(String participantFullName) {
+        this.participantFullName = participantFullName;
     }
 
-    public String getParticipantName() {
-        return participantName;
+    public String getParticipantId() {
+        return participantId;
     }
 
-    public void setParticipantName(String participantName) {
-        this.participantName = participantName;
+    public void setParticipantId(String participantId) {
+        this.participantId = participantId;
     }
 
-    public String getParticipantEmail() {
-        return participantEmail;
+    public String getDescription() {
+        return description;
     }
 
-    public void setParticipantEmail(String participantEmail) {
-        this.participantEmail = participantEmail;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Boolean getParticipantStatus() {
-        return participantStatus;
+    public String getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setParticipantStatus(Boolean participantStatus) {
-        this.participantStatus = participantStatus;
+    public void setExpirationDate(String expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public ChallengeActions getActions() {
+        return actions;
+    }
+
+    public void setActions(ChallengeActions actions) {
+        this.actions = actions;
     }
 }
