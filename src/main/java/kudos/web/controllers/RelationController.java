@@ -1,10 +1,12 @@
 package kudos.web.controllers;
 
 import kudos.exceptions.RelationException;
+import kudos.model.FeedType;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.web.beans.response.RelationResponse;
 import kudos.exceptions.UserException;
+import kudos.web.beans.response.followedUsersResponse.FollowedUsersFeed;
 import org.jsondoc.core.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,6 +28,7 @@ public class RelationController extends BaseController {
         User follower = authenticationService.getLoggedInUser();
         User userToFollow = usersService.findByUserId(userId);
         relationService.follow(follower, userToFollow);
+        feedService.save(follower, userToFollow, FeedType.STARTED_TO_FOLLOW);
     }
 
     @RequestMapping(value = "/follow", method = RequestMethod.POST)
@@ -49,6 +52,7 @@ public class RelationController extends BaseController {
         User follower = authenticationService.getLoggedInUser();
         User userToUnfollow = usersService.findByUserId(userId);
         relationService.unfollow(follower, userToUnfollow);
+        feedService.save(follower, userToUnfollow, FeedType.UNFOLLOWED);
     }
 
     @RequestMapping(value = "/followers", method = RequestMethod.GET)
@@ -63,6 +67,13 @@ public class RelationController extends BaseController {
                                                @RequestParam(value="size") int size) throws UserException {
         User user = authenticationService.getLoggedInUser();
         return convert(relationService.getUsersFollowedByUser(user, new PageRequest(page, size)), false);
+    }
+
+    @RequestMapping(value = "/feed", method = RequestMethod.GET)
+    public List<FollowedUsersFeed> getFollowedUsersFeed(@RequestParam(value="page") int page,
+                                                        @RequestParam(value="size") int size) throws UserException{
+        User follower = authenticationService.getLoggedInUser();
+        return followedUsersFeedService.getFollowedUsersFeed(follower);
     }
 
     public Page<RelationResponse> convert(Page<Relation> relations, boolean followers) throws UserException {

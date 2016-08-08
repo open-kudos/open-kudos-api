@@ -1,10 +1,10 @@
 package kudos.services;
 
 import kudos.exceptions.RelationException;
+import kudos.exceptions.UserException;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.repositories.RelationRepository;
-import kudos.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,16 +26,8 @@ public class RelationService {
         if(follower.getId().equals(userToFollow.getId()))
             throw new RelationException("cant_follow_yourself");
 
-        relationRepository.save(new Relation(follower, userToFollow, LocalDateTime.now().toString()));
-    }
-
-    public Page<Relation> getUsersWhoFollowUser(User user, Pageable pageable) throws UserException {
-        return relationRepository.findRelationsByUserToFollowOrderByAddedDateDesc(user, pageable);
-    }
-
-    public Page<Relation> getUsersFollowedByUser(User user, Pageable pageable) throws UserException {
-        return relationRepository.findRelationsByFollowerOrderByAddedDateDesc(user, pageable);
-
+        Relation relation = new Relation(follower, userToFollow, LocalDateTime.now().toString());
+        relationRepository.save(relation);
     }
 
     public void unfollow(User follower, User userToUnfollow) throws RelationException {
@@ -45,6 +37,14 @@ public class RelationService {
         } else {
             throw new RelationException("relation_does_not_exist");
         }
+    }
+
+    public Page<Relation> getUsersWhoFollowUser(User user, Pageable pageable) throws UserException {
+        return relationRepository.findRelationsByUserToFollowOrderByAddedDateDesc(user, pageable);
+    }
+
+    public Page<Relation> getUsersFollowedByUser(User user, Pageable pageable) throws UserException {
+        return relationRepository.findRelationsByFollowerOrderByAddedDateDesc(user, pageable);
     }
 
 }

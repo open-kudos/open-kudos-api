@@ -31,6 +31,8 @@ public class Challenge {
         this.status = status;
     }
 
+
+
     public String getId() {
         return id;
     }

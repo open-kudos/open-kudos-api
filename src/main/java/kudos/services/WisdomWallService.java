@@ -16,8 +16,9 @@ public class WisdomWallService {
     @Autowired
     private WisdomWallRepository wisdomwallRepository;
 
-    public void addIdea(User creator, String author, String phrase) {
-        wisdomwallRepository.save(new Idea(creator, author, phrase, LocalDateTime.now().toString()));
+    public Idea addIdea(User creator, String author, String phrase) {
+        return wisdomwallRepository.save(new Idea(creator, author, phrase, LocalDateTime.now().toString()));
+
     }
 
     public Idea getRandomIdea(User creator) {

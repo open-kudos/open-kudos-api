@@ -1,6 +1,7 @@
 package kudos.web.controllers;
 
 import kudos.exceptions.UserException;
+import kudos.model.FeedType;
 import kudos.model.User;
 import kudos.model.UserStatus;
 import kudos.web.beans.request.LoginForm;
@@ -24,6 +25,7 @@ public class AuthenticationController extends BaseController {
 
         String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
         emailService.sendEmail(user.getEmail(), message, "Greetings from Acorns app");
+        feedService.save(user, FeedType.REGISTERED_TO_OPENKUDOS);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)

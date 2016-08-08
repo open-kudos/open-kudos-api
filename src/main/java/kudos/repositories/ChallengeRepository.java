@@ -7,11 +7,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
     Optional<Challenge> findChallengeById(String id);
+
+    List<Challenge> findChallengesByParticipant(User participant);
+
+    List<Challenge> findChallengesByCreator(User creator);
 
     Page<Challenge> findChallengesByStatusAndParticipantOrderByClosedDateDesc(ChallengeStatus status, User participant, Pageable pageable);
 
