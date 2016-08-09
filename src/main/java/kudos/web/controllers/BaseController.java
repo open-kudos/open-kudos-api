@@ -49,4 +49,7 @@ public abstract class BaseController {
     @Autowired
     protected LeaderBoardService leaderBoardService;
 
+    @Autowired
+    protected ActionsService actionsService;
+
 }

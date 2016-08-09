@@ -23,6 +23,8 @@ public interface TransactionRepository extends MongoRepository<Transaction,Strin
 
     List<Transaction> findTransactionsByStatusOrderByDateDesc(TransactionStatus status, Pageable pageable);
 
+    List<Transaction> findTransactionsBySenderOrReceiverAndStatusOrderByDateDesc(User sender, User receiver, TransactionStatus status);
+
     Page<Transaction> findTransactionsBySenderAndStatusOrderByDateDesc(User sender, TransactionStatus status, Pageable pageable);
 
     Page<Transaction> findTransactionsByReceiverAndStatusOrderByDateDesc(User receiver, TransactionStatus status, Pageable pageable);

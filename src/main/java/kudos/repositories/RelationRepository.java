@@ -6,12 +6,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface RelationRepository extends MongoRepository<Relation,String>  {
+public interface RelationRepository extends MongoRepository<Relation,String> {
+
+    List<Relation> findRelationsByFollower(User follower);
 
     Page<Relation> findRelationsByFollowerOrderByAddedDateDesc(User follower, Pageable pageable);
+
     Page<Relation> findRelationsByUserToFollowOrderByAddedDateDesc(User userToFollow, Pageable pageable);
+
     Optional<Relation> findRelationByFollowerAndUserToFollow(User follower, User userToFollow);
 
 }
+

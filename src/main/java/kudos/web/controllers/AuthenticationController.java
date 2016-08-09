@@ -5,7 +5,6 @@ import kudos.model.User;
 import kudos.model.UserStatus;
 import kudos.web.beans.request.LoginForm;
 import kudos.web.beans.request.RegisterForm;
-
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;

@@ -4,10 +4,7 @@ import com.google.common.base.Strings;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
-import kudos.repositories.ChallengeRepository;
-import kudos.repositories.CommentRepository;
-import kudos.repositories.TransactionRepository;
-import kudos.repositories.UserRepository;
+import kudos.repositories.*;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,9 +53,10 @@ public class ChallengeService {
         challenge.setExpirationDate(Strings.isNullOrEmpty(expirationDate) ? null : LocalDateTime.parse(expirationDate).toString());
         challenge.setCreatedDate(LocalDateTime.now().toString());
         challenge.setDescription(description);
-
-        return challengeRepository.save(challenge);
+        challengeRepository.save(challenge);
+        return challenge;
     }
+
 
     public Challenge getChallengeById(String id) throws UserException {
         Optional<Challenge> challenge = challengeRepository.findChallengeById(id);
@@ -78,7 +76,6 @@ public class ChallengeService {
     public void declineChallenge(Challenge challenge, User user) throws UserException {
         checkIfCanAcceptOrDecline(challenge, user);
         //TODO create notification that challenge was declined
-
         transactionRepository.delete(challenge.getTransaction());
         challengeRepository.delete(challenge);
     }
@@ -126,6 +123,7 @@ public class ChallengeService {
         challenge.setStatus(ChallengeStatus.FAILED);
         challenge.setClosedDate(LocalDateTime.now().toString());
         challengeRepository.save(challenge);
+
     }
 
     public void checkIfCanAcceptOrDecline(Challenge challenge, User user) throws UserException {

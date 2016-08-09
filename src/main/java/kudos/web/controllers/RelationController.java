@@ -1,14 +1,18 @@
 package kudos.web.controllers;
 
 import kudos.exceptions.RelationException;
+import kudos.exceptions.UserException;
+import kudos.model.Action;
+import kudos.model.ActionType;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.web.beans.response.RelationResponse;
-import kudos.exceptions.UserException;
-import org.jsondoc.core.annotation.*;
+import kudos.web.beans.response.followedUsersFeedResponse.*;
+import org.jsondoc.core.annotation.Api;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -26,6 +30,7 @@ public class RelationController extends BaseController {
         User follower = authenticationService.getLoggedInUser();
         User userToFollow = usersService.findByUserId(userId);
         relationService.follow(follower, userToFollow);
+        actionsService.save(follower, userToFollow, ActionType.STARTED_TO_FOLLOW);
     }
 
     @RequestMapping(value = "/follow", method = RequestMethod.POST)
@@ -35,6 +40,7 @@ public class RelationController extends BaseController {
 
         if(userToFollow.isPresent()) {
             relationService.follow(follower, userToFollow.get());
+            actionsService.save(follower, userToFollow.get(), ActionType.STARTED_TO_FOLLOW);
         } else {
             String email = follower.getFirstName() + " " + follower.getLastName() + "wanted to add you to his" +
                     " followed users list, but you are not registered. Maybe it is time to do it? Go to" +
@@ -65,6 +71,13 @@ public class RelationController extends BaseController {
         return convert(relationService.getUsersFollowedByUser(user, new PageRequest(page, size)), false);
     }
 
+    @RequestMapping(value = "/feed", method = RequestMethod.GET)
+    public Page<FollowedUsersFeed> getFollowedUsersFeed(@RequestParam(value="page") int page,
+                                             @RequestParam(value="size") int size) throws UserException{
+
+        return convertFeed(actionsService.getFeedPage(new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp"))));
+    }
+
     public Page<RelationResponse> convert(Page<Relation> relations, boolean followers) throws UserException {
         List<RelationResponse> response = new ArrayList<>();
 
@@ -80,6 +93,32 @@ public class RelationController extends BaseController {
         }
         return new PageImpl<>(response, new PageRequest(relations.getNumber(), relations.getSize()),
                 relations.getTotalElements());
+    }
+
+    public Page<FollowedUsersFeed> convertFeed(Page<Action> actions) throws UserException {
+        List<FollowedUsersFeed> response = new ArrayList<>();
+
+        for(Action item : actions.getContent()) {
+            response.add(getFeedResponseObject(item));
+        }
+
+        return new PageImpl<>(response, new PageRequest(actions.getNumber(), actions.getSize()),
+                actions.getTotalElements());
+    }
+
+    private FollowedUsersFeed getFeedResponseObject(Action action) {
+        switch (action.getType()) {
+            case KUDOS_GIVEN:
+                return new FollowedUserTransactionResponse(action);
+            case COMMENTED:
+                return new FollowedUserCommentResponse(action);
+            case STARTED_TO_FOLLOW:
+                return new FollowedUserRelationResponse(action);
+            case ADDED_NEW_IDEA:
+                return new FollowedUserIdeaResponse(action);
+            default:
+                return new FollowedUserChallengeResponse(action);
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package kudos.web.controllers;
 
 import kudos.exceptions.UserException;
+import kudos.model.ActionType;
 import kudos.model.Idea;
 import kudos.model.User;
 import kudos.web.beans.request.AddIdeaForm;
@@ -17,7 +18,7 @@ public class WisdomWallController extends BaseController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public void addIdea(@RequestBody AddIdeaForm addIdeaForm) throws UserException {
         User creator = authenticationService.getLoggedInUser();
-        wisdomWallService.addIdea(creator, addIdeaForm.getAuthor(), addIdeaForm.getPhrase());
+        actionsService.save(creator, wisdomWallService.addIdea(creator, addIdeaForm.getAuthor(), addIdeaForm.getPhrase()), ActionType.ADDED_NEW_IDEA);
     }
 
     @RequestMapping(value = "/randomIdea", method = RequestMethod.GET)
