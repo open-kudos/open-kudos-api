@@ -1,12 +1,10 @@
 package kudos.web.controllers;
 
 import kudos.exceptions.UserException;
-import kudos.model.FeedType;
 import kudos.model.User;
 import kudos.model.UserStatus;
 import kudos.web.beans.request.LoginForm;
 import kudos.web.beans.request.RegisterForm;
-
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -25,7 +23,6 @@ public class AuthenticationController extends BaseController {
 
         String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
         emailService.sendEmail(user.getEmail(), message, "Greetings from Acorns app");
-        feedService.save(user, FeedType.REGISTERED_TO_OPENKUDOS);
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)

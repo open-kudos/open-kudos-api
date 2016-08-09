@@ -33,7 +33,7 @@ public class ChallengeController extends BaseController {
             Challenge challenge = challengeService.giveChallenge(creator, receiver.get(), form.getName(),
                     form.getDescription(), form.getExpirationDate(), form.getAmount());
             emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
-            feedService.save(creator, challenge, FeedType.CREATED_CHALLENGE);
+            actionsService.save(creator, challenge, ActionType.CREATED_CHALLENGE);
             return new ChallengeResponse(challenge, getAllowedActions(creator, challenge));
         } else {
             String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
@@ -50,7 +50,7 @@ public class ChallengeController extends BaseController {
         Challenge challenge = challengeService.getChallengeById(challengeId);
         Comment comment = new Comment(creator, form.getComment(), LocalDateTime.now().toString(), challenge);
         challengeService.addComment(comment);
-        feedService.save(creator, comment, FeedType.COMMENTED);
+        actionsService.save(creator, comment, ActionType.COMMENTED);
     }
 
     @RequestMapping(value = "/{challengeId}/comments", method = RequestMethod.GET)
@@ -142,7 +142,7 @@ public class ChallengeController extends BaseController {
         User user = authenticationService.getLoggedInUser();
         Challenge challengeToAccept = challengeService.getChallengeById(challengeId);
         Challenge challengeToReturn = challengeService.acceptChallenge(challengeToAccept, user);
-        feedService.save(user, challengeToReturn, FeedType.ACCEPTED_CHALLENGE);
+        actionsService.save(user, challengeToReturn, ActionType.ACCEPTED_CHALLENGE);
         return new ChallengeResponse(challengeToReturn, getAllowedActions(user, challengeToReturn));
     }
 
@@ -165,7 +165,7 @@ public class ChallengeController extends BaseController {
         User user = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
         challengeService.markChallengeAsCompleted(challenge, user);
-        feedService.save(user, challenge, FeedType.MARKED_AS_COMPLETED);
+        actionsService.save(user, challenge, ActionType.MARKED_AS_COMPLETED);
     }
 
     @RequestMapping(value = "/{challengeId}/markAsFailed", method = RequestMethod.POST)
@@ -173,7 +173,7 @@ public class ChallengeController extends BaseController {
         User user = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
         challengeService.markChallengeAsFailed(challenge, user);
-        feedService.save(user, challenge, FeedType.MARKED_AS_FAILED);
+        actionsService.save(user, challenge, ActionType.MARKED_AS_FAILED);
     }
 
     public Page<ChallengeResponse> convert(Page<Challenge> challenges, User user) throws UserException {

@@ -53,6 +53,6 @@ public abstract class BaseController {
     protected FollowedUsersFeedService followedUsersFeedService;
 
     @Autowired
-    protected FeedService feedService;
+    protected ActionsService actionsService;
 
 }

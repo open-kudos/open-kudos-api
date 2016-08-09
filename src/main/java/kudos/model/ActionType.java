@@ -1,6 +1,6 @@
 package kudos.model;
 
-public enum FeedType {
+public enum ActionType {
     KUDOS_GIVEN,
     CREATED_CHALLENGE,
     CANCELED_CHALLENGE,
@@ -11,10 +11,6 @@ public enum FeedType {
     MARKED_AS_FAILED,
     ACCOMPLISHED_CHALLENGE,
     COMMENTED,
-    REGISTERED_TO_OPENKUDOS,
-    BIRTHDAY,
-    WORK_ANNIVERSARY,
     STARTED_TO_FOLLOW,
-    UNFOLLOWED,
     ADDED_NEW_IDEA
 }

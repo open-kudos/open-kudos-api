@@ -2,7 +2,7 @@ package kudos.web.controllers;
 
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
-import kudos.model.FeedType;
+import kudos.model.ActionType;
 import kudos.model.Transaction;
 import kudos.model.TransactionType;
 import kudos.model.User;
@@ -32,7 +32,7 @@ public class KudosController extends BaseController {
 
         if(receiver.isPresent()) {
             Transaction transaction = kudosService.giveKudos(sender, receiver.get(), form.getAmount(),form.getMessage());
-            feedService.save(sender, transaction, FeedType.KUDOS_GIVEN);
+            actionsService.save(sender, transaction, ActionType.KUDOS_GIVEN);
             return new KudosTransactionResponse(transaction, "GIVEN");
         } else {
             String email = sender.getFirstName() + " " + sender.getLastName() + "wanted to give you KUDOS," +

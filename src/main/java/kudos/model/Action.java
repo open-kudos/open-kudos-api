@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Feed {
+public class Action {
 
     @Id
     private String id;
@@ -30,44 +30,58 @@ public class Feed {
 
     private String timestamp;
 
-    private FeedType type;
+    private ActionType type;
 
-    public Feed(User user, Challenge challenge, String timestamp, FeedType type) {
+    public Action() {}
+
+    public Action(String id, User user, Transaction transaction, Challenge challenge, Comment comment, Relation relation, Idea idea, String timestamp, ActionType type) {
+        this.id = id;
+        this.user = user;
+        this.transaction = transaction;
+        this.challenge = challenge;
+        this.comment = comment;
+        this.relation = relation;
+        this.idea = idea;
+        this.timestamp = timestamp;
+        this.type = type;
+    }
+
+    public Action(User user, Challenge challenge, String timestamp, ActionType type) {
         this.user = user;
         this.challenge = challenge;
         this.timestamp = timestamp;
         this.type = type;
     }
 
-    public Feed(User user, Transaction transaction, String timestamp, FeedType type) {
+    public Action(User user, Transaction transaction, String timestamp, ActionType type) {
         this.user = user;
         this.transaction = transaction;
         this.timestamp = timestamp;
         this.type = type;
     }
 
-    public Feed(User user, Comment comment, String timestamp, FeedType type) {
+    public Action(User user, Comment comment, String timestamp, ActionType type) {
         this.user = user;
         this.comment = comment;
         this.timestamp = timestamp;
         this.type = type;
     }
 
-    public Feed(User user, Relation relation, String timestamp, FeedType type) {
+    public Action(User user, Relation relation, String timestamp, ActionType type) {
         this.user = user;
-        this.comment = comment;
+        this.relation = relation;
         this.timestamp = timestamp;
         this.type = type;
     }
 
-    public Feed(User user, Idea idea, String timestamp, FeedType type) {
+    public Action(User user, Idea idea, String timestamp, ActionType type) {
         this.user = user;
         this.idea = idea;
         this.timestamp = timestamp;
         this.type = type;
     }
 
-    public Feed(User user, String timestamp, FeedType type) {
+    public Action(User user, String timestamp, ActionType type) {
         this.user = user;
         this.timestamp = timestamp;
         this.type = type;
@@ -137,11 +151,11 @@ public class Feed {
         this.timestamp = timestamp;
     }
 
-    public FeedType getType() {
+    public ActionType getType() {
         return type;
     }
 
-    public void setType(FeedType type) {
+    public void setType(ActionType type) {
         this.type = type;
     }
 }

@@ -1,12 +1,13 @@
 package kudos.repositories;
 
-import kudos.model.Feed;
+import kudos.model.Action;
+import kudos.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface FeedRepository extends MongoRepository<Feed, String> {
+public interface ActionRepository extends MongoRepository<Action, String> {
 
-    Page<Feed> findAll(Pageable pageable);
+    Page<Action> findAllByUser(User user, Pageable pageable);
 
 }

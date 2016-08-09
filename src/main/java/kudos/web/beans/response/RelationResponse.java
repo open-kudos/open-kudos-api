@@ -1,10 +1,18 @@
 package kudos.web.beans.response;
 
+import kudos.model.Relation;
+
 public class RelationResponse extends Response {
 
     private String userId;
     private String userFullName;
     private String userEmail;
+
+    public RelationResponse(Relation relation){
+        this.userId = relation.getUserToFollow().getId();
+        this.userFullName = relation.getUserToFollow().getFirstName() + " " + relation.getUserToFollow().getLastName();
+        this.userEmail = relation.getUserToFollow().getEmail();
+    }
 
     public RelationResponse(String userId, String userFullName, String userEmail){
         this.userId = userId;
