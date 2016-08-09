@@ -9,7 +9,7 @@ public class FollowedUserTransactionResponse extends FollowedUsersFeed {
 
     public FollowedUserTransactionResponse(Action action) {
         super(action);
-        this.transactionResponse = new KudosTransactionResponse(action.getTransaction(), action.getType().toString());
+        this.transactionResponse = new KudosTransactionResponse(action.getTransaction(), action.getTransaction().getType().toString());
     }
 
     public KudosTransactionResponse getTransactionResponse() {

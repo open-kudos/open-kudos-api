@@ -12,6 +12,7 @@ import org.jsondoc.core.annotation.Api;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -73,7 +74,8 @@ public class RelationController extends BaseController {
     @RequestMapping(value = "/feed", method = RequestMethod.GET)
     public Page<FollowedUsersFeed> getFollowedUsersFeed(@RequestParam(value="page") int page,
                                              @RequestParam(value="size") int size) throws UserException{
-        return convertFeed(actionsService.getFeedPage(new PageRequest(page, size)));
+
+        return convertFeed(actionsService.getFeedPage(new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp"))));
     }
 
     public Page<RelationResponse> convert(Page<Relation> relations, boolean followers) throws UserException {
@@ -106,15 +108,6 @@ public class RelationController extends BaseController {
 
     private FollowedUsersFeed getFeedResponseObject(Action action) {
         switch (action.getType()) {
-            case ACCEPTED_CHALLENGE:
-            case ACCOMPLISHED_CHALLENGE:
-            case CANCELED_CHALLENGE:
-            case CREATED_CHALLENGE:
-            case DECLINED_CHALLENGE:
-            case FAILED_CHALLENGE:
-            case MARKED_AS_COMPLETED:
-            case MARKED_AS_FAILED:
-                return new FollowedUserChallengeResponse(action);
             case KUDOS_GIVEN:
                 return new FollowedUserTransactionResponse(action);
             case COMMENTED:

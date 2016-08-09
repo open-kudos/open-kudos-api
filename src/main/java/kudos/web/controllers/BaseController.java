@@ -50,9 +50,6 @@ public abstract class BaseController {
     protected LeaderBoardService leaderBoardService;
 
     @Autowired
-    protected FollowedUsersFeedService followedUsersFeedService;
-
-    @Autowired
     protected ActionsService actionsService;
 
 }
