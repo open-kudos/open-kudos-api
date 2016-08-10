@@ -43,6 +43,12 @@ public class ChallengeController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/get/{challengeId}", method = RequestMethod.GET)
+    public ChallengeResponse sentAndReceived(@PathVariable String challengeId) throws UserException {
+        return new ChallengeResponse(challengeService.getChallengeById(challengeId), new ChallengeActions(true, false, false, false, false));
+    }
+
+
     @RequestMapping(value = "/{challengeId}/addComment", method = RequestMethod.POST)
     public void addCommentToChallenge(@PathVariable String challengeId,
                                       @RequestBody AddCommentForm form) throws UserException {
@@ -190,8 +196,7 @@ public class ChallengeController extends BaseController {
         List<CommentResponse> response = new ArrayList<>();
 
         for(Comment item : comments.getContent()) {
-            response.add(new CommentResponse(item.getCreator().getId(), item.getCreator().getFirstName() + " "
-                    + item.getCreator().getLastName(), item.getText(), item.getCreationDate()));
+            response.add(new CommentResponse(item));
         }
         return new PageImpl<>(response, new PageRequest(comments.getNumber(), comments.getSize()),
                 comments.getTotalElements());

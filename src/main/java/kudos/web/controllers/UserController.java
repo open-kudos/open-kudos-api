@@ -6,6 +6,9 @@ import kudos.web.beans.request.ProfileForm;
 import kudos.web.beans.response.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController extends BaseController {
@@ -25,6 +28,19 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/profile/{userId}", method = RequestMethod.GET)
     public UserResponse getUserProfile(@PathVariable String userId) throws UserException {
         return new UserResponse(usersService.findByUserId(userId));
+    }
+
+    @RequestMapping(value = "/email/{predicate}", method = RequestMethod.GET)
+    public List<UserResponse> getEmailPredicates(@PathVariable String predicate) throws UserException {
+        return convert(usersService.getUserEmailPredicate(predicate));
+    }
+
+    private List<UserResponse> convert(List<User> input) {
+        List<UserResponse> users = new ArrayList<>();
+        for(User user : input) {
+            users.add(new UserResponse(user));
+        }
+        return users;
     }
 
 }

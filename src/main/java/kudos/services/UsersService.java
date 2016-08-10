@@ -1,15 +1,16 @@
 package kudos.services;
 
 import com.google.common.base.Strings;
+import kudos.exceptions.UserException;
 import kudos.model.User;
 import kudos.model.UserStatus;
 import kudos.repositories.UserRepository;
-import kudos.exceptions.UserException;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,6 +51,10 @@ public class UsersService {
         if(!Strings.isNullOrEmpty(birthday) && !Strings.isNullOrEmpty(startedToWork))
             user.setStatus(UserStatus.COMPLETED);
         userRepository.save(user);
+    }
+
+    public List<User> getUserEmailPredicate(String emailPredicate){
+        return userRepository.findUsersByFirstNameLikeIgnoreCase(emailPredicate);
     }
 
 }

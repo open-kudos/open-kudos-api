@@ -1,5 +1,6 @@
 package kudos.services;
 
+import kudos.exceptions.RelationException;
 import kudos.model.*;
 import kudos.repositories.ActionRepository;
 import kudos.repositories.RelationRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,6 +50,15 @@ public class ActionsService {
 
     public void save(User user, ActionType type) {
         actionRepository.save(new Action(user, LocalDateTime.now().toString(), type));
+    }
+
+    public void remove(User follower, User userToUnfollow) throws RelationException {
+        Optional<Relation> relation = relationRepository.findRelationByFollowerAndUserToFollow(follower, userToUnfollow);
+        if(relation.isPresent()){
+            actionRepository.deleteByRelation(relation.get());
+        } else {
+            throw new RelationException("relation_does_not_exist");
+        }
     }
 
     public List<User> getFollowedUsers(User follower) {
