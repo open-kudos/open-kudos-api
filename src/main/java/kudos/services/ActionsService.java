@@ -61,6 +61,12 @@ public class ActionsService {
         }
     }
 
+    public void remove(Challenge challenge) {
+        if (challenge != null) {
+            actionRepository.deleteByChallenge(challenge);
+        }
+    }
+
     public List<User> getFollowedUsers(User follower) {
         return relationRepository.findRelationsByFollower(follower).stream()
                 .map(relation -> userRepository.findByEmail(relation.getUserToFollow().getEmail()).get())

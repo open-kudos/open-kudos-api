@@ -163,6 +163,7 @@ public class ChallengeController extends BaseController {
     public void cancel(@PathVariable String challengeId) throws UserException {
         User user = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
+        actionsService.remove(challenge);
         challengeService.cancelChallenge(challenge, user);
     }
 

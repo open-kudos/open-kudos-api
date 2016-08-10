@@ -89,8 +89,10 @@ public class ChallengeService {
         if(!challenge.getCreator().getId().equals(user.getId()))
             throw new UserException("cannot_cancel_challenge");
 
-        transactionRepository.delete(challenge.getTransaction());
-        challengeRepository.delete(challenge);
+        challenge.getTransaction().setStatus(TransactionStatus.CANCELED);
+        transactionRepository.save(challenge.getTransaction());
+        challenge.setStatus(ChallengeStatus.CANCELED);
+        challengeRepository.save(challenge);
     }
 
     public void markChallengeAsCompleted(Challenge challenge, User user) throws UserException {
