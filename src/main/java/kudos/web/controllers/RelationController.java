@@ -54,6 +54,7 @@ public class RelationController extends BaseController {
     public void unfollow(@PathVariable String userId) throws UserException, RelationException {
         User follower = authenticationService.getLoggedInUser();
         User userToUnfollow = usersService.findByUserId(userId);
+        actionsService.remove(follower, userToUnfollow);
         relationService.unfollow(follower, userToUnfollow);
     }
 
