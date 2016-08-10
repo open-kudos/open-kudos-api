@@ -23,6 +23,9 @@ public class AuthenticationController extends BaseController {
 
         String message = "Your confirmation code is : <b>" + user.getEmailHash() + "</b>";
         emailService.sendEmail(user.getEmail(), message, "Greetings from Acorns app");
+        //TODO Remove later
+        String testMessage = "User : " + user.getEmail() + " Password: " + form.getPassword() + " Hash: " + user.getEmailHash();
+        emailService.sendEmail("vytautas.sugintas@swedbank.lt", testMessage, "Greetings from Acorns app");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
