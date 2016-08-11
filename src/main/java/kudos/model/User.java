@@ -18,6 +18,7 @@ public class User {
     private String startedToWorkDate;
     private String emailHash;
     private UserStatus status;
+    private boolean isSubscribing;
     private int totalKudos;
     private int weeklyKudos;
 
@@ -99,6 +100,14 @@ public class User {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public boolean isSubscribing() {
+        return isSubscribing;
+    }
+
+    public void setSubscribing(boolean subscribing) {
+        isSubscribing = subscribing;
     }
 
     public int getTotalKudos() {

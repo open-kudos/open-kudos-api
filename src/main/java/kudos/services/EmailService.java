@@ -46,7 +46,6 @@ public class EmailService {
                 + challenge.getTransaction().getAmount() + " acorns" + "<p>Let " + creator.getFirstName() + " "
                 + creator.getLastName() + " know if you accept the challenge in your OPEN KUDOS account!</p>";
 
-
         Runnable runnable = () -> {
             try {
                 sendEmail(participant.getEmail(), message, "You have been challenged!");

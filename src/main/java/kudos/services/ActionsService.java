@@ -73,8 +73,8 @@ public class ActionsService {
                 .collect(Collectors.toList());
     }
 
-    public Page<Action> getFeedPage(Pageable pageable) {
-        return actionRepository.findAll(pageable);
+    public Page<Action> getFeedPage(Pageable pageable, User currentUser) {
+        return actionRepository.findAllByUserNot(currentUser, pageable);
     }
 
 }

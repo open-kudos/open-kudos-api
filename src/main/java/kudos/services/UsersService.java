@@ -57,4 +57,14 @@ public class UsersService {
         return userRepository.findUsersByFirstNameLikeIgnoreCase(emailPredicate);
     }
 
+    public void subscribe(User user){
+        user.setSubscribing(true);
+        userRepository.save(user);
+    }
+
+    public void unsubscribe(User user){
+        user.setSubscribing(false);
+        userRepository.save(user);
+    }
+
 }

@@ -35,6 +35,18 @@ public class UserController extends BaseController {
         return convert(usersService.getUserEmailPredicate(predicate));
     }
 
+    @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
+    public void subscribeForEmailNotifications() throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        usersService.subscribe(user);
+    }
+
+    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
+    public void unsubscribeEmailNotifications() throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        usersService.unsubscribe(user);
+    }
+
     private List<UserResponse> convert(List<User> input) {
         List<UserResponse> users = new ArrayList<>();
         for(User user : input) {

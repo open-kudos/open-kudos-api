@@ -75,8 +75,8 @@ public class RelationController extends BaseController {
     @RequestMapping(value = "/feed", method = RequestMethod.GET)
     public Page<FollowedUsersFeed> getFollowedUsersFeed(@RequestParam(value="page") int page,
                                              @RequestParam(value="size") int size) throws UserException{
-
-        return convertFeed(actionsService.getFeedPage(new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp"))));
+        User user = authenticationService.getLoggedInUser();
+        return convertFeed(actionsService.getFeedPage(new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp")), user));
     }
 
     public Page<RelationResponse> convert(Page<Relation> relations, boolean followers) throws UserException {

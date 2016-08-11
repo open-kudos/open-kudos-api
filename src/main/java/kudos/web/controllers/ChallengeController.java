@@ -32,7 +32,9 @@ public class ChallengeController extends BaseController {
         if(receiver.isPresent()) {
             Challenge challenge = challengeService.giveChallenge(creator, receiver.get(), form.getName(),
                     form.getDescription(), form.getExpirationDate(), form.getAmount());
-            emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
+            if (receiver.get().isSubscribing()) {
+                emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
+            }
             actionsService.save(creator, challenge, ActionType.CREATED_CHALLENGE);
             return new ChallengeResponse(challenge, getAllowedActions(creator, challenge));
         } else {
