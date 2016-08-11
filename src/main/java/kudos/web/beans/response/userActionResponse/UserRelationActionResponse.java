@@ -1,13 +1,13 @@
-package kudos.web.beans.response.followedUsersFeedResponse;
+package kudos.web.beans.response.userActionResponse;
 
 import kudos.model.Action;
 import kudos.web.beans.response.RelationResponse;
 
-public class FollowedUserRelationResponse extends FollowedUsersFeed{
+public class UserRelationActionResponse extends UserAction {
 
     RelationResponse relationResponse;
 
-    public FollowedUserRelationResponse(Action action){
+    public UserRelationActionResponse(Action action){
         super(action);
         this.relationResponse = new RelationResponse(action.getRelation());
     }

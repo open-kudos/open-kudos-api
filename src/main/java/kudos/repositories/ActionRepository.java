@@ -12,6 +12,8 @@ public interface ActionRepository extends MongoRepository<Action, String> {
 
     Page<Action> findAllByUserNot(User user, Pageable pageable);
 
+    Page<Action> findActionsByUser(User user, Pageable pageable);
+
     long deleteByRelation(Relation relation);
 
     long deleteByChallenge(Challenge challenge);

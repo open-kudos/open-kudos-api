@@ -1,14 +1,14 @@
-package kudos.web.beans.response.followedUsersFeedResponse;
+package kudos.web.beans.response.userActionResponse;
 
 import kudos.model.Action;
 import kudos.web.beans.response.ChallengeActions;
 import kudos.web.beans.response.ChallengeResponse;
 
-public class FollowedUserChallengeResponse extends FollowedUsersFeed {
+public class UserChallengeActionResponse extends UserAction {
 
     ChallengeResponse challengeResponse;
 
-    public FollowedUserChallengeResponse(Action action) {
+    public UserChallengeActionResponse(Action action) {
         super(action);
         this.challengeResponse = new ChallengeResponse(action.getChallenge(), getDefaultChallengeActions());
     }

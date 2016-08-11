@@ -4,6 +4,10 @@ import kudos.exceptions.UserException;
 import kudos.model.User;
 import kudos.web.beans.request.ProfileForm;
 import kudos.web.beans.response.UserResponse;
+import kudos.web.beans.response.userActionResponse.UserAction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -33,6 +37,14 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/email/{predicate}", method = RequestMethod.GET)
     public List<UserResponse> getEmailPredicates(@PathVariable String predicate) throws UserException {
         return convert(usersService.getUserEmailPredicate(predicate));
+    }
+
+    @RequestMapping(value = "/actions/{userId}", method = RequestMethod.GET)
+    public Page<UserAction> getUserActions(@PathVariable String userId,
+                                           @RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
+        return actionConverter.convertActionsPage(actionsService.getUserFeedPage(usersService.findByUserId(userId),
+                                                    new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp"))));
     }
 
     @RequestMapping(value = "/subscribe", method = RequestMethod.POST)

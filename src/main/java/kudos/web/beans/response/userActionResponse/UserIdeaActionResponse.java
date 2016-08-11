@@ -1,4 +1,4 @@
-package kudos.web.beans.response.followedUsersFeedResponse;
+package kudos.web.beans.response.userActionResponse;
 
 import kudos.model.Action;
 import kudos.web.beans.response.IdeaResponse;
@@ -6,11 +6,11 @@ import kudos.web.beans.response.IdeaResponse;
 /**
  * Created by vytautassugintas on 09/08/16.
  */
-public class FollowedUserIdeaResponse extends FollowedUsersFeed {
+public class UserIdeaActionResponse extends UserAction {
 
     IdeaResponse ideaResponse;
 
-    public FollowedUserIdeaResponse(Action action) {
+    public UserIdeaActionResponse(Action action) {
         super(action);
         this.ideaResponse = new IdeaResponse(action.getIdea());
     }

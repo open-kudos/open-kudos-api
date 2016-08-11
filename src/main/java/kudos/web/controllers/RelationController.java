@@ -2,12 +2,11 @@ package kudos.web.controllers;
 
 import kudos.exceptions.RelationException;
 import kudos.exceptions.UserException;
-import kudos.model.Action;
 import kudos.model.ActionType;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.web.beans.response.RelationResponse;
-import kudos.web.beans.response.followedUsersFeedResponse.*;
+import kudos.web.beans.response.userActionResponse.UserAction;
 import org.jsondoc.core.annotation.Api;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -73,10 +72,10 @@ public class RelationController extends BaseController {
     }
 
     @RequestMapping(value = "/feed", method = RequestMethod.GET)
-    public Page<FollowedUsersFeed> getFollowedUsersFeed(@RequestParam(value="page") int page,
-                                             @RequestParam(value="size") int size) throws UserException{
+    public Page<UserAction> getFollowedUsersFeed(@RequestParam(value="page") int page,
+                                                 @RequestParam(value="size") int size) throws UserException{
         User user = authenticationService.getLoggedInUser();
-        return convertFeed(actionsService.getFeedPage(new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp")), user));
+        return actionConverter.convertActionsPage(actionsService.getFeedPage(new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp")), user));
     }
 
     public Page<RelationResponse> convert(Page<Relation> relations, boolean followers) throws UserException {
@@ -94,32 +93,6 @@ public class RelationController extends BaseController {
         }
         return new PageImpl<>(response, new PageRequest(relations.getNumber(), relations.getSize()),
                 relations.getTotalElements());
-    }
-
-    public Page<FollowedUsersFeed> convertFeed(Page<Action> actions) throws UserException {
-        List<FollowedUsersFeed> response = new ArrayList<>();
-
-        for(Action item : actions.getContent()) {
-            response.add(getFeedResponseObject(item));
-        }
-
-        return new PageImpl<>(response, new PageRequest(actions.getNumber(), actions.getSize()),
-                actions.getTotalElements());
-    }
-
-    private FollowedUsersFeed getFeedResponseObject(Action action) {
-        switch (action.getType()) {
-            case KUDOS_GIVEN:
-                return new FollowedUserTransactionResponse(action);
-            case COMMENTED:
-                return new FollowedUserCommentResponse(action);
-            case STARTED_TO_FOLLOW:
-                return new FollowedUserRelationResponse(action);
-            case ADDED_NEW_IDEA:
-                return new FollowedUserIdeaResponse(action);
-            default:
-                return new FollowedUserChallengeResponse(action);
-        }
     }
 
 }

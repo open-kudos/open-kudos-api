@@ -1,13 +1,13 @@
-package kudos.web.beans.response.followedUsersFeedResponse;
+package kudos.web.beans.response.userActionResponse;
 
 import kudos.model.Action;
 import kudos.web.beans.response.KudosTransactionResponse;
 
-public class FollowedUserTransactionResponse extends FollowedUsersFeed {
+public class UserTransactionActionResponse extends UserAction {
 
     KudosTransactionResponse transactionResponse;
 
-    public FollowedUserTransactionResponse(Action action) {
+    public UserTransactionActionResponse(Action action) {
         super(action);
         this.transactionResponse = new KudosTransactionResponse(action.getTransaction(), action.getTransaction().getType().toString());
     }

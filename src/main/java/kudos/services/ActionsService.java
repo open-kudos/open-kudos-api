@@ -67,14 +67,20 @@ public class ActionsService {
         }
     }
 
+    public Page<Action> getFeedPage(Pageable pageable, User currentUser) {
+        return actionRepository.findAllByUserNot(currentUser, pageable);
+    }
+
+    public Page<Action> getUserFeedPage(User user, Pageable pageable) {
+        return  actionRepository.findActionsByUser(user, pageable);
+    }
+
+
+
     public List<User> getFollowedUsers(User follower) {
         return relationRepository.findRelationsByFollower(follower).stream()
                 .map(relation -> userRepository.findByEmail(relation.getUserToFollow().getEmail()).get())
                 .collect(Collectors.toList());
-    }
-
-    public Page<Action> getFeedPage(Pageable pageable, User currentUser) {
-        return actionRepository.findAllByUserNot(currentUser, pageable);
     }
 
 }
