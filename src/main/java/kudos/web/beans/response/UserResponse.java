@@ -12,6 +12,7 @@ public class UserResponse extends Response {
     private String birthday;
     private String startedToWorkDate;
     private boolean isCompleted;
+    private boolean isSubscribing;
     private int totalKudos;
     private int weeklyKudos;
 
@@ -24,11 +25,8 @@ public class UserResponse extends Response {
         this.startedToWorkDate = user.getStartedToWorkDate();
         this.totalKudos = user.getTotalKudos();
         this.weeklyKudos = user.getWeeklyKudos();
-        if(user.getStatus().equals(UserStatus.COMPLETED)) {
-            this.isCompleted = true;
-        } else {
-            this.isCompleted = false;
-        }
+        this.isCompleted = user.getStatus().equals(UserStatus.COMPLETED);
+        this.isSubscribing = user.isSubscribing();
     }
 
     public String getId() {
@@ -85,6 +83,14 @@ public class UserResponse extends Response {
 
     public void setCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
+    }
+
+    public boolean isSubscribing() {
+        return isSubscribing;
+    }
+
+    public void setSubscribing(boolean subscribing) {
+        isSubscribing = subscribing;
     }
 
     public int getTotalKudos() {
