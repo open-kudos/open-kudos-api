@@ -16,5 +16,5 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     List<User> findUsersByStatusNot(UserStatus status);
 
-    List<User> findUsersByFirstNameLikeIgnoreCase(String emailPredicate);
+    List<User> findUsersByFirstNameLikeIgnoreCaseAndIdNot(String emailPredicate, String id);
 }
