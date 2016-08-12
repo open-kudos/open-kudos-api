@@ -53,8 +53,8 @@ public class UsersService {
         userRepository.save(user);
     }
 
-    public List<User> getUserEmailPredicate(String emailPredicate){
-        return userRepository.findUsersByFirstNameLikeIgnoreCase(emailPredicate);
+    public List<User> getUserEmailPredicate(String emailPredicate, String userId){
+        return userRepository.findUsersByFirstNameLikeIgnoreCaseAndIdNot(emailPredicate, userId);
     }
 
     public void subscribe(User user){

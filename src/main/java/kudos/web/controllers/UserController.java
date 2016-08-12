@@ -36,7 +36,8 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/email/{predicate}", method = RequestMethod.GET)
     public List<UserResponse> getEmailPredicates(@PathVariable String predicate) throws UserException {
-        return convert(usersService.getUserEmailPredicate(predicate));
+        User currentUser = authenticationService.getLoggedInUser();
+        return convert(usersService.getUserEmailPredicate(predicate, currentUser.getId()));
     }
 
     @RequestMapping(value = "/actions/{userId}", method = RequestMethod.GET)
