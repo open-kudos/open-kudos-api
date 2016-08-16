@@ -5,12 +5,12 @@ import kudos.model.*;
 import kudos.repositories.ActionRepository;
 import kudos.repositories.RelationRepository;
 import kudos.repositories.UserRepository;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

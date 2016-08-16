@@ -5,12 +5,12 @@ import kudos.exceptions.UserException;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.repositories.RelationRepository;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
