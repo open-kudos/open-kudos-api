@@ -5,6 +5,7 @@ import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
 import kudos.repositories.*;
+import kudos.services.util.ChallengeUtil;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,8 @@ public class ChallengeService {
 
     @Autowired
     private ActionRepository actionRepository;
+
+    private ChallengeUtil challengeUtil = new ChallengeUtil();
 
     public Challenge giveChallenge(User creator, User receiver, String name, String description, String expirationDate,
                                    int amount) throws UserException, InvalidKudosAmountException {
@@ -130,18 +133,6 @@ public class ChallengeService {
 
     }
 
-    public void markChallengeAsExpiredOrFailed(Challenge challenge, ChallengeStatus challengeStatus) {
-
-        //TODO create notification that challenge expired
-
-        Transaction transaction = challenge.getTransaction();
-        transaction.setStatus(TransactionStatus.CANCELED);
-        transactionRepository.save(transaction);
-
-        challenge.setStatus(challengeStatus);
-        challengeRepository.save(challenge);
-    }
-
     public void checkIfCanAcceptOrDecline(Challenge challenge, User user) throws UserException {
         if(challenge.getStatus() != ChallengeStatus.CREATED)
             throw new UserException("cannot_accept_or_decline_challenge");
@@ -150,7 +141,7 @@ public class ChallengeService {
             throw new UserException("cannot_accept_or_decline_challenge");
 
         if(challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now())) {
-            markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.EXPIRED);
+            challengeUtil.changeStatus(challenge, ChallengeStatus.EXPIRED);
             throw new UserException("challenge_expired");
         }
     }
@@ -163,7 +154,7 @@ public class ChallengeService {
             throw new UserException("cannot_complete_or_fail_challenge");
 
         if(challenge.getExpirationDate() != null && LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate()))){
-            markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.FAILED);
+            challengeUtil.changeStatus(challenge, ChallengeStatus.FAILED);
             throw new UserException("challenge_expired");
         }
     }
