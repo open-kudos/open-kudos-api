@@ -130,7 +130,7 @@ public class ChallengeService {
 
     }
 
-    public void markChallengeAsExpired(Challenge challenge) {
+    public void markChallengeAsExpiredOrFailed(Challenge challenge, ChallengeStatus challengeStatus) {
 
         //TODO create notification that challenge expired
 
@@ -138,7 +138,7 @@ public class ChallengeService {
         transaction.setStatus(TransactionStatus.CANCELED);
         transactionRepository.save(transaction);
 
-        challenge.setStatus(ChallengeStatus.EXPIRED);
+        challenge.setStatus(challengeStatus);
         challengeRepository.save(challenge);
     }
 
@@ -150,7 +150,7 @@ public class ChallengeService {
             throw new UserException("cannot_accept_or_decline_challenge");
 
         if(challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now())) {
-            markChallengeAsExpired(challenge);
+            markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.EXPIRED);
             throw new UserException("challenge_expired");
         }
     }
@@ -163,7 +163,7 @@ public class ChallengeService {
             throw new UserException("cannot_complete_or_fail_challenge");
 
         if(challenge.getExpirationDate() != null && LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate()))){
-            markChallengeAsExpired(challenge);
+            markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.FAILED);
             throw new UserException("challenge_expired");
         }
     }

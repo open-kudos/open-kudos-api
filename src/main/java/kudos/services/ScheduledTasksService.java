@@ -25,11 +25,11 @@ public class ScheduledTasksService {
         List<Challenge> acceptedChallenges = challengeRepository.findAllChallengesByStatus(ChallengeStatus.ACCEPTED);
 
         for (Challenge challenge : createdChallenges) {
-            challengeService.markChallengeAsExpired(challenge);
+            challengeService.markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.EXPIRED);
         }
 
         for (Challenge challenge : acceptedChallenges) {
-            challengeService.markChallengeAsFailed(challenge, challenge.getParticipant());
+            challengeService.markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.FAILED);
         }
 
     }
