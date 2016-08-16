@@ -126,7 +126,8 @@ public class AuthenticationService {
     }
 
     public int countKudosToReturn(List<Transaction> transactions) {
-        return transactions.stream().filter(transaction -> transaction.getStatus() == TransactionStatus.CANCELED)
+        return transactions.stream().filter(transaction -> transaction.getStatus() == TransactionStatus.CANCELED
+                || transaction.getStatus() == TransactionStatus.CANCELED)
                 .mapToInt(Transaction::getAmount).sum();
     }
 

@@ -5,13 +5,13 @@ import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
 import kudos.repositories.*;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -80,6 +80,7 @@ public class ChallengeService {
         //TODO create notification that challenge was declined
         transactionRepository.delete(challenge.getTransaction());
         challengeRepository.delete(challenge);
+        actionRepository.deleteByChallenge(challenge);
     }
 
     public void cancelChallenge(Challenge challenge, User user) throws UserException {
@@ -91,10 +92,9 @@ public class ChallengeService {
         if(!challenge.getCreator().getId().equals(user.getId()))
             throw new UserException("cannot_cancel_challenge");
 
-        challenge.getTransaction().setStatus(TransactionStatus.CANCELED);
-        transactionRepository.save(challenge.getTransaction());
-        challenge.setStatus(ChallengeStatus.CANCELED);
-        challengeRepository.save(challenge);
+        transactionRepository.delete(challenge.getTransaction());
+        challengeRepository.delete(challenge);
+        actionRepository.deleteByChallenge(challenge);
     }
 
     public void markChallengeAsCompleted(Challenge challenge, User user) throws UserException {
