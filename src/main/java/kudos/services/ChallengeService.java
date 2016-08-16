@@ -147,6 +147,7 @@ public class ChallengeService {
             throw new UserException("cannot_complete_or_fail_challenge");
 
         if(challenge.getExpirationDate() != null && LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate())))
+
             throw new UserException("cannot_complete_or_fail_challenge");
     }
 

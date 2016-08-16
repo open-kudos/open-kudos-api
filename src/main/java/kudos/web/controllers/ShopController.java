@@ -1,11 +1,10 @@
 package kudos.web.controllers;
 
 import kudos.exceptions.BusinessException;
-import kudos.model.ShopItem;
 import kudos.exceptions.UserException;
+import kudos.model.ActionType;
+import kudos.model.ShopItem;
 import kudos.model.User;
-import kudos.web.beans.request.AddShopItemForm;
-import kudos.web.beans.request.EditShopItemForm;
 import kudos.web.beans.response.ShopItemResponse;
 import org.jsondoc.core.annotation.Api;
 import org.springframework.data.domain.Page;
@@ -13,7 +12,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +29,7 @@ public class ShopController extends BaseController {
     @RequestMapping(value = "/{itemId}/buy", method = RequestMethod.POST)
     public void buy(@PathVariable String itemId) throws UserException, BusinessException {
         User user = authenticationService.getLoggedInUser();
+        actionsService.save(user, shopService.getShopItem(itemId), ActionType.PURCHASED_SHOP_ITEM);
         //shopService.buyItemFromShop(user, itemId);
     }
 

@@ -28,11 +28,27 @@ public class Action {
     @DBRef
     Idea idea;
 
+    @DBRef
+    ShopItem shopItem;
+
     private String timestamp;
 
     private ActionType type;
 
     public Action() {}
+
+    public Action(String id, User user, Transaction transaction, Challenge challenge, Comment comment, Relation relation, Idea idea, ShopItem shopItem, String timestamp, ActionType type) {
+        this.id = id;
+        this.user = user;
+        this.transaction = transaction;
+        this.challenge = challenge;
+        this.comment = comment;
+        this.relation = relation;
+        this.idea = idea;
+        this.shopItem = shopItem;
+        this.timestamp = timestamp;
+        this.type = type;
+    }
 
     public Action(String id, User user, Transaction transaction, Challenge challenge, Comment comment, Relation relation, Idea idea, String timestamp, ActionType type) {
         this.id = id;
@@ -77,6 +93,13 @@ public class Action {
     public Action(User user, Idea idea, String timestamp, ActionType type) {
         this.user = user;
         this.idea = idea;
+        this.timestamp = timestamp;
+        this.type = type;
+    }
+
+    public Action(User user, ShopItem shopItem, String timestamp, ActionType type) {
+        this.user = user;
+        this.shopItem = shopItem;
         this.timestamp = timestamp;
         this.type = type;
     }
@@ -141,6 +164,14 @@ public class Action {
 
     public void setIdea(Idea idea) {
         this.idea = idea;
+    }
+
+    public ShopItem getShopItem() {
+        return shopItem;
+    }
+
+    public void setShopItem(ShopItem shopItem) {
+        this.shopItem = shopItem;
     }
 
     public String getTimestamp() {

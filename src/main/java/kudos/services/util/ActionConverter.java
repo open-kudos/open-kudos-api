@@ -33,6 +33,8 @@ public class ActionConverter {
                 return new UserRelationActionResponse(action);
             case ADDED_NEW_IDEA:
                 return new UserIdeaActionResponse(action);
+            case PURCHASED_SHOP_ITEM:
+                return new UserShopActionResponse(action);
             default:
                 return new UserChallengeActionResponse(action);
         }

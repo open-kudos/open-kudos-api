@@ -1,25 +1,11 @@
 package kudos.services;
 
-import kudos.exceptions.BusinessException;
-import kudos.model.Challenge;
-import kudos.exceptions.UserException;
-import kudos.model.ChallengeStatus;
-import org.apache.log4j.Logger;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ScheduledTasksService {
 
-//    private Logger LOG = Logger.getLogger(ScheduledTasksService.class);
-//
+
 //    @Autowired
 //    ChallengeService challengeService;
 //

@@ -48,6 +48,10 @@ public class ActionsService {
         actionRepository.save(new Action(user, idea, LocalDateTime.now().toString(), type));
     }
 
+    public void save(User user, ShopItem shopItem, ActionType type){
+        actionRepository.save(new Action(user, shopItem, LocalDateTime.now().toString(), type));
+    }
+
     public void save(User user, ActionType type) {
         actionRepository.save(new Action(user, LocalDateTime.now().toString(), type));
     }
@@ -74,8 +78,6 @@ public class ActionsService {
     public Page<Action> getUserFeedPage(User user, Pageable pageable) {
         return  actionRepository.findActionsByUser(user, pageable);
     }
-
-
 
     public List<User> getFollowedUsers(User follower) {
         return relationRepository.findRelationsByFollower(follower).stream()
