@@ -49,10 +49,10 @@ public class AuthenticationService {
     public User registerUser(User user) throws UserException, MessagingException {
         if (userRepository.exists(user.getEmail().toLowerCase())) throw new UserException("user_already_exists");
 
-        if(user.getFirstName().length() > maxNameLength)
+        if (user.getFirstName().length() > maxNameLength)
             throw new UserException("name_too_long");
 
-        if(user.getLastName().length() > maxNameLength)
+        if (user.getLastName().length() > maxNameLength)
             throw new UserException("name_too_long");
 
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
@@ -77,6 +77,15 @@ public class AuthenticationService {
     }
 
     public void login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
+
+        if (!userRepository.findByEmail(email).isPresent()){
+            throw new UserException("user_not_exist");
+        }
+
+        if (userRepository.findByEmail(email).get().getStatus().equals(UserStatus.NOT_CONFIRMED)) {
+            throw new UserException("user_not_confirmed");
+        }
+
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)));
         request.getSession().setMaxInactiveInterval(0);
@@ -93,7 +102,7 @@ public class AuthenticationService {
     public User getLoggedInUser() throws UserException {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<User> user = userRepository.findByEmail(name);
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             return updateWeeklyKudos(user.get());
         } else {
             throw new UserException("user_not_logged_in");

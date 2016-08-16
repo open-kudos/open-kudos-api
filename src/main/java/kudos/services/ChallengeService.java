@@ -32,6 +32,9 @@ public class ChallengeService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private ActionRepository actionRepository;
+
     public Challenge giveChallenge(User creator, User receiver, String name, String description, String expirationDate,
                                    int amount) throws UserException, InvalidKudosAmountException {
         if (creator.getEmail().equals(receiver.getEmail())){
@@ -56,7 +59,6 @@ public class ChallengeService {
         challengeRepository.save(challenge);
         return challenge;
     }
-
 
     public Challenge getChallengeById(String id) throws UserException {
         Optional<Challenge> challenge = challengeRepository.findChallengeById(id);
@@ -128,6 +130,18 @@ public class ChallengeService {
 
     }
 
+    public void markChallengeAsExpiredOrFailed(Challenge challenge, ChallengeStatus challengeStatus) {
+
+        //TODO create notification that challenge expired
+
+        Transaction transaction = challenge.getTransaction();
+        transaction.setStatus(TransactionStatus.CANCELED);
+        transactionRepository.save(transaction);
+
+        challenge.setStatus(challengeStatus);
+        challengeRepository.save(challenge);
+    }
+
     public void checkIfCanAcceptOrDecline(Challenge challenge, User user) throws UserException {
         if(challenge.getStatus() != ChallengeStatus.CREATED)
             throw new UserException("cannot_accept_or_decline_challenge");
@@ -135,8 +149,10 @@ public class ChallengeService {
         if(!challenge.getParticipant().getId().equals(user.getId()))
             throw new UserException("cannot_accept_or_decline_challenge");
 
-        if(challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now()))
-            throw new UserException("cannot_accept_or_decline_challenge");
+        if(challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now())) {
+            markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.EXPIRED);
+            throw new UserException("challenge_expired");
+        }
     }
 
     public void checkIfCanMarkAsCompletedOrDFailed(Challenge challenge, User user) throws UserException {
@@ -146,8 +162,10 @@ public class ChallengeService {
         if(!challenge.getCreator().getId().equals(user.getId()))
             throw new UserException("cannot_complete_or_fail_challenge");
 
-        if(challenge.getExpirationDate() != null && LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate())))
-            throw new UserException("cannot_complete_or_fail_challenge");
+        if(challenge.getExpirationDate() != null && LocalDateTime.now().isBefore(LocalDateTime.parse(challenge.getExpirationDate()))){
+            markChallengeAsExpiredOrFailed(challenge, ChallengeStatus.FAILED);
+            throw new UserException("challenge_expired");
+        }
     }
 
     public Page<Challenge> getAllSentAndReceivedChallenges(User user, Pageable pageable) {

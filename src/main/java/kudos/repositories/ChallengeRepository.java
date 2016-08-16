@@ -18,6 +18,8 @@ public interface ChallengeRepository extends MongoRepository<Challenge,String> {
 
     List<Challenge> findChallengesByCreator(User creator);
 
+    List<Challenge> findAllChallengesByStatus(ChallengeStatus challengeStatus);
+
     Page<Challenge> findChallengesByStatusAndParticipantOrderByClosedDateDesc(ChallengeStatus status, User participant, Pageable pageable);
 
     Page<Challenge> findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(ChallengeStatus status1, User creator, ChallengeStatus status2, User participant, Pageable pageable);

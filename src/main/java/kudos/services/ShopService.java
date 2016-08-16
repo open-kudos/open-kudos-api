@@ -3,18 +3,15 @@ package kudos.services;
 
 import com.google.common.base.Strings;
 import kudos.exceptions.BusinessException;
+import kudos.exceptions.UserException;
 import kudos.model.ShopItem;
-import kudos.model.Transaction;
 import kudos.model.User;
 import kudos.repositories.ShopRepository;
 import kudos.repositories.TransactionRepository;
-import kudos.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @Service
@@ -37,6 +34,8 @@ public class ShopService {
     public void removeItemFromShop(String itemId) {
         shopRepository.delete(itemId);
     }
+
+    public ShopItem getShopItem(String itemId) { return shopRepository.findOne(itemId); }
 
     public ShopItem editItemOnShop(String itemId, String name, Integer price, String description, Integer amount, String pictureUrl) {
         ShopItem oldItem = shopRepository.findOne(itemId);
