@@ -40,4 +40,17 @@ public class AuthenticationController extends BaseController {
         authenticationService.confirmRegistration(confirmationCode);
     }
 
+    @RequestMapping(value = "/reset", method = RequestMethod.POST)
+    public void resetPassword(@RequestBody String email) throws UserException, MessagingException {
+        String newPassword = authenticationService.resetPassword(email);
+        String emailMessage = "Your new password: " + "<b>" + newPassword  + "</b> <br> You can change your password in settings";
+        String subject = "OpenKudos new password";
+        emailService.sendEmailOnNewThread(email, emailMessage, subject);
+    }
+
+    @RequestMapping(value = "/change/password", method = RequestMethod.POST)
+    public void changePassword(@RequestBody String newPassword) throws UserException {
+        authenticationService.changePassword(newPassword);
+    }
+
 }

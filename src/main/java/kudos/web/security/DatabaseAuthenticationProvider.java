@@ -40,7 +40,6 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         if ((user.isPresent() && new StrongPasswordEncryptor().checkPassword(password, user.get().getPassword()))) {
             List<GrantedAuthority> grantedAuths = new LinkedList();
             grantedAuths.add(new SimpleGrantedAuthority("ROLE_USER"));
-
             return new UsernamePasswordAuthenticationToken(name, password, grantedAuths);
         }
         throw new AuthenticationCredentialsNotFoundException("email_password_mismatch");

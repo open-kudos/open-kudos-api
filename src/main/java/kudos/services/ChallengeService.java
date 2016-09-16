@@ -8,13 +8,9 @@ import kudos.repositories.*;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -169,20 +165,6 @@ public class ChallengeService {
     }
 
     public Page<Challenge> getAllSentAndReceivedChallenges(User user, Pageable pageable) {
-//        Page<Challenge> challengesParticipant = challengeRepository
-//                .findChallengesByStatusAndParticipantOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, pageable);
-//        Page<Challenge> challengesCreator = challengeRepository
-//                .findChallengesByStatusAndCreatorOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, pageable);
-//        if(challengesCreator.hasContent() && challengesParticipant.hasContent()) {
-//            return mergeChallengePages(challengesCreator, challengesParticipant, pageable,
-//                    new DateComparatorDescendingByCreated());
-//        } else if(challengesCreator.hasContent() && !challengesParticipant.hasContent()) {
-//            return challengesCreator;
-//        } else if(!challengesCreator.hasContent() && challengesParticipant.hasContent()) {
-//            return challengesParticipant;
-//        } else {
-//            return new PageImpl<>(new ArrayList<>(), pageable, 0);
-//        }
         return challengeRepository.findChallengesByStatusAndCreatorOrStatusAndParticipantOrderByCreatedDateDesc(ChallengeStatus.CREATED, user, ChallengeStatus.CREATED, user, pageable);
     }
 
@@ -212,16 +194,6 @@ public class ChallengeService {
 
     public Page<Comment> getComments(Challenge challenge, Pageable pageable) throws UserException {
         return commentRepository.findCommentsByChallengeOrderByCreationDateDesc(challenge, pageable);
-    }
-
-    private Page<Challenge> mergeChallengePages(Page<Challenge> challenges1, Page<Challenge> challenges2,
-                                                Pageable pageable, Comparator<Challenge> comparator) {
-        List<Challenge> merged = new ArrayList<>();
-        merged.addAll(challenges1.getContent());
-        merged.addAll(challenges2.getContent());
-        merged.sort(comparator);
-        int endIndex = merged.size() < pageable.getPageSize() ? merged.size() : pageable.getPageSize();
-        return new PageImpl<>(merged.subList(0, endIndex), pageable, challenges1.getTotalElements()+challenges2.getTotalElements());
     }
 
 }

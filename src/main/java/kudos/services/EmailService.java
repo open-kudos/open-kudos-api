@@ -57,59 +57,20 @@ public class EmailService {
         Thread thread = new Thread(runnable);
         thread.start();
     }
-//
-//    public void generateEmailForOngoingChallengeSelection(Challenge challenge) throws MessagingException{
-//        String text;
-//
-//        if (challenge.getParticipantStatus() == null) {
-//            if (challenge.getParticipant().isSubscribing()) {
-//                if (challenge.getCreatorStatus()) text = "WON";
-//                else text = "LOST";
-//
-//                String message = "<h2>Challenge updated!</h2>"
-//                        + "<p>" + challenge.getCreator().getFirstName() + " " + challenge.getCreator().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
-//                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
-//                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
-//                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
-//
-//
-//                Runnable runnable = () -> {
-//                    try {
-//                        generateAndSendEmail(challenge.getParticipant().getEmail(), message, "Challenge updated!");
-//                    } catch (MessagingException e) {
-//                        e.printStackTrace();
-//                    }
-//                };
-//
-//                Thread thread = new Thread(runnable);
-//                thread.start();
-//            }
-//        } else if (challenge.getCreatorStatus() == null) {
-//            if (challenge.getCreator().isSubscribing()){
-//                if (challenge.getParticipantStatus()) text = "WON";
-//                else text = "LOST";
-//
-//                String message = "<h2>Challenge updated!</h2>"
-//                        + "<p>" + challenge.getParticipant().getFirstName() + " " + challenge.getParticipant().getLastName() + " selected that HE " + text + " the challenge in " + challenge.getName() + "</p>"
-//                        + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for " + challenge.getAmount() + " acorns"
-//                        + "<p>It is the time to you decide who won this challenge in your Openkudos account!</p>"
-//                        + "<br><p>If you don't want to receive notifications about new challenges, go to your openkudos account settings and stop your subscription<p>";
-//
-//
-//                Runnable runnable = () -> {
-//                    try {
-//                        generateAndSendEmail(challenge.getCreator().getEmail(), message, "Challenge updated!");
-//                    } catch (MessagingException e) {
-//                        e.printStackTrace();
-//                    }
-//                };
-//
-//                Thread thread = new Thread(runnable);
-//                thread.start();
-//            }
-//        }
-//    }
-//
+
+    public void sendEmailOnNewThread(String recipient, String message, String subject){
+        Runnable runnable = () -> {
+            try {
+                sendEmail(recipient, message, subject);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
     public String checkChallengeDescription(Challenge challenge){
         if (challenge.getDescription() == null){
             return challenge.getName();

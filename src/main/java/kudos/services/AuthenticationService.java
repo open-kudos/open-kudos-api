@@ -76,6 +76,27 @@ public class AuthenticationService {
         }
     }
 
+    public String resetPassword(String email) throws UserException {
+        System.out.println(getRandomPassword());
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            String newPassword = getRandomPassword();
+            String password = new StrongPasswordEncryptor().encryptPassword(newPassword);
+            user.get().setPassword(password);
+            userRepository.save(user.get());
+            return newPassword;
+        } else {
+            throw new UserException("user_not_found");
+        }
+    }
+
+    public void changePassword(String newPassword) throws UserException {
+        User user = getLoggedInUser();
+        String password = new StrongPasswordEncryptor().encryptPassword(newPassword);
+        user.setPassword(password);
+        userRepository.save(user);
+    }
+
     public void login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
 
         if (!userRepository.findByEmail(email).isPresent()){
@@ -133,6 +154,10 @@ public class AuthenticationService {
 
     private String getRandomHash() {
         return new BigInteger(130, new SecureRandom()).toString(32);
+    }
+
+    private String getRandomPassword() {
+        return new BigInteger(20, new SecureRandom()).toString(16);
     }
 
 }
