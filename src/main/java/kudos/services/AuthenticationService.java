@@ -10,7 +10,6 @@ import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,17 +42,9 @@ public class AuthenticationService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    @Value("${kudos.maxNameLength}")
-    private int maxNameLength;
-
     public User registerUser(User user) throws UserException, MessagingException {
-        if (userRepository.exists(user.getEmail().toLowerCase())) throw new UserException("user_already_exists");
-
-        if (user.getFirstName().length() > maxNameLength)
-            throw new UserException("name_too_long");
-
-        if (user.getLastName().length() > maxNameLength)
-            throw new UserException("name_too_long");
+        if (userRepository.findByEmail(user.getEmail().toLowerCase()).isPresent())
+            throw new UserException("user_already_exists");
 
         String password = new StrongPasswordEncryptor().encryptPassword(user.getPassword());
         user.setPassword(password);

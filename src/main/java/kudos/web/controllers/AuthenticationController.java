@@ -1,10 +1,14 @@
 package kudos.web.controllers;
 
+import kudos.exceptions.FormValidationException;
 import kudos.exceptions.UserException;
 import kudos.model.User;
 import kudos.model.UserStatus;
+import kudos.web.beans.request.validator.RegisterFormValidator;
 import kudos.web.beans.request.LoginForm;
 import kudos.web.beans.request.RegisterForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -16,8 +20,15 @@ import java.security.Principal;
 @RequestMapping("/authentication")
 public class AuthenticationController extends BaseController {
 
+    @Autowired
+    RegisterFormValidator validator;
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public void register(@RequestBody RegisterForm form) throws MessagingException, UserException {
+    public void register(@RequestBody RegisterForm form, BindingResult errors) throws MessagingException, UserException, FormValidationException {
+        validator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
+
         User user = authenticationService.registerUser(new User(form.getFirstName(), form.getLastName(),
                 form.getPassword(), form.getEmail().toLowerCase(), UserStatus.NOT_CONFIRMED));
 

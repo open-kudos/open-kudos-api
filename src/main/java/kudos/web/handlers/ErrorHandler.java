@@ -3,10 +3,12 @@ package kudos.web.handlers;
 import com.mongodb.MongoException;
 import kudos.exceptions.*;
 import kudos.exceptions.FormValidationException;
+import kudos.web.beans.response.InputFieldError;
 import kudos.web.beans.response.Response;
 import kudos.web.beans.response.ErrorResponse;
 import kudos.exceptions.UserException;
 import org.apache.log4j.Logger;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -23,12 +25,16 @@ import java.text.ParseException;
 public class ErrorHandler extends ResponseEntityExceptionHandler {
     private final Logger LOG = Logger.getLogger(ErrorHandler.class.getName());
 
+
+
     @ExceptionHandler(FormValidationException.class)
     public ResponseEntity<Response> handleFromValidationException(HttpServletRequest request,
                                                                   FormValidationException exception)   {
         LOG.info("error count is: " + exception.getErrors().getErrorCount());
         Errors errors = exception.getErrors();
-        return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors()), HttpStatus.BAD_REQUEST);
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(errors.getFieldErrors(), messageSource), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(InvalidKudosAmountException.class)
@@ -53,8 +59,11 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(UserException.class)
-    public ResponseEntity<String> handleOccupiedEmailException(HttpServletRequest request, UserException e){
-        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Response> handleOccupiedEmailException(HttpServletRequest request, UserException e){
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, e.getErrorCause(),
+                messageSource.getMessage(e.getErrorCause(), null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
