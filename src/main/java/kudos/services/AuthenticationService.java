@@ -53,6 +53,8 @@ public class AuthenticationService {
         user.setTotalKudos(0);
         user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount());
 
+        user.setSubscribing(false);
+
         return userRepository.save(user);
 
     }
