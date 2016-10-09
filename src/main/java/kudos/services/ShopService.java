@@ -2,7 +2,6 @@ package kudos.services;
 
 
 import com.google.common.base.Strings;
-import kudos.exceptions.BusinessException;
 import kudos.exceptions.UserException;
 import kudos.model.ShopItem;
 import kudos.model.User;
@@ -58,7 +57,7 @@ public class ShopService {
         return shopRepository.save(oldItem);
     }
 
-    public void buyItemFromShop(String itemId, User user) throws UserException, BusinessException {
+    public void buyItemFromShop(String itemId, User user) throws UserException {
 //        ShopItem item = shopRepository.findOne(itemId);
 //
 //        //kudosService.takeSystemKudos(user, item.getPrice()*-1, "Buying: " + item.getName(), Transaction.Status.SHOP);

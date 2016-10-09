@@ -38,7 +38,7 @@ public class ChallengeService {
         }
 
         if (amount < 1 || creator.getWeeklyKudos() < amount) {
-            throw new InvalidKudosAmountException("invalid_kudos_amount");
+            throw new InvalidKudosAmountException("not_enough_kudos");
         }
 
         if(expirationDate != null && LocalDateTime.parse(expirationDate).isBefore(LocalDateTime.now())) {

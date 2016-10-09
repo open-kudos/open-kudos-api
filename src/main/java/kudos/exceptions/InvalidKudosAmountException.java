@@ -1,7 +1,14 @@
 package kudos.exceptions;
 
-public class InvalidKudosAmountException extends BusinessException {
-    public InvalidKudosAmountException(String error) {
-        super(error);
+public class InvalidKudosAmountException extends Exception {
+
+    private String errorCause;
+
+    public InvalidKudosAmountException(String errorCause) {
+        this.errorCause = errorCause;
+    }
+
+    public String getErrorCause() {
+        return errorCause;
     }
 }

@@ -38,24 +38,27 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidKudosAmountException.class)
-    public ResponseEntity<String> handleInvalidKudosAmountException(HttpServletRequest request,
-                                                                    InvalidKudosAmountException e){
-        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleBusinessException(HttpServletRequest request, BusinessException e){
-        return new ResponseEntity<>(e.getError(),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Response> handleInvalidKudosAmountException(HttpServletRequest request, InvalidKudosAmountException e){
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, e.getErrorCause(),
+                messageSource.getMessage(e.getErrorCause(), null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MessagingException.class)
-    public ResponseEntity<String> handleMessagingException(HttpServletRequest request, MessagingException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Response> handleMessagingException(HttpServletRequest request, MessagingException e){
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, "undeclared_error",
+                messageSource.getMessage("undeclared_error", null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MongoException.class)
-    public ResponseEntity<String> handleMessagingException(HttpServletRequest request, MongoException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Response> handleMessagingException(HttpServletRequest request, MongoException e){
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, "undeclared_error",
+                messageSource.getMessage("undeclared_error", null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserException.class)
@@ -67,24 +70,36 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-    public ResponseEntity<String> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
+    public ResponseEntity<Response> handleAuthenticationCredentialsNotFoundException(HttpServletRequest request,
                                                                  AuthenticationCredentialsNotFoundException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, "undeclared_error",
+                messageSource.getMessage("undeclared_error", null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ParseException.class)
-    public ResponseEntity<String> handleIntegerParseException(HttpServletRequest request, ParseException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Response> handleIntegerParseException(HttpServletRequest request, ParseException e){
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, "undeclared_error",
+                messageSource.getMessage("undeclared_error", null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ChallengeException.class)
-    public ResponseEntity<String> handleChallengeException(HttpServletRequest request, ChallengeException e){
-        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Response> handleChallengeException(HttpServletRequest request, ChallengeException e){
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, e.getErrorCause(),
+                messageSource.getMessage(e.getErrorCause(), null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(RelationException.class)
-    public ResponseEntity<String> handleRelationExceptionException(HttpServletRequest request, RelationException e){
-        return new ResponseEntity<>(e.getErrorCause(),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Response> handleRelationExceptionException(HttpServletRequest request, RelationException e){
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("messages");
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, e.getErrorCause(),
+                messageSource.getMessage(e.getErrorCause(), null, null))), HttpStatus.BAD_REQUEST);
     }
 
 }

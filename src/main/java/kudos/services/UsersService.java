@@ -37,10 +37,10 @@ public class UsersService {
 
     public void updateUserProfile(User user, String firstName, String lastName, String birthday, String startedToWork) throws UserException {
         if(firstName != null && firstName.length() > maxNameLength)
-            throw new UserException("name_too_long");
+            throw new UserException("first_name_too_long");
 
         if(lastName != null && lastName.length() > maxNameLength)
-            throw new UserException("name_too_long");
+            throw new UserException("last_name_too_long");
 
         user.setFirstName(Strings.isNullOrEmpty(firstName) ? user.getFirstName() : firstName);
         user.setLastName(Strings.isNullOrEmpty(lastName) ? user.getLastName() : lastName);

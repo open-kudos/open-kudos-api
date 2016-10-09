@@ -93,7 +93,7 @@ public class AuthenticationService {
     public void login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
 
         if (!userRepository.findByEmail(email).isPresent()){
-            throw new UserException("user_not_exist");
+            throw new UserException("user_not_found");
         }
 
         if (userRepository.findByEmail(email).get().getStatus().equals(UserStatus.NOT_CONFIRMED)) {
@@ -108,7 +108,7 @@ public class AuthenticationService {
 
     public void logout(HttpSession session, Principal principal) throws UserException {
         if (principal == null) {
-            throw new UserException("not_logged");
+            throw new UserException("user_not_logged_in");
         }
         session.invalidate();
     }
@@ -119,7 +119,7 @@ public class AuthenticationService {
         if (user.isPresent()) {
             return updateWeeklyKudos(user.get());
         } else {
-            throw new UserException("user_not_logged_in");
+            throw new UserException("user_not_found");
         }
     }
 

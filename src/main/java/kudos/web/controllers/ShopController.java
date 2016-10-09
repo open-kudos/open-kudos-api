@@ -1,6 +1,5 @@
 package kudos.web.controllers;
 
-import kudos.exceptions.BusinessException;
 import kudos.exceptions.UserException;
 import kudos.model.ActionType;
 import kudos.model.ShopItem;
@@ -27,7 +26,7 @@ public class ShopController extends BaseController {
     }
 
     @RequestMapping(value = "/{itemId}/buy", method = RequestMethod.POST)
-    public void buy(@PathVariable String itemId) throws UserException, BusinessException {
+    public void buy(@PathVariable String itemId) throws UserException {
         User user = authenticationService.getLoggedInUser();
         actionsService.save(user, shopService.getShopItem(itemId), ActionType.PURCHASED_SHOP_ITEM);
         //shopService.buyItemFromShop(user, itemId);
