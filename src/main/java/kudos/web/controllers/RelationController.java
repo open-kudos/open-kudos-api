@@ -41,11 +41,11 @@ public class RelationController extends BaseController {
             relationService.follow(follower, userToFollow.get());
             actionsService.save(follower, userToFollow.get(), ActionType.STARTED_TO_FOLLOW);
         } else {
-            String email = follower.getFirstName() + " " + follower.getLastName() + "wanted to add you to his" +
-                    " followed users list, but you are not registered. Maybe it is time to do it? Go to" +
-                    " www.openkudos.com and try it!";
-            emailService.sendEmail(userEmail.toLowerCase(), email, "Open Kudos");
-            throw new UserException("receiver_does_not_exist_email_sent");
+//            String email = follower.getFirstName() + " " + follower.getLastName() + "wanted to add you to his" +
+//                    " followed users list, but you are not registered. Maybe it is time to do it? Go to" +
+//                    " www.openkudos.com and try it!";
+//            emailService.sendEmail(userEmail.toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist");
         }
     }
 

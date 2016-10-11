@@ -44,10 +44,10 @@ public class KudosController extends BaseController {
             actionsService.save(sender, transaction, ActionType.KUDOS_GIVEN);
             return new KudosTransactionResponse(transaction, "GIVEN");
         } else {
-            String email = sender.getFirstName() + " " + sender.getLastName() + "wanted to give you KUDOS," +
-                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
-            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
-            throw new UserException("receiver_does_not_exist_email_sent");
+//            String email = sender.getFirstName() + " " + sender.getLastName() + "wanted to give you KUDOS," +
+//                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
+//            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist");
         }
     }
 

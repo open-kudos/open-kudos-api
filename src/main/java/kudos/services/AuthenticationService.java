@@ -95,7 +95,7 @@ public class AuthenticationService {
             throw new UserException("user_not_found");
         }
 
-        if (userRepository.findByEmail(email).get().getStatus().equals(UserStatus.NOT_CONFIRMED)) {
+        if (userRepository.findByEmail(email).get().getStatus() == UserStatus.NOT_CONFIRMED) {
             throw new UserException("user_not_confirmed");
         }
 

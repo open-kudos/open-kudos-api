@@ -48,16 +48,16 @@ public class ChallengeController extends BaseController {
         if(receiver.isPresent()) {
             Challenge challenge = challengeService.giveChallenge(creator, receiver.get(), form.getName(),
                     form.getDescription(), form.getExpirationDate(), form.getAmount());
-            if (receiver.get().isSubscribing()) {
-                emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
-            }
+//            if (receiver.get().isSubscribing()) {
+//                emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
+//            }
             actionsService.save(creator, challenge, ActionType.CREATED_CHALLENGE);
             return new ChallengeResponse(challenge, getAllowedActions(creator, challenge));
         } else {
-            String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
-                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
-            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
-            throw new UserException("receiver_does_not_exist_email_sent");
+//            String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
+//                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
+//            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist");
         }
     }
 
