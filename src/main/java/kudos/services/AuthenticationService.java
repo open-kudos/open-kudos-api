@@ -90,13 +90,13 @@ public class AuthenticationService {
     }
 
     public void login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
-
-        if (!userRepository.findByEmail(email).isPresent()){
+        Optional<User> user = userRepository.findByEmail(email);
+        if (!user.isPresent()){
             throw new UserException("user_not_found");
         }
 
-        if (userRepository.findByEmail(email).get().getStatus() == UserStatus.NOT_CONFIRMED) {
-            throw new UserException("user_not_confirmed");
+        if (user.get().getStatus() == null) {
+            throw new UserException("user_status_undefined");
         }
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
