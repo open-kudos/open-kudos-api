@@ -4,9 +4,11 @@ import kudos.exceptions.FormValidationException;
 import kudos.exceptions.UserException;
 import kudos.model.User;
 import kudos.model.UserStatus;
-import kudos.web.beans.request.validator.RegisterFormValidator;
 import kudos.web.beans.request.LoginForm;
 import kudos.web.beans.request.RegisterForm;
+import kudos.web.beans.request.validator.BaseValidator;
+import kudos.web.beans.request.validator.LoginFormValidator;
+import kudos.web.beans.request.validator.RegisterFormValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +23,17 @@ import java.security.Principal;
 public class AuthenticationController extends BaseController {
 
     @Autowired
-    RegisterFormValidator validator;
+    RegisterFormValidator registerFormValidator;
+
+    @Autowired
+    LoginFormValidator loginFormValidator;
+
+    @Autowired
+    BaseValidator baseValidator;
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void register(@RequestBody RegisterForm form, BindingResult errors) throws MessagingException, UserException, FormValidationException {
-        validator.validate(form, errors);
+        registerFormValidator.validate(form, errors);
         if(errors.hasErrors())
             throw new FormValidationException(errors);
 
@@ -37,7 +45,10 @@ public class AuthenticationController extends BaseController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public void login(@RequestBody LoginForm form, HttpServletRequest request) throws UserException {
+    public void login(@RequestBody LoginForm form, HttpServletRequest request, BindingResult errors) throws UserException, FormValidationException {
+        loginFormValidator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
         authenticationService.login(form.getEmail().toLowerCase(), form.getPassword(), request);
     }
 
@@ -53,6 +64,9 @@ public class AuthenticationController extends BaseController {
 
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
     public void resetPassword(@RequestBody String email) throws UserException, MessagingException {
+        if(baseValidator.isEmailWrongPattern(email))
+            throw new UserException("email_incorrect_pattern");
+
         String newPassword = authenticationService.resetPassword(email);
         String emailMessage = "Your new password: " + "<b>" + newPassword  + "</b> <br> You can change your password in settings";
         String subject = "OpenKudos new password";

@@ -1,13 +1,17 @@
 package kudos.web.controllers;
 
+import kudos.exceptions.FormValidationException;
 import kudos.exceptions.UserException;
 import kudos.model.User;
 import kudos.web.beans.request.ProfileForm;
+import kudos.web.beans.request.validator.ProfileFormValidator;
 import kudos.web.beans.response.UserResponse;
 import kudos.web.beans.response.userActionResponse.UserAction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -17,13 +21,20 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController extends BaseController {
 
+    @Autowired
+    ProfileFormValidator profileFormValidator;
+
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
     public UserResponse getUserProfile() throws UserException {
         return new UserResponse(authenticationService.getLoggedInUser());
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public void updateUserProfile(@RequestBody ProfileForm form) throws UserException {
+    public void updateUserProfile(@RequestBody ProfileForm form, BindingResult errors) throws UserException, FormValidationException {
+        profileFormValidator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
+
         User user = authenticationService.getLoggedInUser();
         usersService.updateUserProfile(user, form.getFirstName(), form.getLastName(), form.getBirthday(),
                 form.getStartedToWork());

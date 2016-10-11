@@ -1,5 +1,6 @@
 package kudos.web.controllers;
 
+import kudos.exceptions.FormValidationException;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.ActionType;
@@ -7,10 +8,13 @@ import kudos.model.Transaction;
 import kudos.model.TransactionType;
 import kudos.model.User;
 import kudos.web.beans.request.GiveKudosForm;
+import kudos.web.beans.request.validator.GiveKudosFormValidator;
 import kudos.web.beans.response.KudosTransactionResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -22,9 +26,15 @@ import java.util.Optional;
 @RequestMapping("/kudos")
 public class KudosController extends BaseController {
 
+    @Autowired
+    GiveKudosFormValidator giveKudosFormValidator;
+
     @RequestMapping(value = "/give", method = RequestMethod.POST)
-    public KudosTransactionResponse giveKudos(@RequestBody GiveKudosForm form) throws UserException,
-            InvalidKudosAmountException, MessagingException {
+    public KudosTransactionResponse giveKudos(@RequestBody GiveKudosForm form, BindingResult errors) throws UserException,
+            InvalidKudosAmountException, MessagingException, FormValidationException {
+        giveKudosFormValidator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
 
         User sender = authenticationService.getLoggedInUser();
         Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());

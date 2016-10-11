@@ -1,17 +1,22 @@
 package kudos.web.controllers;
 
+import kudos.exceptions.FormValidationException;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
 import kudos.web.beans.request.AddCommentForm;
 import kudos.web.beans.request.GiveChallengeForm;
+import kudos.web.beans.request.validator.AddCommentFormValidator;
+import kudos.web.beans.request.validator.GiveChallengeFormValidator;
 import kudos.web.beans.response.ChallengeActions;
 import kudos.web.beans.response.ChallengeResponse;
 import kudos.web.beans.response.CommentResponse;
 import org.joda.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -23,9 +28,20 @@ import java.util.Optional;
 @RestController
 public class ChallengeController extends BaseController {
 
+
+    @Autowired
+    GiveChallengeFormValidator giveChallengeFormValidator;
+
+    @Autowired
+    AddCommentFormValidator addCommentFormValidator;
+
     @RequestMapping(value = "/give", method = RequestMethod.POST)
-    public ChallengeResponse giveChallenge(@RequestBody GiveChallengeForm form) throws UserException, MessagingException,
-            InvalidKudosAmountException {
+    public ChallengeResponse giveChallenge(@RequestBody GiveChallengeForm form, BindingResult errors) throws UserException, MessagingException,
+            InvalidKudosAmountException, FormValidationException {
+        giveChallengeFormValidator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
+
         User creator = authenticationService.getLoggedInUser();
         Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());
 
@@ -53,7 +69,11 @@ public class ChallengeController extends BaseController {
 
     @RequestMapping(value = "/{challengeId}/addComment", method = RequestMethod.POST)
     public void addCommentToChallenge(@PathVariable String challengeId,
-                                      @RequestBody AddCommentForm form) throws UserException {
+                                      @RequestBody AddCommentForm form, BindingResult errors) throws UserException, FormValidationException {
+        addCommentFormValidator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
+
         User creator = authenticationService.getLoggedInUser();
         Challenge challenge = challengeService.getChallengeById(challengeId);
         Comment comment = new Comment(creator, form.getComment(), LocalDateTime.now().toString(), challenge);

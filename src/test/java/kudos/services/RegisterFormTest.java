@@ -1,12 +1,7 @@
 package kudos.services;
 
-import kudos.web.beans.request.validator.RegisterFormValidator;
 import kudos.web.beans.request.RegisterForm;
-import org.junit.Test;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
-
-import static org.junit.Assert.assertEquals;
 
 public class RegisterFormTest {
 

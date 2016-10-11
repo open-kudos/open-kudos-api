@@ -61,7 +61,7 @@ public class AuthenticationService {
 
     public void confirmRegistration(String hashedEmail) throws UserException {
         Optional<User> user = userRepository.findUserByEmailHash(hashedEmail);
-        if (user.isPresent()) {
+        if (user.isPresent() && user.get().getStatus().equals(UserStatus.NOT_CONFIRMED)) {
             user.get().setStatus(UserStatus.NOT_COMPLETED);
             userRepository.save(user.get());
         } else {
@@ -70,7 +70,6 @@ public class AuthenticationService {
     }
 
     public String resetPassword(String email) throws UserException {
-        System.out.println(getRandomPassword());
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             String newPassword = getRandomPassword();
