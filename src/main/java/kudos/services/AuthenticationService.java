@@ -64,6 +64,8 @@ public class AuthenticationService {
         if (user.isPresent() && user.get().getStatus().equals(UserStatus.NOT_CONFIRMED)) {
             user.get().setStatus(UserStatus.NOT_COMPLETED);
             userRepository.save(user.get());
+        } else if (user.isPresent() && user.get().getStatus().equals(UserStatus.NOT_COMPLETED) || user.get().getStatus().equals(UserStatus.COMPLETED)) {
+            throw new UserException("user_already_confirmed");
         } else {
             throw new UserException("user_not_found");
         }
@@ -91,7 +93,7 @@ public class AuthenticationService {
 
     public void login(String email, String password, HttpServletRequest request) throws AuthenticationCredentialsNotFoundException, UserException {
         Optional<User> user = userRepository.findByEmail(email);
-        if (!user.isPresent()){
+        if (!user.isPresent()) {
             throw new UserException("user_not_found");
         }
 

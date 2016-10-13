@@ -1,73 +1,45 @@
 package kudos.services;
 
-
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.multipart.FormDataMultiPart;
+import kudos.model.Challenge;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.core.MediaType;
 
 @Component
 public class EmailService {
 
-//    public void sendEmail(String recipient, String message, String subject) throws MessagingException {
-//        Properties mailServerProperties = System.getProperties();
-//        mailServerProperties.put("mail.smtp.port", "587");
-//        mailServerProperties.put("mail.smtp.auth", "true");
-//        mailServerProperties.put("mail.smtp.starttls.enable", "true");
-//
-//        Session session = Session.getDefaultInstance(mailServerProperties, null);
-//        MimeMessage email = generateEmail(recipient, message, subject, session);
-//        Transport transport = session.getTransport("smtp");
-//
-//        transport.connect("smtp.gmail.com", "vilniuscckudos@gmail.com", "kudosapp");
-//        transport.sendMessage(email, email.getAllRecipients());
-//        transport.close();
-//    }
-//
-//    public MimeMessage generateEmail(String recipient, String message, String subject, Session session) throws MessagingException {
-//        MimeMessage email = new MimeMessage(session);
-//        email.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-//        email.setSubject(subject);
-//        email.setContent(message, "text/html");
-//        return email;
-//    }
-//
-//    public void sendEmailForNewChallenge(User creator, User participant, Challenge challenge) throws MessagingException{
-//        String message = "<h2>You got new challenge</h2>"
-//                + "<p>You got challenge from " + creator.getFirstName() + " " + creator.getLastName() + "</p>"
-//                + "<p>Challenge description: " + checkChallengeDescription(challenge) + ", for "
-//                + challenge.getTransaction().getAmount() + " acorns" + "<p>Let " + creator.getFirstName() + " "
-//                + creator.getLastName() + " know if you accept the challenge in your OPEN KUDOS account!</p>";
-//
-//        Runnable runnable = () -> {
-//            try {
-//                sendEmail(participant.getEmail(), message, "You have been challenged!");
-//            } catch (MessagingException e) {
-//                e.printStackTrace();
-//            }
-//        };
-//
-//        Thread thread = new Thread(runnable);
-//        thread.start();
-//    }
-//
-//    public void sendEmailOnNewThread(String recipient, String message, String subject){
-//        Runnable runnable = () -> {
-//            try {
-//                sendEmail(recipient, message, subject);
-//            } catch (MessagingException e) {
-//                e.printStackTrace();
-//            }
-//        };
-//
-//        Thread thread = new Thread(runnable);
-//        thread.start();
-//    }
-//
-//    public String checkChallengeDescription(Challenge challenge){
-//        if (challenge.getDescription() == null){
-//            return challenge.getName();
-//        } else {
-//            return challenge.getDescription();
-//        }
-//    }
+    public final static HTTPBasicAuthFilter httpBasicAuthFilter = new HTTPBasicAuthFilter("api", "key-cba3da24e695e51592f396fe07a00092");
+    public final static String resourceDomain = "https://api.mailgun.net/v3/" + "mg.openkudos.com" + "/messages";
+
+
+    public ClientResponse sendEmail(String emailTo, String message, String subject) {
+        Client client = Client.create();
+
+        client.addFilter(httpBasicAuthFilter);
+        WebResource webResource = client.resource(resourceDomain);
+
+        FormDataMultiPart formData = new FormDataMultiPart();
+        formData.field("from", "Kudos team <info@openkudos.com>");
+        formData.field("to", emailTo);
+        formData.field("subject", subject);
+        formData.field("html", message);
+
+        return webResource.type(MediaType.MULTIPART_FORM_DATA).
+                post(ClientResponse.class, formData);
+    }
+
+    public String checkChallengeDescription(Challenge challenge) {
+        if (challenge.getDescription() == null) {
+            return challenge.getName();
+        } else {
+            return challenge.getDescription();
+        }
+    }
 }
 
 

@@ -49,6 +49,11 @@ dependencies {
    compile 'org.springframework.session:spring-session:1.0.2.RELEASE'
    compile 'org.springframework.data:spring-data-redis:1.5.2.RELEASE'
    compile 'org.freemarker:freemarker:2.3.23'
+
+    compile 'com.sun.jersey:jersey-client:1.18.1'
+    compile 'com.sun.jersey:jersey-core:1.18.1'
+    compile 'com.sun.jersey.contribs:jersey-multipart:1.18.1'
+
    testCompile 'org.mockito:mockito-all:1.10.19'
    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
    testCompile 'com.jayway.jsonpath:json-path:2.0.0'
