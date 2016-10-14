@@ -74,8 +74,8 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
                                                                  AuthenticationCredentialsNotFoundException e){
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("messages");
-        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, "undeclared_error",
-                messageSource.getMessage("undeclared_error", null, null))), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorResponse.create(new InputFieldError(null, "wrong_credentials",
+                messageSource.getMessage("wrong_credentials", null, null))), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ParseException.class)
