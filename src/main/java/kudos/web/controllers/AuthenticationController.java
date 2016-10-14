@@ -35,7 +35,7 @@ public class AuthenticationController extends BaseController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void register(@RequestBody RegisterForm form, BindingResult errors) throws MessagingException, UserException, FormValidationException {
-        //registerFormValidator.validate(form, errors);
+        registerFormValidator.validate(form, errors);
         if(errors.hasErrors())
             throw new FormValidationException(errors);
 
@@ -75,8 +75,8 @@ public class AuthenticationController extends BaseController {
 
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
     public void resetPassword(@RequestBody String email) throws UserException {
-//        if(baseValidator.isEmailWrongPattern(email))
-//            throw new UserException("email_incorrect_pattern");
+        if(baseValidator.isEmailWrongPattern(email))
+            throw new UserException("email_incorrect_pattern");
 
         String newPassword = authenticationService.resetPassword(email);
         String emailMessage = "Your new password: " + "<b>" + newPassword  + "</b> <br> You can change your password in settings";
