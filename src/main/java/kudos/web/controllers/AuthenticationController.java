@@ -9,6 +9,7 @@ import kudos.web.beans.request.RegisterForm;
 import kudos.web.beans.request.validator.BaseValidator;
 import kudos.web.beans.request.validator.LoginFormValidator;
 import kudos.web.beans.request.validator.RegisterFormValidator;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -75,18 +76,19 @@ public class AuthenticationController extends BaseController {
 
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
     public void resetPassword(@RequestBody String email) throws UserException {
-        if(baseValidator.isEmailWrongPattern(email))
+        JSONObject obj = new JSONObject(email);
+        if(baseValidator.isEmailWrongPattern(obj.getString("email"))) {
             throw new UserException("email_incorrect_pattern");
-
-        String newPassword = authenticationService.resetPassword(email);
+        }
+        String newPassword = authenticationService.resetPassword(obj.getString("email"));
         String emailMessage = "Your new password: " + "<b>" + newPassword  + "</b> <br> You can change your password in settings";
-        String subject = "Open Kudos new password";
-        emailService.sendEmail(email, emailMessage, subject);
+        emailService.sendEmail(obj.getString("email"), emailMessage, "Open Kudos");
     }
 
     @RequestMapping(value = "/change/password", method = RequestMethod.POST)
     public void changePassword(@RequestBody String newPassword) throws UserException {
-        authenticationService.changePassword(newPassword);
+        JSONObject obj = new JSONObject(newPassword);
+        authenticationService.changePassword(obj.getString("newPassword"));
     }
 
 }
