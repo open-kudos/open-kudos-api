@@ -11,9 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ActionsService {
@@ -78,11 +76,4 @@ public class ActionsService {
     public Page<Action> getUserFeedPage(User user, Pageable pageable) {
         return  actionRepository.findActionsByUser(user, pageable);
     }
-
-    public List<User> getFollowedUsers(User follower) {
-        return relationRepository.findRelationsByFollower(follower).stream()
-                .map(relation -> userRepository.findByEmail(relation.getUserToFollow().getEmail()).get())
-                .collect(Collectors.toList());
-    }
-
 }

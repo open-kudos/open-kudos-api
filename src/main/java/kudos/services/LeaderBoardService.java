@@ -51,26 +51,24 @@ public class LeaderBoardService {
     public List<LeaderBoardItem> sortListByAmountOfKudos(List<LeaderBoardItem> leaderBoardItems, int startingIndex, int endingIndex) {
         try {
             return leaderBoardItems.stream().sorted((l1, l2) -> Integer.valueOf(l2.getKudosAmount())
-                    .compareTo(Integer.valueOf(l1.getKudosAmount()))).collect(Collectors.toList())
+                    .compareTo(l1.getKudosAmount())).collect(Collectors.toList())
                     .subList(startingIndex, endingIndex);
         } catch (IndexOutOfBoundsException e) {
             return leaderBoardItems.stream().sorted((l1, l2) -> Integer.valueOf(l2.getKudosAmount())
-                    .compareTo(Integer.valueOf(l1.getKudosAmount()))).collect(Collectors.toList())
+                    .compareTo(l1.getKudosAmount())).collect(Collectors.toList())
                     .subList(0, leaderBoardItems.size());
         }
     }
 
     public int calculateSendersTransactionsAmount(User user, int periodInDays) {
         List<Transaction> transactions = transactionRepository
-                .findTransactionsBySenderAndStatusAndDateGreaterThanOrderByDateDesc(user, TransactionStatus.COMPLETED,
-                        LocalDateTime.now().minusDays(periodInDays).toString());
+                .findTransactionsBySenderAndStatusAndDateGreaterThanOrderByDateDesc(user, TransactionStatus.COMPLETED, LocalDateTime.now().minusDays(periodInDays).toString());
         return calculateTransactionsAmountForChallengesAndKudosGiving(transactions);
     }
 
     public int calculateReceiversTransactionsAmount(User user, int periodInDays) {
         List<Transaction> transactions = transactionRepository
-                .findTransactionsByReceiverAndStatusAndDateGreaterThanOrderByDateDesc(user, TransactionStatus.COMPLETED,
-                        LocalDateTime.now().minusDays(periodInDays).toString());
+                .findTransactionsByReceiverAndStatusAndDateGreaterThanOrderByDateDesc(user, TransactionStatus.COMPLETED, LocalDateTime.now().minusDays(periodInDays).toString());
         return calculateTransactionsAmountForChallengesAndKudosGiving(transactions);
     }
 

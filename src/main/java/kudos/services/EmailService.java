@@ -5,7 +5,6 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import kudos.model.Challenge;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.MediaType;
@@ -15,7 +14,6 @@ public class EmailService {
 
     public final static HTTPBasicAuthFilter httpBasicAuthFilter = new HTTPBasicAuthFilter("api", "key-cba3da24e695e51592f396fe07a00092");
     public final static String resourceDomain = "https://api.mailgun.net/v3/" + "mg.openkudos.com" + "/messages";
-
 
     public ClientResponse sendEmail(String emailTo, String message, String subject) {
         Client client = Client.create();
@@ -33,13 +31,4 @@ public class EmailService {
                 post(ClientResponse.class, formData);
     }
 
-    public String checkChallengeDescription(Challenge challenge) {
-        if (challenge.getDescription() == null) {
-            return challenge.getName();
-        } else {
-            return challenge.getDescription();
-        }
-    }
 }
-
-

@@ -18,7 +18,6 @@ public class WisdomWallService {
 
     public Idea addIdea(User creator, String author, String phrase) {
         return wisdomwallRepository.save(new Idea(creator, author, phrase, LocalDateTime.now().toString()));
-
     }
 
     public Idea getRandomIdea(User creator) {

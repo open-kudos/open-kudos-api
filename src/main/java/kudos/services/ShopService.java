@@ -34,7 +34,9 @@ public class ShopService {
         shopRepository.delete(itemId);
     }
 
-    public ShopItem getShopItem(String itemId) { return shopRepository.findOne(itemId); }
+    public ShopItem getShopItem(String itemId) {
+        return shopRepository.findOne(itemId);
+    }
 
     public ShopItem editItemOnShop(String itemId, String name, Integer price, String description, Integer amount, String pictureUrl) {
         ShopItem oldItem = shopRepository.findOne(itemId);
