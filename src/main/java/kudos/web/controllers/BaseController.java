@@ -55,4 +55,6 @@ public abstract class BaseController {
     @Autowired
     protected ActionsService actionsService;
 
+    @Autowired OrdersService ordersService;
+
 }
