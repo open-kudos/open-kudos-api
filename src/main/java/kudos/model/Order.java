@@ -1,5 +1,6 @@
 package kudos.model;
 
+import org.joda.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
@@ -12,11 +13,13 @@ public class Order {
     @DBRef
     private ShopItem item;
     private OrderStatus status;
+    private String timestamp;
 
     public Order(User customer, ShopItem item, OrderStatus status) {
         this.customer = customer;
         this.item = item;
         this.status = status;
+        this.timestamp = LocalDateTime.now().toString();
     }
 
     public String getId() {
@@ -49,5 +52,13 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 }

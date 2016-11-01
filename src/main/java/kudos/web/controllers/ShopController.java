@@ -28,7 +28,9 @@ public class ShopController extends BaseController {
     @RequestMapping(value = "/{itemId}/buy", method = RequestMethod.POST)
     public void buy(@PathVariable String itemId) throws UserException {
         User user = authenticationService.getLoggedInUser();
-        actionsService.save(user, shopService.getShopItem(itemId), ActionType.PURCHASED_SHOP_ITEM);
+        ShopItem itemToBuy = shopService.getShopItem(itemId);
+        ordersService.newOrder(user, itemToBuy);
+        actionsService.save(user, itemToBuy, ActionType.PURCHASED_SHOP_ITEM);
         //shopService.buyItemFromShop(user, itemId);
     }
 

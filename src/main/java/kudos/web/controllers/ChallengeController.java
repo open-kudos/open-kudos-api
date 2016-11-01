@@ -28,7 +28,6 @@ import java.util.Optional;
 @RestController
 public class ChallengeController extends BaseController {
 
-
     @Autowired
     GiveChallengeFormValidator giveChallengeFormValidator;
 

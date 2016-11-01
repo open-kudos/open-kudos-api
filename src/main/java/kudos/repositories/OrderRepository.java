@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface OrderRepository extends MongoRepository<Order,String> {
 
-    Page<Order> findOrdersByCustomerOrderByAddedDateDesc(User customer, Pageable pageable);
+    Page<Order> findAllOrdersOrderByTimestampDesc(Pageable pageable);
+
+    Page<Order> findOrdersByCustomerOrderByTimestampDesc(User customer, Pageable pageable);
 
 }
