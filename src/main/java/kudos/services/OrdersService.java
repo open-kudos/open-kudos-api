@@ -32,11 +32,11 @@ public class OrdersService {
     }
 
     public Page<Order> getPageableOrders(Pageable pageable){
-        return orderRepository.findAllOrdersOrderByTimestampDesc(pageable);
+        return orderRepository.findAll(pageable);
     }
 
     public Page<Order> getPageableOrdersByUser(User user, Pageable pageable){
-        return orderRepository.findOrdersByCustomerOrderByTimestampDesc(user, pageable);
+        return orderRepository.findOrdersByCustomer(user, pageable);
     }
 
 }

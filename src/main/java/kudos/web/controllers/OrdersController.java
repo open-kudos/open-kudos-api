@@ -18,13 +18,13 @@ public class OrdersController extends BaseController {
         ordersService.updateOrderStatus(orderId, orderStatus);
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/get", method = RequestMethod.GET)
     public Page<Order> getAllOrders(@RequestParam int page,
                                     @RequestParam int size){
         return ordersService.getPageableOrders(new PageRequest(page, size));
     }
 
-    @RequestMapping(value = "/all/{userId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/{userId}", method = RequestMethod.GET)
     public Page<Order> getOrdersByUserId(@PathVariable String userId,
                                          @RequestParam int page,
                                          @RequestParam int size) throws UserException {
