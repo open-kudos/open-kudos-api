@@ -1,26 +1,35 @@
 package kudos.model;
 
 
+import kudos.model.status.UserStatus;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @Document
 public class User {
     @Id
     @Indexed(unique = true)
     private String id;
-    private String email;
-    private String password;
     private String firstName;
     private String lastName;
-    private String birthday;
-    private String startedToWorkDate;
+    private String password;
+    private String email;
     private String emailHash;
     private UserStatus status;
-    private boolean isSubscribing;
     private int totalKudos;
     private int weeklyKudos;
+    private int spendableKudos;
+
+    private int level;
+    private int experiencePoints;
+    private int previousLevelExperiencePoints;
+    private int experiencePointsToLevelUp;
+
+    private List<Endorsement> endorsements;
+    private List<Achievement> achievements;
 
     public User(String firstName, String lastName, String password, String email, UserStatus status) {
         this.firstName = firstName;
@@ -36,22 +45,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getFirstName() {
@@ -70,20 +63,20 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getBirthday() {
-        return birthday;
+    public String getPassword() {
+        return password;
     }
 
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getStartedToWorkDate() {
-        return startedToWorkDate;
+    public String getEmail() {
+        return email;
     }
 
-    public void setStartedToWorkDate(String startedToWorkDate) {
-        this.startedToWorkDate = startedToWorkDate;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getEmailHash() {
@@ -102,14 +95,6 @@ public class User {
         this.status = status;
     }
 
-    public boolean isSubscribing() {
-        return isSubscribing;
-    }
-
-    public void setSubscribing(boolean subscribing) {
-        isSubscribing = subscribing;
-    }
-
     public int getTotalKudos() {
         return totalKudos;
     }
@@ -124,5 +109,61 @@ public class User {
 
     public void setWeeklyKudos(int weeklyKudos) {
         this.weeklyKudos = weeklyKudos;
+    }
+
+    public int getSpendableKudos() {
+        return spendableKudos;
+    }
+
+    public void setSpendableKudos(int spendableKudos) {
+        this.spendableKudos = spendableKudos;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getExperiencePoints() {
+        return experiencePoints;
+    }
+
+    public void setExperiencePoints(int experiencePoints) {
+        this.experiencePoints = experiencePoints;
+    }
+
+    public int getPreviousLevelExperiencePoints() {
+        return previousLevelExperiencePoints;
+    }
+
+    public void setPreviousLevelExperiencePoints(int previousLevelExperiencePoints) {
+        this.previousLevelExperiencePoints = previousLevelExperiencePoints;
+    }
+
+    public int getExperiencePointsToLevelUp() {
+        return experiencePointsToLevelUp;
+    }
+
+    public void setExperiencePointsToLevelUp(int experiencePointsToLevelUp) {
+        this.experiencePointsToLevelUp = experiencePointsToLevelUp;
+    }
+
+    public List<Endorsement> getEndorsements() {
+        return endorsements;
+    }
+
+    public void setEndorsements(List<Endorsement> endorsements) {
+        this.endorsements = endorsements;
+    }
+
+    public List<Achievement> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(List<Achievement> achievements) {
+        this.achievements = achievements;
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BaseValidator {
 
-    private String domain = "swedbank";
+    private String domain = ".";
 
     private String emailPattern = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*"+
             "@" + domain + "+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";

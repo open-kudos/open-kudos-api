@@ -3,7 +3,7 @@ package kudos.web.controllers;
 import kudos.exceptions.FormValidationException;
 import kudos.exceptions.UserException;
 import kudos.model.User;
-import kudos.model.UserStatus;
+import kudos.model.status.UserStatus;
 import kudos.web.beans.request.LoginForm;
 import kudos.web.beans.request.RegisterForm;
 import kudos.web.beans.request.validator.BaseValidator;
@@ -37,16 +37,13 @@ public class AuthenticationController extends BaseController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public void register(@RequestBody RegisterForm form, BindingResult errors) throws MessagingException, UserException, FormValidationException {
         registerFormValidator.validate(form, errors);
-        if(errors.hasErrors())
+
+        if(errors.hasErrors()) {
             throw new FormValidationException(errors);
+        }
 
-        User user = authenticationService.registerUser(new User(form.getFirstName(), form.getLastName(),
+        authenticationService.registerUser(new User(form.getFirstName(), form.getLastName(),
                 form.getPassword(), form.getEmail().toLowerCase(), UserStatus.NOT_CONFIRMED));
-
-        String message = "Thank you for joining Open Kudos! Follow this " +
-                "http://" + serverUrl + "/authentication/confirm/link/" + user.getEmailHash() +
-                " to complete your registration " ;
-        emailService.sendEmail(user.getEmail(), message, "Greetings from Kudos app");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)

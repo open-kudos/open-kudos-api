@@ -2,7 +2,7 @@ package kudos.web.beans.response;
 
 import kudos.model.Challenge;
 import kudos.model.Transaction;
-import kudos.model.TransactionType;
+import kudos.model.status.TransactionType;
 
 public class HistoryResponse {
 

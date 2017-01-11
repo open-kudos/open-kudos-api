@@ -31,7 +31,7 @@ public class HomeController extends BaseController {
     private List<KudosTransactionResponse> convert(List<Transaction> input) {
         List<KudosTransactionResponse> transactions = new ArrayList<>();
         for(Transaction transaction : input) {
-            transactions.add(new KudosTransactionResponse(transaction, "UNKNOWN"));
+            transactions.add(new KudosTransactionResponse(transaction, transaction.getStatus().toValue()));
         }
         return transactions;
     }

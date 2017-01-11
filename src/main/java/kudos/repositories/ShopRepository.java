@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ShopRepository extends MongoRepository<ShopItem,String>  {
 
+    ShopItem findShopItemById(String id);
+
     Page<ShopItem> findShopItemsByAmountGreaterThan(int amount, Pageable pageable);
 //    ShopItem save(ShopItem item);
 //    void delete(String itemId);

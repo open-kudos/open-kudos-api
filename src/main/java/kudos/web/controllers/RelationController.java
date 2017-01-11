@@ -2,7 +2,7 @@ package kudos.web.controllers;
 
 import kudos.exceptions.RelationException;
 import kudos.exceptions.UserException;
-import kudos.model.ActionType;
+import kudos.model.status.ActionType;
 import kudos.model.Relation;
 import kudos.model.User;
 import kudos.web.beans.response.RelationResponse;

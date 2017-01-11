@@ -4,6 +4,9 @@ import com.google.common.base.Strings;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
+import kudos.model.status.ChallengeStatus;
+import kudos.model.status.TransactionStatus;
+import kudos.model.status.TransactionType;
 import kudos.repositories.*;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +48,10 @@ public class ChallengeService {
             throw new UserException("invalid_challenge_date");
         }
 
-        Transaction transaction = transactionRepository.save(new Transaction(creator, receiver, amount, name,
+        //TODO: remove fake endorsement;
+        String endorsement = "Challenge";
+
+        Transaction transaction = transactionRepository.save(new Transaction(creator, receiver, amount, name, endorsement,
                 TransactionType.CHALLENGE, LocalDateTime.now().toString(), TransactionStatus.PENDING));
 
         Challenge challenge = new Challenge(creator, receiver, name, transaction, ChallengeStatus.CREATED);

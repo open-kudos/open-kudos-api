@@ -1,4 +1,4 @@
-package kudos.model;
+package kudos.model.status;
 
 public enum ActionType {
     KUDOS_GIVEN,

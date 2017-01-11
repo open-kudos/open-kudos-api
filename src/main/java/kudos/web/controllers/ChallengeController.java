@@ -4,6 +4,8 @@ import kudos.exceptions.FormValidationException;
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.exceptions.UserException;
 import kudos.model.*;
+import kudos.model.status.ActionType;
+import kudos.model.status.ChallengeStatus;
 import kudos.web.beans.request.AddCommentForm;
 import kudos.web.beans.request.GiveChallengeForm;
 import kudos.web.beans.request.validator.AddCommentFormValidator;

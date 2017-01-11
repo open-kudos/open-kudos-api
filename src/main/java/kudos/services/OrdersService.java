@@ -1,11 +1,12 @@
 package kudos.services;
 
 import kudos.model.Order;
-import kudos.model.OrderStatus;
+import kudos.model.status.OrderStatus;
 import kudos.model.ShopItem;
 import kudos.model.User;
 import kudos.repositories.OrderRepository;
 import kudos.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,8 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrdersService {
 
-    public OrderRepository orderRepository;
-    public UserRepository userRepository;
+    @Autowired
+    private OrderRepository orderRepository;
 
     public Order newOrder(User customer, ShopItem item) {
         return orderRepository.insert(new Order(customer, item, OrderStatus.PENDING));

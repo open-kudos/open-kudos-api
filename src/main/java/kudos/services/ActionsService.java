@@ -2,6 +2,7 @@ package kudos.services;
 
 import kudos.exceptions.RelationException;
 import kudos.model.*;
+import kudos.model.status.ActionType;
 import kudos.repositories.ActionRepository;
 import kudos.repositories.RelationRepository;
 import kudos.repositories.UserRepository;

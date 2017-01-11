@@ -1,7 +1,6 @@
 package kudos.web.beans.response;
 
 import kudos.model.Challenge;
-import kudos.model.ChallengeStatus;
 
 public class ChallengeResponse extends Response {
 

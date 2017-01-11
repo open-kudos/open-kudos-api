@@ -3,7 +3,7 @@ package kudos.services;
 import com.google.common.base.Strings;
 import kudos.exceptions.UserException;
 import kudos.model.User;
-import kudos.model.UserStatus;
+import kudos.model.status.UserStatus;
 import kudos.repositories.UserRepository;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +45,6 @@ public class UsersService {
         user.setFirstName(Strings.isNullOrEmpty(firstName) ? user.getFirstName() : firstName);
         user.setLastName(Strings.isNullOrEmpty(lastName) ? user.getLastName() : lastName);
 
-        user.setBirthday(Strings.isNullOrEmpty(birthday) ? null : LocalDateTime.parse(birthday).toString());
-        user.setStartedToWorkDate(Strings.isNullOrEmpty(startedToWork) ? null : LocalDateTime.parse(startedToWork).toString());
-
         if(!Strings.isNullOrEmpty(birthday) && !Strings.isNullOrEmpty(startedToWork))
             user.setStatus(UserStatus.COMPLETED);
         userRepository.save(user);
@@ -58,12 +55,10 @@ public class UsersService {
     }
 
     public void subscribe(User user){
-        user.setSubscribing(true);
         userRepository.save(user);
     }
 
     public void unsubscribe(User user){
-        user.setSubscribing(false);
         userRepository.save(user);
     }
 

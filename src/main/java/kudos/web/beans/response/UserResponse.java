@@ -1,7 +1,7 @@
 package kudos.web.beans.response;
 
 import kudos.model.User;
-import kudos.model.UserStatus;
+import kudos.model.status.UserStatus;
 
 public class UserResponse extends Response {
 
@@ -12,21 +12,27 @@ public class UserResponse extends Response {
     private String birthday;
     private String startedToWorkDate;
     private boolean isCompleted;
-    private boolean isSubscribing;
+    private boolean canFollow;
+    private String followingSince;
     private int totalKudos;
     private int weeklyKudos;
+    private int level;
+    private int experiencePoints;
+    private int experiencePointsToLevelUp;
+    private int previousLevelExperiencePoints;
 
-    public UserResponse(User user){
+    public UserResponse(User user) {
         this.id = user.getId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
-        this.birthday = user.getBirthday();
-        this.startedToWorkDate = user.getStartedToWorkDate();
         this.totalKudos = user.getTotalKudos();
         this.weeklyKudos = user.getWeeklyKudos();
         this.isCompleted = user.getStatus().equals(UserStatus.COMPLETED);
-        this.isSubscribing = user.isSubscribing();
+        this.level = user.getLevel();
+        this.experiencePoints = user.getExperiencePoints();
+        this.experiencePointsToLevelUp = user.getExperiencePointsToLevelUp();
+        this.previousLevelExperiencePoints = user.getPreviousLevelExperiencePoints();
     }
 
     public String getId() {
@@ -81,16 +87,24 @@ public class UserResponse extends Response {
         return isCompleted;
     }
 
-    public void setCompleted(boolean isCompleted) {
-        this.isCompleted = isCompleted;
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
     }
 
-    public boolean isSubscribing() {
-        return isSubscribing;
+    public boolean isCanFollow() {
+        return canFollow;
     }
 
-    public void setSubscribing(boolean subscribing) {
-        isSubscribing = subscribing;
+    public void setCanFollow(boolean canFollow) {
+        this.canFollow = canFollow;
+    }
+
+    public String getFollowingSince() {
+        return followingSince;
+    }
+
+    public void setFollowingSince(String followingSince) {
+        this.followingSince = followingSince;
     }
 
     public int getTotalKudos() {
@@ -107,5 +121,37 @@ public class UserResponse extends Response {
 
     public void setWeeklyKudos(int weeklyKudos) {
         this.weeklyKudos = weeklyKudos;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getExperiencePoints() {
+        return experiencePoints;
+    }
+
+    public void setExperiencePoints(int experiencePoints) {
+        this.experiencePoints = experiencePoints;
+    }
+
+    public int getExperiencePointsToLevelUp() {
+        return experiencePointsToLevelUp;
+    }
+
+    public void setExperiencePointsToLevelUp(int experiencePointsToLevelUp) {
+        this.experiencePointsToLevelUp = experiencePointsToLevelUp;
+    }
+
+    public int getPreviousLevelExperiencePoints() {
+        return previousLevelExperiencePoints;
+    }
+
+    public void setPreviousLevelExperiencePoints(int previousLevelExperiencePoints) {
+        this.previousLevelExperiencePoints = previousLevelExperiencePoints;
     }
 }

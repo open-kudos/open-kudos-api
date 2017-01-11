@@ -1,9 +1,9 @@
 package kudos.services.util;
 
 import kudos.model.Challenge;
-import kudos.model.ChallengeStatus;
+import kudos.model.status.ChallengeStatus;
 import kudos.model.Transaction;
-import kudos.model.TransactionStatus;
+import kudos.model.status.TransactionStatus;
 import kudos.repositories.ChallengeRepository;
 import kudos.repositories.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;

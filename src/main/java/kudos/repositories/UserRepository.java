@@ -1,7 +1,7 @@
 package kudos.repositories;
 
 import kudos.model.User;
-import kudos.model.UserStatus;
+import kudos.model.status.UserStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;

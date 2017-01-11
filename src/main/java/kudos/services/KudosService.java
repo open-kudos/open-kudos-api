@@ -2,6 +2,8 @@ package kudos.services;
 
 import kudos.exceptions.InvalidKudosAmountException;
 import kudos.model.*;
+import kudos.model.status.TransactionStatus;
+import kudos.model.status.TransactionType;
 import kudos.repositories.TransactionRepository;
 import kudos.exceptions.UserException;
 import kudos.repositories.UserRepository;
@@ -18,9 +20,9 @@ public class KudosService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public Transaction giveKudos(User sender, User receiver, int amount, String message) throws InvalidKudosAmountException,
+    public Transaction giveKudos(User sender, User receiver, int amount, String message, String endorsement) throws InvalidKudosAmountException,
             UserException {
-        if (sender.getEmail().equals(receiver.getEmail())){
+        if (sender.getEmail().equals(receiver.getEmail())) {
             throw new UserException("cant_give_kudos_to_yourself");
         }
 
@@ -28,7 +30,7 @@ public class KudosService {
             throw new InvalidKudosAmountException("invalid_kudos_amount");
         }
 
-        Transaction transaction = transactionRepository.save(new Transaction(sender, receiver, amount, message,
+        Transaction transaction = transactionRepository.save(new Transaction(sender, receiver, amount, message, endorsement,
                 TransactionType.KUDOS, LocalDateTime.now().toString(), TransactionStatus.COMPLETED));
 
         receiver.setTotalKudos(receiver.getTotalKudos() + amount);

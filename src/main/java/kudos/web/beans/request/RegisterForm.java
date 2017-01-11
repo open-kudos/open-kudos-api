@@ -5,16 +5,14 @@ public class RegisterForm {
     private String firstName;
     private String lastName;
     private String password;
-    private String confirmPassword;
     private String email;
 
     public RegisterForm() {}
 
-    public RegisterForm(String firstName, String lastName, String password, String confirmPassword, String email) {
+    public RegisterForm(String firstName, String lastName, String password, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.confirmPassword = confirmPassword;
         this.email = email;
     }
 
@@ -24,14 +22,6 @@ public class RegisterForm {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 
     public String getEmail() {

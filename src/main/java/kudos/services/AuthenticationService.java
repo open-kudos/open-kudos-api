@@ -3,9 +3,9 @@ package kudos.services;
 import kudos.KudosBusinessStrategy;
 import kudos.exceptions.UserException;
 import kudos.model.Transaction;
-import kudos.model.TransactionStatus;
+import kudos.model.status.TransactionStatus;
 import kudos.model.User;
-import kudos.model.UserStatus;
+import kudos.model.status.UserStatus;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -53,10 +53,12 @@ public class AuthenticationService {
         user.setTotalKudos(0);
         user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount());
 
-        user.setSubscribing(false);
+        user.setLevel(1);
+        user.setExperiencePoints(1);
+        user.setPreviousLevelExperiencePoints(0);
+        user.setExperiencePointsToLevelUp(25);
 
         return userRepository.save(user);
-
     }
 
     public void confirmRegistration(String hashedEmail) throws UserException {
@@ -101,6 +103,7 @@ public class AuthenticationService {
             throw new UserException("user_status_undefined");
         }
 
+        updateWeeklyKudos(user.get());
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)));
         request.getSession().setMaxInactiveInterval(0);
@@ -131,7 +134,7 @@ public class AuthenticationService {
         int usedThisWeek = countUsedKudos(transactions);
         int shouldBeReturnedThisWeek = countKudosToReturn(transactions);
 
-        user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount() - usedThisWeek + shouldBeReturnedThisWeek);
+        user.setWeeklyKudos(kudosBusinessStrategy.getWeeklyAmount() + user.getLevel() - usedThisWeek + shouldBeReturnedThisWeek);
         return userRepository.save(user);
     }
 

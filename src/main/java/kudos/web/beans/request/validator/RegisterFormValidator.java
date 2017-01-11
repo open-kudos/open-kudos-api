@@ -22,11 +22,6 @@ public class RegisterFormValidator extends BaseValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "email_is_required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lastName", "last_name_is_required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password_not_specified");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmPassword", "confirm_password_not_specified");
-
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
-            errors.rejectValue("confirmPassword", "no_match_password");
-        }
 
         if(isEmailWrongPattern(form.getEmail())){
             errors.rejectValue("email", "email_incorrect_pattern");

@@ -2,6 +2,7 @@ package kudos.web.controllers;
 
 import kudos.exceptions.FormValidationException;
 import kudos.exceptions.UserException;
+import kudos.model.Relation;
 import kudos.model.User;
 import kudos.web.beans.request.ProfileForm;
 import kudos.web.beans.request.validator.ProfileFormValidator;
@@ -25,14 +26,14 @@ public class UserController extends BaseController {
     ProfileFormValidator profileFormValidator;
 
     @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public UserResponse getUserProfile() throws UserException {
+    public UserResponse getProfile() throws UserException {
         return new UserResponse(authenticationService.getLoggedInUser());
     }
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public void updateUserProfile(@RequestBody ProfileForm form, BindingResult errors) throws UserException, FormValidationException {
         profileFormValidator.validate(form, errors);
-        if(errors.hasErrors())
+        if (errors.hasErrors())
             throw new FormValidationException(errors);
 
         User user = authenticationService.getLoggedInUser();
@@ -42,7 +43,11 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/profile/{userId}", method = RequestMethod.GET)
     public UserResponse getUserProfile(@PathVariable String userId) throws UserException {
-        return new UserResponse(usersService.findByUserId(userId));
+        User user = usersService.findByUserId(userId);
+        UserResponse userResponse = new UserResponse(user);
+        Relation relation = relationService.checkIfUserIsFollowed(authenticationService.getLoggedInUser(), user);
+        decorateUserResponse(userResponse, relation);
+        return userResponse;
     }
 
     @RequestMapping(value = "/email/{predicate}", method = RequestMethod.GET)
@@ -53,10 +58,10 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/actions/{userId}", method = RequestMethod.GET)
     public Page<UserAction> getUserActions(@PathVariable String userId,
-                                           @RequestParam(value="page") int page,
-                                           @RequestParam(value="size") int size) throws UserException {
+                                           @RequestParam(value = "page") int page,
+                                           @RequestParam(value = "size") int size) throws UserException {
         return actionConverter.convertActionsPage(actionsService.getUserFeedPage(usersService.findByUserId(userId),
-                                                    new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp"))));
+                new PageRequest(page, size, new Sort(Sort.Direction.DESC, "timestamp"))));
     }
 
     @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
@@ -71,12 +76,24 @@ public class UserController extends BaseController {
         usersService.unsubscribe(user);
     }
 
-    private List<UserResponse> convert(List<User> input) {
+    private List<UserResponse> convert(List<User> input) throws UserException {
         List<UserResponse> users = new ArrayList<>();
-        for(User user : input) {
-            users.add(new UserResponse(user));
+        for (User user : input) {
+            UserResponse userResponse = new UserResponse(user);
+            Relation relation = relationService.checkIfUserIsFollowed(authenticationService.getLoggedInUser(), user);
+            decorateUserResponse(userResponse, relation);
+            users.add(userResponse);
         }
         return users;
+    }
+
+    private void decorateUserResponse(UserResponse userResponse, Relation relation){
+        if (relation != null) {
+            userResponse.setCanFollow(false);
+            userResponse.setFollowingSince(relation.getAddedDate());
+        } else {
+            userResponse.setCanFollow(true);
+        }
     }
 
 }

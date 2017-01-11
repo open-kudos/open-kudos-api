@@ -1,7 +1,7 @@
 package kudos.repositories;
 
 import kudos.model.Challenge;
-import kudos.model.ChallengeStatus;
+import kudos.model.status.ChallengeStatus;
 import kudos.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

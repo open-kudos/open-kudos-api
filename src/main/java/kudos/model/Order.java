@@ -1,5 +1,6 @@
 package kudos.model;
 
+import kudos.model.status.OrderStatus;
 import org.joda.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;

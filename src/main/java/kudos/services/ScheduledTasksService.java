@@ -2,7 +2,7 @@ package kudos.services;
 
 import kudos.exceptions.UserException;
 import kudos.model.Challenge;
-import kudos.model.ChallengeStatus;
+import kudos.model.status.ChallengeStatus;
 import kudos.repositories.ChallengeRepository;
 import kudos.services.util.ChallengeUtil;
 import org.joda.time.LocalDateTime;

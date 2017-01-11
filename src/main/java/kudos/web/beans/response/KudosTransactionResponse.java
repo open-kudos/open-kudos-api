@@ -5,6 +5,7 @@ import kudos.model.Transaction;
 public class KudosTransactionResponse extends Response {
     private int amount;
     private String message;
+    private String endorsement;
     private String receiverId;
     private String receiverFullName;
     private String senderId;
@@ -15,6 +16,7 @@ public class KudosTransactionResponse extends Response {
     public KudosTransactionResponse(Transaction transaction, String type) {
         this.amount = transaction.getAmount();
         this.message = transaction.getMessage();
+        this.endorsement = transaction.getEndorsement();
         this.receiverId = transaction.getReceiver().getId();
         this.receiverFullName = transaction.getReceiver().getFirstName() + " " + transaction.getReceiver().getLastName();
         this.senderId = transaction.getSender().getId();
@@ -37,6 +39,14 @@ public class KudosTransactionResponse extends Response {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getEndorsement() {
+        return endorsement;
+    }
+
+    public void setEndorsement(String endorsement) {
+        this.endorsement = endorsement;
     }
 
     public String getReceiverId() {

@@ -1,7 +1,7 @@
 package kudos.web.beans.response.userActionResponse;
 
 import kudos.model.Action;
-import kudos.model.ActionType;
+import kudos.model.status.ActionType;
 
 public abstract class UserAction {
 
