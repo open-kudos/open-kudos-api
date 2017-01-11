@@ -46,7 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/relations/**").hasRole("USER")
             .and()
                 .authorizeRequests()
-                    .antMatchers("/shop/**").hasRole("USER");
+                    .antMatchers("/shop/**").hasRole("USER")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/leaderboard/**").hasRole("USER");
     }
 
     @Bean(name="KudosAuthenticationManager")
