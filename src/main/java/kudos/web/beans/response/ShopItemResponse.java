@@ -1,6 +1,6 @@
 package kudos.web.beans.response;
 
-import kudos.model.ShopItem;
+import kudos.model.InventoryItem;
 
 public class ShopItemResponse extends Response {
 
@@ -11,13 +11,13 @@ public class ShopItemResponse extends Response {
     private int amount;
     private String pictureUrl;
 
-    public ShopItemResponse(ShopItem item) {
-        this.id = item.getId();
-        this.name = item.getName();
-        this.price = item.getPrice();
-        this.description = item.getDescription();
-        this.amount = item.getAmount();
-        this.pictureUrl = item.getPictureUrl();
+    public ShopItemResponse(InventoryItem inventoryItem) {
+        this.id = inventoryItem.getId();
+        this.name = inventoryItem.getName();
+        this.price = inventoryItem.getPrice();
+        this.description = inventoryItem.getDescription();
+        this.amount = inventoryItem.getAmount();
+        this.pictureUrl = inventoryItem.getPictureUrl();
     }
 
     public String getId() {

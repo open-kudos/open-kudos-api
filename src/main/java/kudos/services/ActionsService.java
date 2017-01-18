@@ -46,8 +46,8 @@ public class ActionsService {
         actionRepository.save(new Action(user, idea, LocalDateTime.now().toString(), type));
     }
 
-    public void save(User user, ShopItem shopItem, ActionType type){
-        actionRepository.save(new Action(user, shopItem, LocalDateTime.now().toString(), type));
+    public void save(User user, InventoryItem inventoryItem, ActionType type){
+        actionRepository.save(new Action(user, inventoryItem, LocalDateTime.now().toString(), type));
     }
 
     public void save(User user, ActionType type) {

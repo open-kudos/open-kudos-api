@@ -1,28 +1,33 @@
-package kudos.web.beans.request;
+package kudos.model;
 
-import javax.validation.constraints.NotNull;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-public class AddShopItemForm {
+@Document
+public class InventoryItem {
 
-    @NotNull
+    @Id
+    private String id;
     private String name;
-    @NotNull
-    private Integer price;
-    @NotNull
+    private int price;
     private String description;
-    @NotNull
-    private Integer amount;
-    @NotNull
+    private int amount;
     private String pictureUrl;
 
-    public AddShopItemForm() {}
-
-    public AddShopItemForm(String name, Integer price, String description, Integer amount, String pictureUrl) {
+    public InventoryItem(String name, int price, String description, int amount, String pictureUrl) {
         this.name = name;
         this.price = price;
         this.description = description;
         this.amount = amount;
         this.pictureUrl = pictureUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -33,11 +38,11 @@ public class AddShopItemForm {
         this.name = name;
     }
 
-    public Integer getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
@@ -49,11 +54,11 @@ public class AddShopItemForm {
         this.description = description;
     }
 
-    public Integer getAmount() {
+    public int getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 
@@ -64,4 +69,5 @@ public class AddShopItemForm {
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
     }
+
 }

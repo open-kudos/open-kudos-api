@@ -11,15 +11,16 @@ public class Order {
     @DBRef
     private User customer;
     @DBRef
-    private ShopItem item;
+    private InventoryItem inventoryItem;
     private OrderStatus status;
-    private String timestamp;
+    @DBRef
+    private Transaction transaction;
 
-    public Order(User customer, ShopItem item, OrderStatus status) {
+    public Order(User customer, InventoryItem inventoryItem, OrderStatus status, Transaction transaction) {
         this.customer = customer;
-        this.item = item;
+        this.inventoryItem = inventoryItem;
         this.status = status;
-        this.timestamp = LocalDateTime.now().toString();
+        this.transaction = transaction;
     }
 
     public String getId() {
@@ -38,12 +39,12 @@ public class Order {
         this.customer = customer;
     }
 
-    public ShopItem getItem() {
-        return item;
+    public InventoryItem getInventoryItem() {
+        return inventoryItem;
     }
 
-    public void setItem(ShopItem item) {
-        this.item = item;
+    public void setInventoryItem(InventoryItem inventoryItem) {
+        this.inventoryItem = inventoryItem;
     }
 
     public OrderStatus getStatus() {
@@ -54,11 +55,11 @@ public class Order {
         this.status = status;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public Transaction getTransaction() {
+        return transaction;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 }

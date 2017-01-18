@@ -109,6 +109,8 @@ public class KudosController extends BaseController {
             return "GIVEN";
         } else if(transaction.getType() == TransactionType.KUDOS && transaction.getReceiver().getId().equals(user.getId())) {
             return "RECEIVED";
+        } else if(transaction.getType() == TransactionType.SHOP) {
+            return "SHOP";
         } else {
             return "UNKNOWN";
         }

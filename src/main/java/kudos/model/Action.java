@@ -29,7 +29,7 @@ public class Action {
     Idea idea;
 
     @DBRef
-    ShopItem shopItem;
+    InventoryItem inventoryItem;
 
     private String timestamp;
 
@@ -37,7 +37,7 @@ public class Action {
 
     public Action() {}
 
-    public Action(String id, User user, Transaction transaction, Challenge challenge, Comment comment, Relation relation, Idea idea, ShopItem shopItem, String timestamp, ActionType type) {
+    public Action(String id, User user, Transaction transaction, Challenge challenge, Comment comment, Relation relation, Idea idea, InventoryItem inventoryItem, String timestamp, ActionType type) {
         this.id = id;
         this.user = user;
         this.transaction = transaction;
@@ -45,7 +45,7 @@ public class Action {
         this.comment = comment;
         this.relation = relation;
         this.idea = idea;
-        this.shopItem = shopItem;
+        this.inventoryItem = inventoryItem;
         this.timestamp = timestamp;
         this.type = type;
     }
@@ -97,9 +97,9 @@ public class Action {
         this.type = type;
     }
 
-    public Action(User user, ShopItem shopItem, String timestamp, ActionType type) {
+    public Action(User user, InventoryItem inventoryItem, String timestamp, ActionType type) {
         this.user = user;
-        this.shopItem = shopItem;
+        this.inventoryItem = inventoryItem;
         this.timestamp = timestamp;
         this.type = type;
     }
@@ -166,12 +166,12 @@ public class Action {
         this.idea = idea;
     }
 
-    public ShopItem getShopItem() {
-        return shopItem;
+    public InventoryItem getInventoryItem() {
+        return inventoryItem;
     }
 
-    public void setShopItem(ShopItem shopItem) {
-        this.shopItem = shopItem;
+    public void setInventoryItem(InventoryItem inventoryItem) {
+        this.inventoryItem = inventoryItem;
     }
 
     public String getTimestamp() {

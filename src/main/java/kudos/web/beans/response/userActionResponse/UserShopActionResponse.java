@@ -9,7 +9,7 @@ public class UserShopActionResponse extends UserAction {
 
     public UserShopActionResponse(Action action){
         super(action);
-        this.shopItemResponse = new ShopItemResponse(action.getShopItem());
+        this.shopItemResponse = new ShopItemResponse(action.getInventoryItem());
     }
 
     public ShopItemResponse getShopItemResponse() {

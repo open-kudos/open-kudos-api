@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable()
                 .authorizeRequests()
-                    .antMatchers("/user/**").hasRole("USER")
+                    .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
             .and()
                 .authorizeRequests()
                     .antMatchers("/challenge/**").hasRole("USER")
@@ -43,7 +43,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/kudos/**").hasRole("USER")
             .and()
                 .authorizeRequests()
-                    .antMatchers("/relations/**").hasRole("USER");
+                    .antMatchers("/relation/**").hasRole("USER")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/inventory/add").hasRole("ADMIN")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/inventory/*/delete").hasRole("ADMIN")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/order/*/approve").hasRole("ADMIN")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/order/pending").hasRole("ADMIN")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/order/place/*").hasRole("USER")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/order/*").hasAnyRole("USER", "ADMIN");
     }
 
     @Bean(name="KudosAuthenticationManager")

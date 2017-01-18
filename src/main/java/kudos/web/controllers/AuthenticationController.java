@@ -3,6 +3,7 @@ package kudos.web.controllers;
 import kudos.exceptions.FormValidationException;
 import kudos.exceptions.UserException;
 import kudos.model.User;
+import kudos.model.UserRole;
 import kudos.model.UserStatus;
 import kudos.web.beans.request.LoginForm;
 import kudos.web.beans.request.RegisterForm;
@@ -41,7 +42,7 @@ public class AuthenticationController extends BaseController {
             throw new FormValidationException(errors);
 
         User user = authenticationService.registerUser(new User(form.getFirstName(), form.getLastName(),
-                form.getPassword(), form.getEmail().toLowerCase(), UserStatus.NOT_CONFIRMED));
+                form.getPassword(), form.getEmail().toLowerCase(), UserStatus.NOT_CONFIRMED, UserRole.ROLE_USER));
 
         String message = "Thank you for joining Open Kudos! Follow this " +
                 "http://" + serverUrl + "/authentication/confirm/link/" + user.getEmailHash() +

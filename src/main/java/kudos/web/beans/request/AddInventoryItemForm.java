@@ -1,6 +1,6 @@
 package kudos.web.beans.request;
 
-public class EditShopItemForm {
+public class AddInventoryItemForm {
 
     private String name;
     private Integer price;
@@ -8,9 +8,9 @@ public class EditShopItemForm {
     private Integer amount;
     private String pictureUrl;
 
-    public EditShopItemForm() {}
+    public AddInventoryItemForm() {}
 
-    public EditShopItemForm(String name, Integer price, String description, Integer amount, String pictureUrl) {
+    public AddInventoryItemForm(String name, Integer price, String description, Integer amount, String pictureUrl) {
         this.name = name;
         this.price = price;
         this.description = description;

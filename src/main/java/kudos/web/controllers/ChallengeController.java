@@ -214,7 +214,7 @@ public class ChallengeController extends BaseController {
                 challenges.getTotalElements());
     }
 
-    public Page<CommentResponse> convert(Page<Comment> comments) throws UserException {
+    public Page<CommentResponse> convert(Page<Comment> comments) {
         List<CommentResponse> response = new ArrayList<>();
 
         for(Comment item : comments.getContent()) {

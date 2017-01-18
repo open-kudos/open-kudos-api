@@ -1,33 +1,21 @@
-package kudos.model;
+package kudos.web.beans.request;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+public class EditInventoryItemForm {
 
-@Document
-public class ShopItem {
-
-    @Id
-    private String id;
     private String name;
-    private int price;
+    private Integer price;
     private String description;
-    private int amount;
+    private Integer amount;
     private String pictureUrl;
 
-    public ShopItem(String name, int price, String description, int amount, String pictureUrl) {
+    public EditInventoryItemForm() {}
+
+    public EditInventoryItemForm(String name, Integer price, String description, Integer amount, String pictureUrl) {
         this.name = name;
         this.price = price;
         this.description = description;
         this.amount = amount;
         this.pictureUrl = pictureUrl;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -38,11 +26,11 @@ public class ShopItem {
         this.name = name;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
@@ -54,11 +42,11 @@ public class ShopItem {
         this.description = description;
     }
 
-    public int getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 
@@ -69,5 +57,4 @@ public class ShopItem {
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
     }
-
 }

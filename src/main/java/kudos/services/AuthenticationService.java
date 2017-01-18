@@ -2,10 +2,7 @@ package kudos.services;
 
 import kudos.KudosBusinessStrategy;
 import kudos.exceptions.UserException;
-import kudos.model.Transaction;
-import kudos.model.TransactionStatus;
-import kudos.model.User;
-import kudos.model.UserStatus;
+import kudos.model.*;
 import kudos.repositories.TransactionRepository;
 import kudos.repositories.UserRepository;
 import org.jasypt.util.password.StrongPasswordEncryptor;
@@ -136,8 +133,9 @@ public class AuthenticationService {
     }
 
     public int countUsedKudos(List<Transaction> transactions) {
-        return transactions.stream().filter(transaction -> transaction.getStatus() == TransactionStatus.COMPLETED
-                || transaction.getStatus() == TransactionStatus.PENDING).mapToInt(Transaction::getAmount).sum();
+        return transactions.stream().filter(transaction -> (transaction.getStatus() == TransactionStatus.COMPLETED
+                || transaction.getStatus() == TransactionStatus.PENDING) && transaction.getType() != TransactionType.SHOP)
+                .mapToInt(Transaction::getAmount).sum();
     }
 
     public int countKudosToReturn(List<Transaction> transactions) {

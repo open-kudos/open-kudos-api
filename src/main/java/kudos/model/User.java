@@ -21,13 +21,15 @@ public class User {
     private boolean isSubscribing;
     private int totalKudos;
     private int weeklyKudos;
+    private UserRole role;
 
-    public User(String firstName, String lastName, String password, String email, UserStatus status) {
+    public User(String firstName, String lastName, String password, String email, UserStatus status, UserRole role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
         this.email = email;
         this.status = status;
+        this.role = role;
     }
 
     public String getId() {
@@ -124,5 +126,13 @@ public class User {
 
     public void setWeeklyKudos(int weeklyKudos) {
         this.weeklyKudos = weeklyKudos;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }

@@ -15,6 +15,7 @@ public class UserResponse extends Response {
     private boolean isSubscribing;
     private int totalKudos;
     private int weeklyKudos;
+    private String role;
 
     public UserResponse(User user){
         this.id = user.getId();
@@ -27,6 +28,7 @@ public class UserResponse extends Response {
         this.weeklyKudos = user.getWeeklyKudos();
         this.isCompleted = user.getStatus().equals(UserStatus.COMPLETED);
         this.isSubscribing = user.isSubscribing();
+        this.role = user.getRole().name();
     }
 
     public String getId() {
@@ -107,5 +109,13 @@ public class UserResponse extends Response {
 
     public void setWeeklyKudos(int weeklyKudos) {
         this.weeklyKudos = weeklyKudos;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRoleString (String role) {
+        this.role = role;
     }
 }

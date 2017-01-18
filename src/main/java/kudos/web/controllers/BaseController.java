@@ -44,7 +44,7 @@ public abstract class BaseController {
     protected DateTimeFormatter formatter;
 
     @Autowired
-    protected ShopService shopService;
+    protected InventoryService inventoryService;
 
     @Autowired
     protected AuthenticationService authenticationService;
@@ -55,6 +55,7 @@ public abstract class BaseController {
     @Autowired
     protected ActionsService actionsService;
 
-    @Autowired OrdersService ordersService;
+    @Autowired
+    OrderService orderService;
 
 }
