@@ -23,7 +23,7 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
 
     public List<Transaction> getLatestTransactions() {
-        return transactionRepository.findTransactionsByStatusOrderByDateDesc(TransactionStatus.SHOP.toValue(),
+        return transactionRepository.findTransactionsByStatusOrderByDateDesc(TransactionStatus.COMPLETED.toValue(),
                 new PageRequest(0, 10));
     }
 

@@ -59,18 +59,6 @@ public class AuthenticationController extends BaseController {
         authenticationService.logout(session, principal);
     }
 
-    @RequestMapping(value = "/confirm/{confirmationCode}", method = RequestMethod.POST)
-    public void confirmRegistration(@PathVariable String confirmationCode) throws UserException {
-        authenticationService.confirmRegistration(confirmationCode);
-    }
-
-    @RequestMapping(value = "/confirm/link/{confirmationCode}", method = RequestMethod.GET)
-    public String confirmRegistrationViaLink(@PathVariable String confirmationCode) throws UserException {
-        authenticationService.confirmRegistration(confirmationCode);
-        return "Your account is now confirmed <br>" +
-                "You can login now. Go to <a href='http://openkudos.com'>Open Kudos</a>";
-    }
-
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
     public void resetPassword(@RequestBody String email) throws UserException {
         JSONObject obj = new JSONObject(email);

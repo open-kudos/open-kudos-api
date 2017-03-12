@@ -54,6 +54,10 @@ public class UsersService {
         return userRepository.findUsersByFirstNameLikeIgnoreCaseAndIdNot(emailPredicate, userId);
     }
 
+    public List<User> getAllUsers(){
+        return userRepository.findAll();
+    }
+
     public void subscribe(User user){
         userRepository.save(user);
     }

@@ -1,19 +1,15 @@
 package kudos.web.controllers;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
 import kudos.exceptions.UserException;
 import kudos.model.Order;
-import kudos.model.Transaction;
 import kudos.model.status.OrderStatus;
 import kudos.model.User;
-import kudos.web.beans.response.KudosTransactionResponse;
 import kudos.web.beans.response.OrderResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

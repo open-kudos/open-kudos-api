@@ -61,11 +61,11 @@ public class AuthenticationService {
         return userRepository.save(user);
     }
 
-    public void confirmRegistration(String hashedEmail) throws UserException {
+    public User confirmUser(String hashedEmail) throws UserException {
         Optional<User> user = userRepository.findUserByEmailHash(hashedEmail);
         if (user.isPresent() && user.get().getStatus().equals(UserStatus.NOT_CONFIRMED)) {
             user.get().setStatus(UserStatus.NOT_COMPLETED);
-            userRepository.save(user.get());
+            return userRepository.save(user.get());
         } else if (user.isPresent() && user.get().getStatus().equals(UserStatus.NOT_COMPLETED) || user.get().getStatus().equals(UserStatus.COMPLETED)) {
             throw new UserException("user_already_confirmed");
         } else {
