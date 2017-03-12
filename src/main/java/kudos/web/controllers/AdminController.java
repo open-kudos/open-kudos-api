@@ -28,7 +28,7 @@ public class AdminController extends BaseController {
         return usersService.getAllUsers();
     }
 
-    @RequestMapping(value = "/confirm/{userEmailHash}", method = RequestMethod.GET)
+    @RequestMapping(value = "/confirm/{userEmailHash}", method = RequestMethod.POST)
     public User confirmUser(@PathVariable String userEmailHash) throws UserException {
         return authenticationService.confirmUser(userEmailHash);
     }
