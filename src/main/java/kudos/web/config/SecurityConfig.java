@@ -37,13 +37,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/user/**").hasRole("USER")
             .and()
                 .authorizeRequests()
-                    .antMatchers("/challenges/**").hasRole("USER")
+                    .antMatchers("/challenge/**").hasRole("USER")
             .and()
                 .authorizeRequests()
                     .antMatchers("/kudos/**").hasRole("USER")
             .and()
                 .authorizeRequests()
-                    .antMatchers("/relations/**").hasRole("USER");
+                    .antMatchers("/relations/**").hasRole("USER")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/shop/**").hasRole("USER")
+            .and()
+                .authorizeRequests()
+                    .antMatchers("/leaderboard/**").hasRole("USER");
     }
 
     @Bean(name="KudosAuthenticationManager")

@@ -1,70 +1,67 @@
 package kudos.services;
 
-import kudos.KudosBusinessStrategy;
 import kudos.model.Transaction;
+import kudos.model.status.TransactionStatus;
 import kudos.model.User;
 import kudos.repositories.TransactionRepository;
-import kudos.repositories.UserRepository;
-import kudos.web.beans.response.TransactionResponse;
-import kudos.web.exceptions.UserException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
 
-    SimpleDateFormat transactionDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
-
     @Autowired
-    private UsersService usersService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TransactionRepository repository;
-    @Autowired
-    private KudosBusinessStrategy strategy;
+    private TransactionRepository transactionRepository;
 
-    public List<Transaction> getAllTrransactionsMadeThisWeek() {
-        return repository.findTransactionByTimestampGreaterThanOrderByTimestampDesc(transactionDateFormat.format(strategy.getStartTime().toDate()));
+    public List<Transaction> getLatestTransactions() {
+        return transactionRepository.findTransactionsByStatusOrderByDateDesc(TransactionStatus.COMPLETED.toValue(),
+                new PageRequest(0, 10));
     }
 
-    public List<Transaction> getPageableTransactionsMadeThisWeek(int page, int pageSize) {
-        return repository.findTransactionByTimestampGreaterThanOrderByTimestampDesc(transactionDateFormat.format(strategy.getStartTime().toDate()), new PageRequest(page, pageSize));
+    public Page<Transaction> getGivenKudosHistory(User user, Pageable pageable) {
+        return transactionRepository.findTransactionsBySenderAndStatusOrderByDateDesc(user,
+                TransactionStatus.COMPLETED.toValue(), pageable);
     }
 
-    public List<TransactionResponse> getPageableTransactionsByStatus(Transaction.Status status, int page, int pageSize){
-        return repository.findTransactionByStatusOrderByTimestampDesc(status, new PageRequest(page, pageSize)).stream().map(TransactionResponse::new).collect(Collectors.toList());
+    public Page<Transaction> getReceivedKudosHistory(User user, Pageable pageable) {
+        return transactionRepository.findTransactionsByReceiverAndStatusOrderByDateDesc(user,
+                TransactionStatus.COMPLETED.toValue(), pageable);
     }
 
-    public List<TransactionResponse> getNewTransactions(String timestamp) throws UserException{
-        User currentUser = usersService.getLoggedUser().get();
-        if(timestamp == null){
-            setLastSeenTransactionTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS")));
-        }
-        return repository.findTransactionsByReceiverAndStatusAndTimestampGreaterThanOrderByTimestampDesc(currentUser, Transaction.Status.COMPLETED, timestamp)
-                .stream().map(TransactionResponse::new).collect(Collectors.toList());
+    public Page<Transaction> getKudosHistory(User user, Pageable pageable) {
+        return transactionRepository.findTransactionsBySenderOrReceiverAndStatusOrderByDateDesc(user, user,
+                TransactionStatus.COMPLETED.toValue(), pageable);
     }
 
-    public boolean isLastTransactionChanged(String lastTransactionTimestamp){
-        return !lastTransactionTimestamp.equals(repository.findFirstByOrderByTimestampDesc().getTimestamp());
+    public Page<Transaction> getKudosTransactionsByEdorsement(User user, String endorsement, Pageable pageable) {
+        return transactionRepository.findTransactionsByReceiverAndEndorsementOrderByDateDesc(user, endorsement, pageable);
     }
 
-    public void setLastSeenTransactionTimestamp(String timestamp) throws UserException{
-        User currentUser = usersService.getLoggedUser().get();
-        currentUser.setLastSeenTransactionTimestamp(timestamp);
-        userRepository.save(currentUser);
-    }
+    public Map<String, Integer> getEndorsementsMap(User user) {
 
-    public List<Transaction> test(String id) throws UserException{
-        User user = usersService.findById(id).get();
-        return repository.findTransactionsByReceiver(user);
+        Map<String, Integer> endorsements = new HashMap<>();
+
+        transactionRepository.findTransactionsByReceiver(user).stream().filter(
+                transaction -> transaction.getEndorsement() != null).forEach(transaction -> {
+            if (endorsements.containsKey(transaction.getEndorsement())) {
+                endorsements.put(transaction.getEndorsement(), endorsements.get(transaction.getEndorsement()) + transaction.getAmount());
+            } else {
+                endorsements.put(transaction.getEndorsement(), transaction.getAmount());
+            }
+        });
+
+        return endorsements.entrySet().stream()
+                .sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, HashMap::new));
     }
 
 }

@@ -2,6 +2,8 @@ package kudos.repositories;
 
 import kudos.model.Transaction;
 import kudos.model.User;
+import kudos.model.status.TransactionType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -9,41 +11,34 @@ import java.util.List;
 
 public interface TransactionRepository extends MongoRepository<Transaction,String> {
 
-    /**
-     * TEMP METHODS
-     */
+    List<Transaction> findTransactionsBySenderAndStatusAndDateGreaterThanOrderByDateDesc(User sender, String status, String date);
 
-    List<Transaction> findTransactionsByReceiverEmail(String receiverEmail);
+    List<Transaction> findTransactionsByReceiverAndStatusAndDateGreaterThanOrderByDateDesc(User receiver, String status, String date);
 
-    List<Transaction> findTransactionsBySenderEmail(String senderEmail);
+    List<Transaction> findTransactionBySenderAndType(User receiver, TransactionType type);
 
-    /**
-     * TEMP METHODS
-     */
+    List<Transaction> findTransactionsBySenderAndStatusOrderByDateDesc(User sender, String status);
 
-    Transaction findFirstByOrderByTimestampDesc();
+    List<Transaction> findTransactionsByReceiverAndStatusOrderByDateDesc(User receiver, String status);
 
-    Transaction findTransactionByReceiverOrderByTimestampDesc(User receiver);
+    List<Transaction> findTransactionsBySenderAndDateGreaterThan(User sender, String date);
 
     List<Transaction> findTransactionsByReceiver(User receiver);
 
-    List<Transaction> findTransactionsByReceiverAndStatus(User receiver, Transaction.Status status);
+    List<Transaction> findTransactionsByStatusOrderByDateDesc(String status, Pageable pageable);
 
-    List<Transaction> findTransactionsByReceiverAndTimestampGreaterThanOrderByTimestampDesc(User receiver, String timestamp);
+    List<Transaction> findTransactionsBySenderOrReceiverAndStatusOrderByDateDesc(User sender, User receiver, String status);
 
-    List<Transaction> findTransactionsByReceiverAndStatusAndTimestampGreaterThanOrderByTimestampDesc(User receiver, Transaction.Status status, String timestamp);
+    Page<Transaction> findTransactionsBySenderAndStatusOrderByDateDesc(User sender, String status, Pageable pageable);
 
-    List<Transaction> findTransactionsBySender(User sender);
+    Page<Transaction> findTransactionsByReceiverAndStatusOrderByDateDesc(User receiver, String status, Pageable pageable);
 
-    List<Transaction> findTransactionsBySenderAndStatus(User sender, Transaction.Status status);
+    Page<Transaction> findTransactionsBySenderOrReceiverAndStatusOrderByDateDesc(User sender, User receiver, String status, Pageable pageable);
 
-    List<Transaction> findTransactionsBySenderAndTimestampGreaterThanOrderByTimestampDesc(User sender, String timestamp);
+    Page<Transaction> findTransactionsByReceiverAndEndorsementOrderByDateDesc(User receiver, String endorsement, Pageable pageable);
 
-    List<Transaction> findTransactionBySenderOrderByTimestampDesc(User sender);
+    List<Transaction> findTransactionsByReceiverAndEndorsementAndDateGreaterThanOrderByDateDesc(User receiver, String endorsement, String date);
 
-    List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp);
+    List<Transaction> findTransactionsByReceiverAndEndorsement(User receiver, String endorsement);
 
-    List<Transaction> findTransactionByTimestampGreaterThanOrderByTimestampDesc(String timeStamp, Pageable pageable);
-
-    List<Transaction> findTransactionByStatusOrderByTimestampDesc(Transaction.Status status, Pageable pageable);
 }

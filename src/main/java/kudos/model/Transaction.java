@@ -1,86 +1,46 @@
 package kudos.model;
 
-import org.jsondoc.core.annotation.ApiObject;
+import kudos.model.status.TransactionStatus;
+import kudos.model.status.TransactionType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-/**
- * Created by chc on 15.8.5.
- */
-@ApiObject
 @Document
 public class Transaction {
-
-    public enum Status {
-        COMPLETED, PENDING_CHALLENGE, COMPLETED_CHALLENGE, DECLINED_CHALLENGE, CANCELED_CHALLENGE, EXPIRED_CHALLENGE, COMPLETED_CHALLENGE_PARTICIPANT, COMPLETED_CHALLENGE_CREATOR, SHOP
-    }
 
     @Id
     private String id;
     @DBRef
     private User sender;
-
-    //TODO remove after migration
-    private String senderEmail;
-
-    //TODO remove after migration
-    private String receiverEmail;
-
     @DBRef
     private User receiver;
+
     private String message;
     private int amount;
-    private String timestamp;
-    private Status status;
-    private int receiverBalance;
+    private String date;
+    private String endorsement;
+    private TransactionType type;
+    private TransactionStatus status;
 
-    public Transaction(User sender, User receiver, int amount, String message, Status status) {
+    public Transaction(User sender, User receiver, int amount, String message, String endorsement, TransactionType type, String date,
+                       TransactionStatus status) {
         this.sender = sender;
         this.receiver = receiver;
         this.amount = amount;
         this.message = message;
-        this.timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS").format(new Date());;
+        this.endorsement = endorsement;
+        this.date = date;
+        this.type = type;
         this.status = status;
     }
 
-    public String getMessage() {
-        return message;
+    public String getId() {
+        return id;
     }
 
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public int getReceiverBalance() {
-        return receiverBalance;
-    }
-
-    public void setReceiverBalance(int receiverBalance) {
-        this.receiverBalance = receiverBalance;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public User getSender() {
@@ -99,26 +59,51 @@ public class Transaction {
         this.receiver = receiver;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     public void setMessage(String message) {
         this.message = message;
     }
 
-
-    //TODO remove later
-
-    public String getSenderEmail() {
-        return senderEmail;
+    public String getEndorsement() {
+        return endorsement;
     }
 
-    public void setSenderEmail(String senderEmail) {
-        this.senderEmail = senderEmail;
+    public void setEndorsement(String endorsement) {
+        this.endorsement = endorsement;
     }
 
-    public String getReceiverEmail() {
-        return receiverEmail;
+    public int getAmount() {
+        return amount;
     }
 
-    public void setReceiverEmail(String receiverEmail) {
-        this.receiverEmail = receiverEmail;
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public TransactionType getType() {
+        return type;
+    }
+
+    public void setType(TransactionType type) {
+        this.type = type;
+    }
+
+    public TransactionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TransactionStatus status) {
+        this.status = status;
     }
 }

@@ -1,324 +1,259 @@
 package kudos.web.controllers;
 
-import com.google.common.base.Strings;
-import kudos.exceptions.BusinessException;
-import kudos.exceptions.ChallengeException;
-import kudos.exceptions.IdNotSpecifiedException;
-import kudos.exceptions.WrongChallengeEditorException;
-import kudos.model.Challenge;
-import kudos.web.beans.form.ChallengeTransferForm;
+import kudos.exceptions.FormValidationException;
+import kudos.exceptions.InvalidKudosAmountException;
+import kudos.exceptions.UserException;
+import kudos.model.*;
+import kudos.model.status.ActionType;
+import kudos.model.status.ChallengeStatus;
+import kudos.web.beans.request.AddCommentForm;
+import kudos.web.beans.request.GiveChallengeForm;
+import kudos.web.beans.request.validator.AddCommentFormValidator;
+import kudos.web.beans.request.validator.GiveChallengeFormValidator;
+import kudos.web.beans.response.ChallengeActions;
 import kudos.web.beans.response.ChallengeResponse;
-import kudos.web.exceptions.FormValidationException;
-import kudos.web.exceptions.UserException;
-import org.jsondoc.core.annotation.*;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import kudos.web.beans.response.CommentResponse;
+import org.joda.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
-import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Api(name = "Challenge Controller", description = "Controller for managing challenges")
-@RequestMapping("/challenges")
-@Controller
+@RequestMapping("/challenge")
+@RestController
 public class ChallengeController extends BaseController {
 
-    @ApiMethod(description = "Service to create challenges")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "participant",
-                        description = "The email of challenge participant. For testing use testP@google.lt"),
-            @ApiQueryParam(name = "referee",
-                        description = "The email of challenge referee, For testing use testR@google.lt"),
-            @ApiQueryParam(name = "name",
-                        description = "The name of challenge. For testing use XYZ"),
-            @ApiQueryParam(name = "finishDate",
-                        description = "Finish date until challenge must be completed. For testing use 2015-10-10 2015:15:15,333"),
-            @ApiQueryParam(name = "amount",
-                        description = "The amount of Kudos that will be gifted if challenge was completed. For testing use 10")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "receiver_email_not_specified",
-                    description = "If receiver email was not specified"),
-            @ApiError(code = "receiver_email_incorrect",
-                    description = "If receiver email was incorrect"),
-            @ApiError(code = "amount_not_specified",
-                    description = "If amount was not specified"),
-            @ApiError(code = "amount_negative_or_zero",
-                    description = "If specified amount was negative or equal to zero"),
-            @ApiError(code = "amount_not_digit",
-                    description = "If specified amount was not a digit"),
-            @ApiError(code = "name_not_specified",
-                    description = "If name was not specified"),
-            @ApiError(code = "finishDate_not_specified",
-                    description = "If finish date was not specified"),
-            @ApiError(code = "finishDate_incorrect",
-                    description = "If finishDate was incorrect"),
-            @ApiError(code = "invalid_kudos_amount",
-                    description = "If user does not have enough KUDOS to spent"),
-            @ApiError(code = "receiver_not_exist",
-                    description = "If kudos receiver does not exist"),
-            @ApiError(code = "participant_not_exist",
-                    description = "If participant user does not exist")
-    })
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody ChallengeResponse challenge(ChallengeTransferForm form, Errors errors)
-            throws FormValidationException, ParseException, BusinessException, UserException, MessagingException {
+    @Autowired
+    GiveChallengeFormValidator giveChallengeFormValidator;
 
-        new ChallengeTransferForm.ChallengeTransferFormValidator().validate(form, errors);
+    @Autowired
+    AddCommentFormValidator addCommentFormValidator;
 
-        if (errors.hasErrors())
+    @RequestMapping(value = "/give", method = RequestMethod.POST)
+    public ChallengeResponse giveChallenge(@RequestBody GiveChallengeForm form, BindingResult errors) throws UserException, MessagingException,
+            InvalidKudosAmountException, FormValidationException {
+        giveChallengeFormValidator.validate(form, errors);
+        if(errors.hasErrors())
             throw new FormValidationException(errors);
 
-        return new ChallengeResponse(challengeService.create(
-                form.getParticipant(),
-                form.getName(),
-                form.getDescription(),
-                form.getFinishDate(),
-                Integer.parseInt(form.getAmount())
-        ));
+        User creator = authenticationService.getLoggedInUser();
+        Optional<User> receiver = usersService.findByEmail(form.getReceiverEmail().toLowerCase());
+
+        if(receiver.isPresent()) {
+            Challenge challenge = challengeService.giveChallenge(creator, receiver.get(), form.getName(),
+                    form.getDescription(), form.getExpirationDate(), form.getAmount());
+//            if (receiver.get().isSubscribing()) {
+//                emailService.sendEmailForNewChallenge(creator, receiver.get(), challenge);
+//            }
+            actionsService.save(creator, challenge, ActionType.CREATED_CHALLENGE);
+            return new ChallengeResponse(challenge, getAllowedActions(creator, challenge));
+        } else {
+//            String email = creator.getFirstName() + " " + creator.getLastName() + "wanted to give you CHALLENGE," +
+//                    " but you are not registered. Maybe it is time to do it? Go to www.openkudos.com and try it!";
+//            emailService.sendEmail(form.getReceiverEmail().toLowerCase(), email, "Open Kudos");
+            throw new UserException("receiver_does_not_exist");
+        }
     }
 
-    @ApiMethod(description = "Gets all challenges that logged user has created")
-    @RequestMapping(value = "/created", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> createdChallenges() throws UserException {
-        return challengeService.getAllUserCreatedChallenges();
+    @RequestMapping(value = "/get/{challengeId}", method = RequestMethod.GET)
+    public ChallengeResponse sentAndReceived(@PathVariable String challengeId) throws UserException {
+        return new ChallengeResponse(challengeService.getChallengeById(challengeId), new ChallengeActions(true, false, false, false, false));
     }
 
-    @ApiMethod(description = "Gets all challenges that logged user has created by its status")
-    @RequestMapping(value = "/createdByStatus", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> createdChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeService.getAllUserCreatedChallengesByStatus(status);
+
+    @RequestMapping(value = "/{challengeId}/addComment", method = RequestMethod.POST)
+    public void addCommentToChallenge(@PathVariable String challengeId,
+                                      @RequestBody AddCommentForm form, BindingResult errors) throws UserException, FormValidationException {
+        addCommentFormValidator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
+
+        User creator = authenticationService.getLoggedInUser();
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        Comment comment = new Comment(creator, form.getComment(), LocalDateTime.now().toString(), challenge);
+        challengeService.addComment(comment);
+        actionsService.save(creator, comment, ActionType.COMMENTED);
     }
 
-    @ApiMethod(description = "Gets all challenges that logged user has participated")
-    @RequestMapping(value = "/participated", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> participatedChallenges() throws UserException {
-        return challengeService.getAllUserParticipatedChallenges();
+    @RequestMapping(value = "/{challengeId}/comments", method = RequestMethod.GET)
+    public Page<CommentResponse> getChallengeComments(@PathVariable String challengeId,
+                                                      @RequestParam(value="page") int page,
+                                                      @RequestParam(value="size") int size) throws UserException {
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+
+        return convert(challengeService.getComments(challenge, new PageRequest(page, size)));
     }
 
-    @ApiMethod(description = "Gets all challenges that logged user has participated by status")
-    @RequestMapping(value = "/participatedByStatus", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> participatedChallengesByStatus(Challenge.Status status) throws UserException {
-        return challengeService.getAllUserParticipatedChallengesByStatus(status);
+    @RequestMapping(value = "/sentAndReceived", method = RequestMethod.GET)
+    public Page<ChallengeResponse> sentAndReceived(@RequestParam(value="page") int page,
+                                                   @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(challengeService.getAllSentAndReceivedChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Gets all challenges that logged user has participated by status pageable")
-    @RequestMapping(value = "/participatedByStatusPageable", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<Challenge> participatedChallengesByStatusPageable(Challenge.Status status, int page, int pageSize) throws UserException {
-        return challengeService.getAllUserParticipatedChallengesByStatusPageable(status, page, pageSize);
+    @RequestMapping(value = "/sentAndReceived/{userId}", method = RequestMethod.GET)
+    public Page<ChallengeResponse> sentAndReceived(@PathVariable String userId,
+                                                   @RequestParam(value="page") int page,
+                                                   @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllSentAndReceivedChallenges(user, new PageRequest(page, size)), user);
     }
 
-    //TODO CHANGE
-    @ApiMethod(description = "Gets all challenges that logged user has completed")
-    @RequestMapping(value = "/completedChallenges", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<ChallengeResponse> completedChallenges() throws UserException {
-        return challengeService.getAllCompletedChallenges();
-    }
-
-    @ApiMethod(description = "Gets all challenges that logged user is participating")
     @RequestMapping(value = "/ongoing", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<ChallengeResponse> ongoingChallenges() throws UserException {
-        return challengeService.getAllOngoingChallenges();
+    public Page<ChallengeResponse> ongoing(@RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(challengeService.getAllOngoingChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Gets all new challenges (both created and received)")
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
-    public @ApiResponseObject @ResponseBody List<ChallengeResponse> newChallenges() throws UserException {
-        return challengeService.getAllNewChallenges();
+    @RequestMapping(value = "/ongoing/{userId}", method = RequestMethod.GET)
+    public Page<ChallengeResponse> ongoing(@PathVariable String userId,
+                                           @RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllOngoingChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Accepts challenge by its id")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "id")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "challenge.id.not.specified",
-                    description = "If challenge id was not specified"),
-            @ApiError(code = "not_a_participant",
-                    description = "If user is not a participant"),
-            @ApiError(code = "challenge_already_accepted",
-                    description = "If challenge is already accepted"),
-            @ApiError(code = "challenge_already_accomplished",
-                    description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge_already_declined",
-                    description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
-            @ApiError(code = "challenge_already_canceled",
-                    description = "If challenge is already canceled")
-    })
-    @RequestMapping(value = "/accept", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody ChallengeResponse accept(String id)
-            throws BusinessException, IdNotSpecifiedException, ChallengeException, UserException {
-
-        if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id.not.specified");
-
-        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
-        if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge_not_found");
-        }
-
-        Challenge challenge = maybeChallenge.get();
-        if(!challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
-            throw new WrongChallengeEditorException("not_a_participant");
-        }
-        return new ChallengeResponse(challengeService.accept(challenge));
+    @RequestMapping(value = "/history", method = RequestMethod.GET)
+    public Page<ChallengeResponse> history(@RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Declines challenge by its id")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "id")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "challenge_id_not_specified",
-                    description = "If challenge id was not specified"),
-            @ApiError(code = "not_a_participant",
-                    description = "If user is not referee"),
-            @ApiError(code = "challenge_already_accepted",
-                    description = "If challenge is already accepted"),
-            @ApiError(code = "challenge_already_accomplished",
-                    description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge_already_declined",
-                    description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
-            @ApiError(code = "challenge_already_canceled",
-                    description = "If challenge is already canceled")
-    })
-    @RequestMapping(value = "/decline", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody ChallengeResponse decline(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
-
-        if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id_not_specified");
-
-        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
-
-        if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge_not_found");
-        }
-
-        Challenge challenge = maybeChallenge.get();
-        if(!challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
-            throw new WrongChallengeEditorException("not_a_particitipant");
-        }
-        return new ChallengeResponse(challengeService.decline(challenge));
+    @RequestMapping(value = "/history/{userId}", method = RequestMethod.GET)
+    public Page<ChallengeResponse> history(@PathVariable String userId,
+                                           @RequestParam(value="page") int page,
+                                           @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllFailedAndAccomplishedChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Cancels challenge by its id")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "id")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "challenge_id_not_specified",
-                    description = "If challenge id was not specified"),
-            @ApiError(code = "not_a_creator",
-                    description = "If user is not a creator"),
-            @ApiError(code = "challenge_already_accepted",
-                    description = "If challenge is already accepted"),
-            @ApiError(code = "challenge_already_accomplished",
-                    description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge_already_declined",
-                    description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
-            @ApiError(code = "challenge_already_canceled",
-                    description = "If challenge is already canceled")
-    })
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody ChallengeResponse cancel(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
-
-        if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id_not_specified");
-
-        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
-
-        if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge_not_found");
-        }
-
-        Challenge challenge = maybeChallenge.get();
-        if(!challenge.getCreatorUser().getId().equals(usersService.getLoggedUser().get().getId())) {
-            throw new WrongChallengeEditorException("not_a_creator");
-        }
-        return new ChallengeResponse(challengeService.cancel(challenge));
+    @RequestMapping(value = "/history/failed", method = RequestMethod.GET)
+    public Page<ChallengeResponse> historyForFailed(@RequestParam(value="page") int page,
+                                                    @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(challengeService.getAllFailedChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Accomplishes challenge by its id")
-    @ApiParams(queryparams = {@ApiQueryParam(name = "id")})
-    @ApiErrors(apierrors = {
-            @ApiError(code = "challenge_id_not_specified",
-                    description = "If challenge id was not specified"),
-            @ApiError(code = "not_a_referee",
-                    description = "If user is not a referee"),
-            @ApiError(code = "challenge_already_accomplished",
-                    description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge_already_declined",
-                    description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
-            @ApiError(code = "challenge_already_canceled",
-                    description = "If challenge is already canceled")
-    })
-    @RequestMapping(value = "/accomplish", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody ChallengeResponse accomplish(String id, Boolean status) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException, MessagingException {
-
-        if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id_not_specified");
-
-        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
-        if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge_not_found");
-        }
-
-        Challenge challenge = maybeChallenge.get();
-        if(challenge.getCreatorUser().getId().equals(usersService.getLoggedUser().get().getId())) {
-            challenge.setCreatorStatus(status);
-        }
-
-        if (challenge.getParticipantUser().getId().equals(usersService.getLoggedUser().get().getId())) {
-            challenge.setParticipantStatus(status);
-        }
-
-        return new ChallengeResponse(challengeService.accomplish(challenge));
+    @RequestMapping(value = "/history/failed/{userId}", method = RequestMethod.GET)
+    public Page<ChallengeResponse> historyForFailed(@PathVariable String userId,
+                                                     @RequestParam(value="page") int page,
+                                                     @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllFailedChallenges(user, new PageRequest(page, size)), user);
     }
 
-    @ApiMethod(description = "Marks challenge as failed by its id")
-    @ApiParams(queryparams = {
-            @ApiQueryParam(name = "id")
-    })
-    @ApiErrors(apierrors = {
-            @ApiError(code = "challenge_id_not_specified",
-                    description = "If challenge id was not specified"),
-            @ApiError(code = "not_a_referee",
-                    description = "If user is not a referee"),
-            @ApiError(code = "challenge_already_accomplished",
-                    description = "If challenge is already accomplished"),
-            @ApiError(code = "challenge_already_declined",
-                    description = "If challenge is already declined"),
-            @ApiError(code = "challenge_already_failed",
-                    description = "If challenge is already failed"),
-            @ApiError(code = "challenge_already_canceled",
-                    description = "If challenge is already canceled")
-    })
-    @RequestMapping(value = "/fail", method = RequestMethod.POST)
-    public @ApiResponseObject @ResponseBody ChallengeResponse fail(String id) throws BusinessException, IdNotSpecifiedException, UserException, ChallengeException {
+    @RequestMapping(value = "/history/accomplished", method = RequestMethod.GET)
+    public Page<ChallengeResponse> historyForAccomplished(@RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        return convert(challengeService.getAllAccomplishedChallenges(user, new PageRequest(page, size)), user);
+    }
 
-        if(Strings.isNullOrEmpty(id))
-            throw new IdNotSpecifiedException("id_not_specified");
+    @RequestMapping(value = "/history/accomplished/{userId}", method = RequestMethod.GET)
+    public Page<ChallengeResponse> historyForAccomplished(@PathVariable String userId,
+                                                          @RequestParam(value="page") int page,
+                                                          @RequestParam(value="size") int size) throws UserException {
+        User user = usersService.findByUserId(userId);
+        return convert(challengeService.getAllAccomplishedChallenges(user, new PageRequest(page, size)), user);
+    }
 
-        Optional<Challenge> maybeChallenge = challengeService.getChallenge(id);
-        if(!maybeChallenge.isPresent()){
-            throw new ChallengeException("challenge_not_found");
+    @RequestMapping(value = "/{challengeId}/accept", method = RequestMethod.POST)
+    public ChallengeResponse accept(@PathVariable String challengeId) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        Challenge challengeToAccept = challengeService.getChallengeById(challengeId);
+        Challenge challengeToReturn = challengeService.acceptChallenge(challengeToAccept, user);
+        actionsService.save(user, challengeToReturn, ActionType.ACCEPTED_CHALLENGE);
+        return new ChallengeResponse(challengeToReturn, getAllowedActions(user, challengeToReturn));
+    }
+
+    @RequestMapping(value = "/{challengeId}/decline", method = RequestMethod.POST)
+    public void decline(@PathVariable String challengeId) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        challengeService.declineChallenge(challenge, user);
+    }
+
+    @RequestMapping(value = "/{challengeId}/cancel", method = RequestMethod.POST)
+    public void cancel(@PathVariable String challengeId) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        actionsService.remove(challenge);
+        challengeService.cancelChallenge(challenge, user);
+    }
+
+    @RequestMapping(value = "/{challengeId}/markAsCompleted", method = RequestMethod.POST)
+    public void markAsCompleted(@PathVariable String challengeId) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        challengeService.markChallengeAsCompleted(challenge, user);
+        actionsService.save(user, challenge, ActionType.MARKED_AS_COMPLETED);
+    }
+
+    @RequestMapping(value = "/{challengeId}/markAsFailed", method = RequestMethod.POST)
+    public void markAsFailed(@PathVariable String challengeId) throws UserException {
+        User user = authenticationService.getLoggedInUser();
+        Challenge challenge = challengeService.getChallengeById(challengeId);
+        challengeService.markChallengeAsFailed(challenge, user);
+        actionsService.save(user, challenge, ActionType.MARKED_AS_FAILED);
+    }
+
+    public Page<ChallengeResponse> convert(Page<Challenge> challenges, User user) throws UserException {
+        List<ChallengeResponse> response = new ArrayList<>();
+
+        for(Challenge item : challenges.getContent()) {
+            response.add(new ChallengeResponse(item, getAllowedActions(user, item)));
         }
+        return new PageImpl<>(response, new PageRequest(challenges.getNumber(), challenges.getSize()),
+                challenges.getTotalElements());
+    }
 
-        Challenge challenge = maybeChallenge.get();
+    public Page<CommentResponse> convert(Page<Comment> comments) throws UserException {
+        List<CommentResponse> response = new ArrayList<>();
 
-        return new ChallengeResponse(challengeService.expire(challenge));
+        for(Comment item : comments.getContent()) {
+            response.add(new CommentResponse(item));
+        }
+        return new PageImpl<>(response, new PageRequest(comments.getNumber(), comments.getSize()),
+                comments.getTotalElements());
+    }
+
+    public ChallengeActions getAllowedActions(User user, Challenge challenge) throws UserException {
+        if(challenge.getCreator().getId().contentEquals(user.getId())) {
+            return getActionsForCreator(challenge.getStatus());
+        } else if(challenge.getParticipant().getId().contentEquals(user.getId())) {
+            return getActionsForParticipant(challenge.getStatus());
+        } else {
+            throw new UserException("no_supported_challenge_actions");
+        }
+    }
+
+    private ChallengeActions getActionsForCreator(ChallengeStatus status) {
+        switch (status) {
+            case CREATED:
+                return new ChallengeActions(true, false, false, false, false);
+            case ACCEPTED:
+                return new ChallengeActions(false, false, false, true, true);
+            default:
+                return new ChallengeActions(false, false, false, false, false);
+        }
+    }
+
+    private ChallengeActions getActionsForParticipant(ChallengeStatus status) {
+        switch (status) {
+            case CREATED:
+                return new ChallengeActions(false, true, true, false, false);
+            default:
+                return new ChallengeActions(false, false, false, false, false);
+        }
     }
 
 }

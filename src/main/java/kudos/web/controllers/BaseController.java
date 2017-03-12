@@ -2,12 +2,15 @@ package kudos.web.controllers;
 
 import kudos.KudosBusinessStrategy;
 import kudos.services.*;
+import kudos.services.util.ActionConverter;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 
 public abstract class BaseController {
+
+    ActionConverter actionConverter = new ActionConverter();
 
     @Autowired
     protected AuthenticationManager authenticationManager;
@@ -37,13 +40,25 @@ public abstract class BaseController {
     protected EmailService emailService;
 
     @Autowired
-    protected HistoryService historyService;
-
-    @Autowired
     @Qualifier(value = "DBTimeFormatter")
     protected DateTimeFormatter formatter;
 
     @Autowired
     protected ShopService shopService;
+
+    @Autowired
+    protected AuthenticationService authenticationService;
+
+    @Autowired
+    protected LeaderBoardService leaderBoardService;
+
+    @Autowired
+    protected ActionsService actionsService;
+
+    @Autowired
+    OrdersService ordersService;
+
+    @Autowired
+    protected LevelUpService levelUpService;
 
 }

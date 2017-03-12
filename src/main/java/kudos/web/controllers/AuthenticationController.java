@@ -1,55 +1,79 @@
 package kudos.web.controllers;
 
-import kudos.web.beans.form.LoginForm;
-import kudos.web.beans.response.UserResponse;
-import kudos.web.exceptions.FormValidationException;
-import kudos.web.exceptions.UserException;
-import org.jsondoc.core.annotation.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import kudos.exceptions.FormValidationException;
+import kudos.exceptions.UserException;
+import kudos.model.User;
+import kudos.model.status.UserStatus;
+import kudos.web.beans.request.LoginForm;
+import kudos.web.beans.request.RegisterForm;
+import kudos.web.beans.request.validator.BaseValidator;
+import kudos.web.beans.request.validator.LoginFormValidator;
+import kudos.web.beans.request.validator.RegisterFormValidator;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 
-@Api(name = "Authentication Controller", description = "Login and logout for a user. For testing purposes use test1@google.lt with password google")
-@Controller
+@RestController
+@RequestMapping("/authentication")
 public class AuthenticationController extends BaseController {
-    @Value("${kudos.domain}")
-    private String domain;
-    @ApiMethod(description = "Service to log into system")
-    @ApiErrors(apierrors = {
-            @ApiError(code = "email_password_mismatch", description = "If entered email or password does not exist in database"),
-            @ApiError(code = "email_not_specified", description = "If email was not specified"),
-            @ApiError(code = "password_not_specified", description = "If password was not specified"),
-            @ApiError(code = "user_not_exist", description = "If user does not exist"),
-            @ApiError(code = "user_already_logged", description = "If user is already logged")})
-    @RequestMapping(value = "/login", method = RequestMethod.POST, headers = {"Content-type=application/json"})
-    public @ApiResponseObject @ResponseBody
-    UserResponse login(@RequestBody LoginForm loginForm, Errors errors, HttpServletRequest request) throws FormValidationException, UserException {
-        new LoginForm.LoginFormValidator(domain).validate(loginForm,errors);
-        if (errors.hasErrors()) {
+
+    String serverUrl = "localhost:8080";
+
+    @Autowired
+    RegisterFormValidator registerFormValidator;
+
+    @Autowired
+    LoginFormValidator loginFormValidator;
+
+    @Autowired
+    BaseValidator baseValidator;
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public void register(@RequestBody RegisterForm form, BindingResult errors) throws MessagingException, UserException, FormValidationException {
+        registerFormValidator.validate(form, errors);
+
+        if(errors.hasErrors()) {
             throw new FormValidationException(errors);
         }
-        return usersService.login(loginForm.getEmail(), loginForm.getPassword(), request);
+
+        authenticationService.registerUser(new User(form.getFirstName(), form.getLastName(),
+                form.getPassword(), form.getEmail().toLowerCase(), UserStatus.NOT_CONFIRMED));
     }
 
-    @ApiMethod(description = "Service to log out of system")
-    @ApiErrors(apierrors = {
-            @ApiError(code = "not_logged",
-                    description = "If user is not logged in")
-    })
-    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public void login(@RequestBody LoginForm form, HttpServletRequest request, BindingResult errors) throws UserException, FormValidationException {
+        loginFormValidator.validate(form, errors);
+        if(errors.hasErrors())
+            throw new FormValidationException(errors);
+        authenticationService.login(form.getEmail().toLowerCase(), form.getPassword(), request);
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public void logout(HttpSession session, Principal principal) throws UserException {
-        if (principal == null) {
-            throw new UserException("not_logged");
+        authenticationService.logout(session, principal);
+    }
+
+    @RequestMapping(value = "/reset", method = RequestMethod.POST)
+    public void resetPassword(@RequestBody String email) throws UserException {
+        JSONObject obj = new JSONObject(email);
+        if(baseValidator.isEmailWrongPattern(obj.getString("email"))) {
+            throw new UserException("email_incorrect_pattern");
         }
-        session.invalidate();
+        String newPassword = authenticationService.resetPassword(obj.getString("email"));
+        String emailMessage = "Your new password: " + "<b>" + newPassword  + "</b> <br> You can change your password in settings";
+        emailService.sendEmail(obj.getString("email"), emailMessage, "Open Kudos");
+    }
+
+    @RequestMapping(value = "/change/password", method = RequestMethod.POST)
+    public void changePassword(@RequestBody String newPassword) throws UserException {
+        JSONObject obj = new JSONObject(newPassword);
+        authenticationService.changePassword(obj.getString("newPassword"));
     }
 
 }

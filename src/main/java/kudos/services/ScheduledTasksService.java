@@ -1,52 +1,43 @@
 package kudos.services;
 
-import kudos.exceptions.BusinessException;
+import kudos.exceptions.UserException;
 import kudos.model.Challenge;
-import kudos.web.exceptions.UserException;
-import org.apache.log4j.Logger;
+import kudos.model.status.ChallengeStatus;
+import kudos.repositories.ChallengeRepository;
+import kudos.services.util.ChallengeUtil;
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ScheduledTasksService {
 
-    private Logger LOG = Logger.getLogger(ScheduledTasksService.class);
-
     @Autowired
-    ChallengeService challengeService;
+    private ChallengeRepository challengeRepository;
 
-    @Autowired
-    @Qualifier(value = "DBTimeFormatter")
-    DateTimeFormatter dateTimeFormatter;
+    private ChallengeUtil challengeUtil = new ChallengeUtil();
 
-    @Scheduled(fixedRate = 1000 * 15)
-    public void markTasksAsExpired() {
-        List<Challenge> challengesToCheck = new ArrayList<>();
-        challengesToCheck.addAll(challengeService.getAllAcceptedChallenges());
-        challengesToCheck.addAll(challengeService.getAllCreatedChallenges());
+    @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
+    public void markTasksAsExpired() throws UserException {
+        List<Challenge> createdChallenges = challengeRepository.findAllChallengesByStatus(ChallengeStatus.CREATED);
+        List<Challenge> acceptedChallenges = challengeRepository.findAllChallengesByStatus(ChallengeStatus.ACCEPTED);
 
-        LOG.info("challengesToCheck challenges amount is: " + challengesToCheck.size());
+        for (Challenge challenge : createdChallenges) {
+            if (challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now())) {
+                challengeUtil.changeStatus(challenge, ChallengeStatus.EXPIRED);
+            }
+        }
 
-        challengesToCheck.stream()
-                .filter(c -> !c.getStatus().equals(Challenge.Status.EXPIRED))
-                .filter(c -> !(c.getFinishDate() == null))
-                .filter(c -> dateTimeFormatter.parseLocalDateTime(c.getFinishDate()).isBefore(LocalDateTime.now()))
-                .forEach((challenge) -> {
-                    try {
-                        challengeService.expire(challenge);
-                    } catch (BusinessException e) {
-                        e.printStackTrace();
-                    } catch (UserException e) {
-                        e.printStackTrace();
-                    }
-                });
+        for (Challenge challenge : acceptedChallenges) {
+            if (challenge.getExpirationDate() != null && LocalDateTime.parse(challenge.getExpirationDate()).isBefore(LocalDateTime.now())) {
+                challengeUtil.changeStatus(challenge, ChallengeStatus.FAILED);
+            }
+        }
+
     }
+
 }
 

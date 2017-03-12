@@ -1,31 +1,38 @@
 package kudos.web.beans.response;
 
 import kudos.model.User;
+import kudos.model.status.UserStatus;
 
 public class UserResponse extends Response {
 
-    protected String id;
-    protected String firstName;
-    protected String lastName;
-    protected String email;
+    private String id;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String birthday;
+    private String startedToWorkDate;
+    private boolean isCompleted;
+    private boolean canFollow;
+    private String followingSince;
+    private int totalKudos;
+    private int weeklyKudos;
+    private int level;
+    private int experiencePoints;
+    private int experiencePointsToLevelUp;
+    private int previousLevelExperiencePoints;
 
-    protected String birthday;
-    protected String startedToWorkDate;
-
-    protected boolean subscribing;
-    protected boolean isCompleted;
-    protected String lastSeenTransactionTimestamp;
-
-    public UserResponse(User user){
+    public UserResponse(User user) {
         this.id = user.getId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
-        this.birthday = user.getBirthday();
-        this.startedToWorkDate = user.getStartedToWorkDate();
-        this.subscribing = user.isSubscribing();
-        this.isCompleted = user.isCompleted();
-        this.lastSeenTransactionTimestamp = user.getLastSeenTransactionTimestamp();
+        this.totalKudos = user.getTotalKudos();
+        this.weeklyKudos = user.getWeeklyKudos();
+        this.isCompleted = user.getStatus().equals(UserStatus.COMPLETED);
+        this.level = user.getLevel();
+        this.experiencePoints = user.getExperiencePoints();
+        this.experiencePointsToLevelUp = user.getExperiencePointsToLevelUp();
+        this.previousLevelExperiencePoints = user.getPreviousLevelExperiencePoints();
     }
 
     public String getId() {
@@ -34,6 +41,14 @@ public class UserResponse extends Response {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getFirstName() {
@@ -52,14 +67,6 @@ public class UserResponse extends Response {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getBirthday() {
         return birthday;
     }
@@ -76,14 +83,6 @@ public class UserResponse extends Response {
         this.startedToWorkDate = startedToWorkDate;
     }
 
-    public boolean isSubscribing() {
-        return subscribing;
-    }
-
-    public void setSubscribing(boolean subscribing) {
-        this.subscribing = subscribing;
-    }
-
     public boolean isCompleted() {
         return isCompleted;
     }
@@ -92,11 +91,67 @@ public class UserResponse extends Response {
         isCompleted = completed;
     }
 
-    public String getLastSeenTransactionTimestamp() {
-        return lastSeenTransactionTimestamp;
+    public boolean isCanFollow() {
+        return canFollow;
     }
 
-    public void setLastSeenTransactionTimestamp(String lastSeenTransactionTimestamp) {
-        this.lastSeenTransactionTimestamp = lastSeenTransactionTimestamp;
+    public void setCanFollow(boolean canFollow) {
+        this.canFollow = canFollow;
+    }
+
+    public String getFollowingSince() {
+        return followingSince;
+    }
+
+    public void setFollowingSince(String followingSince) {
+        this.followingSince = followingSince;
+    }
+
+    public int getTotalKudos() {
+        return totalKudos;
+    }
+
+    public void setTotalKudos(int totalKudos) {
+        this.totalKudos = totalKudos;
+    }
+
+    public int getWeeklyKudos() {
+        return weeklyKudos;
+    }
+
+    public void setWeeklyKudos(int weeklyKudos) {
+        this.weeklyKudos = weeklyKudos;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getExperiencePoints() {
+        return experiencePoints;
+    }
+
+    public void setExperiencePoints(int experiencePoints) {
+        this.experiencePoints = experiencePoints;
+    }
+
+    public int getExperiencePointsToLevelUp() {
+        return experiencePointsToLevelUp;
+    }
+
+    public void setExperiencePointsToLevelUp(int experiencePointsToLevelUp) {
+        this.experiencePointsToLevelUp = experiencePointsToLevelUp;
+    }
+
+    public int getPreviousLevelExperiencePoints() {
+        return previousLevelExperiencePoints;
+    }
+
+    public void setPreviousLevelExperiencePoints(int previousLevelExperiencePoints) {
+        this.previousLevelExperiencePoints = previousLevelExperiencePoints;
     }
 }

@@ -1,26 +1,20 @@
 package kudos.repositories;
 
 import kudos.model.User;
+import kudos.model.status.UserStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository extends MongoRepository<User, String>, CustomUserRepository {
+public interface UserRepository extends MongoRepository<User, String> {
 
-    User findByFirstName(String firstName);
+    Optional<User> findById(String id);
 
-    List<User> findByLastName(String lastName);
-
-    User findById(String id);
-
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     Optional<User> findUserByEmailHash(String emailHash);
 
-    List<User> findUsersByIsConfirmed(Boolean isConfirmed);
+    List<User> findUsersByStatusNot(UserStatus status);
 
-    @Query(value = "{'_id': ?0}", count = true)
-    Long countUsersByEmail(String email);
+    List<User> findUsersByFirstNameLikeIgnoreCaseAndIdNot(String emailPredicate, String id);
 }

@@ -3,43 +3,32 @@ package kudos.services;
 import kudos.model.Idea;
 import kudos.model.User;
 import kudos.repositories.WisdomWallRepository;
-import kudos.web.exceptions.UserException;
 import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class WisdomWallService {
 
     @Autowired
-    private WisdomWallRepository repository;
-    @Autowired
-    private UsersService usersService;
+    private WisdomWallRepository wisdomwallRepository;
 
-    @Autowired
-    @Qualifier(value = "DBTimeFormatter")
-    DateTimeFormatter dateTimeFormatter;
-
-
-    public Idea addIdeaToWisdomWall(String author, String idea) throws UserException {
-        User postedBy = usersService.getLoggedUser().get();
-        return repository.insert(new Idea(author, postedBy.getEmail(), idea, LocalDateTime.now().toString(dateTimeFormatter)));
+    public Idea addIdea(User creator, String author, String phrase) {
+        return wisdomwallRepository.save(new Idea(creator, author, phrase, LocalDateTime.now().toString()));
     }
 
-    /**
-     * Returns list of ideas posted by certain user
-     * @return List
-     */
-    public List<Idea> getIdeasByPostedBy(String postedBy) {
-        return repository.findIdeasByPostedByEmail(postedBy);
-    }
-
-    public Idea updateIdeaCreationTime(Idea idea) {
-        return repository.save(idea);
+    public Idea getRandomIdea(User creator) {
+        List<Idea> ideas = wisdomwallRepository.findAll();
+        Random randomGenerator = new Random();
+        if (ideas.size() > 0) {
+            int index = randomGenerator.nextInt(ideas.size());
+            return ideas.get(index);
+        }
+        return new Idea(creator, "Open Kudos", "There is no ideas, maybe it is time to add new one?",
+                LocalDateTime.now().toString());
     }
 
 }
